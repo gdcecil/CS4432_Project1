@@ -7,7 +7,7 @@ import simpledb.file.*;
  * @author Edward Sciore
  *
  */
-class BasicBufferMgr {
+class BasicBufferMgr extends AdvancedBufferMgr{
    protected Buffer[] bufferpool;
    protected int numAvailable;
    

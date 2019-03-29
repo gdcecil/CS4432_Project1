@@ -17,19 +17,6 @@ public class CreateTestTable {
 			String s = "create table TEST(ID int, Name varchar(20), Year int)";
 			stmt.executeUpdate(s);
 			System.out.println("Table TEST created.");
-<<<<<<< HEAD
-			
-			String setx = "INSERT INTO TEST(ID, Name, Year) VALUES (10, 'Fred', 2000)";
-			stmt.executeUpdate(setx);
-			System.out.println("Inserted Fred");
-			
-			String getx = "SELECT Name FROM TEST WHERE ID = 10";
-			ResultSet rs = stmt.executeQuery(getx);
-			while (rs.next()) {
-				String name = rs.getString("Name");
-				System.out.println(name);
-			}
-=======
 
 			// insert some records into TEST
 			s = "insert into TEST(ID, Name, Year) values ";
@@ -65,7 +52,6 @@ public class CreateTestTable {
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
 
->>>>>>> 05eb005c758c761e0fcd08b2820506b98a0af9f7
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
