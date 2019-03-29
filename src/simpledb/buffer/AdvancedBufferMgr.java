@@ -6,7 +6,8 @@ import java.util.HashMap;
 
 public class AdvancedBufferMgr extends BasicBufferMgr {
 	private LinkedList<Buffer> emptyBuffers;
-	private HashMap<Integer,Buffer> fullBuffers;
+	private LinkedList<Buffer> unpinnedBuffers;
+	private HashMap<Integer,Buffer> fullBuffers;	
 	AdvancedBufferMgr(int numbuffs) {
 		super(numbuffs);
 		for (Buffer buff : bufferpool)
@@ -46,7 +47,12 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	
 	//Returns the next 
 	private Buffer chooseUnpinnedBuffer() {
-		return emptyBuffers.pop();
+		Buffer buff = unpinnedBuffers.remove();
+		return buff;
 	}	
+	
+	private Buffer chooseEmptyBuffer() {
+		return emptyBuffers.pop();
+	}
 
 }
