@@ -2,6 +2,7 @@ package simpledb.buffer;
 
 import simpledb.server.SimpleDB;
 import simpledb.file.*;
+import java.util.Date;
 
 /**
  * An individual buffer.
@@ -19,6 +20,8 @@ public class Buffer {
    private int pins = 0;
    private int modifiedBy = -1;  // negative means not modified
    private int logSequenceNumber = -1; // negative means no corresponding log record
+   private boolean secondChance = true;
+   private final long timestamp;
 
    /**
     * Creates a new buffer, wrapping a new 
@@ -34,7 +37,10 @@ public class Buffer {
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
     */
-   public Buffer() {}
+   public Buffer() {
+	   Date date = new Date(); 
+	   timestamp = date.getTime();
+   }
    
    /**
     * Returns the integer value at the specified offset of the
@@ -186,5 +192,55 @@ public class Buffer {
       fmtr.format(contents);
       blk = contents.append(filename);
       pins = 0;
+   }
+   
+   /**
+    * set the second chance bit to the given value
+    * 
+    * @param boolean bit, set the second chance bit to this value
+    * 
+    * @return nothing
+    */
+   public void setSecondChance(boolean bit) 
+   {
+	   secondChance = bit;
+   }
+   /**
+    * 
+    * @return true if this buffer has a second chance
+    */
+   public boolean hasSecondChance() 
+   {
+	   return secondChance;
+   }
+   
+   /**
+    * Check if there's a block in the buffer
+    * @return true if there is no block in this buffer
+    */
+   public boolean isEmpty() 
+   {
+	   return (blk == null);
+   }
+   
+   /**
+    * Get timestamp of this buffer 
+    * 
+    * @return long timestamp
+    */
+   public long getTimestamp() 
+   {
+	   return timestamp;
+   }
+   
+   @Override
+   public String toString()
+   {
+	   String str = "Timestamp: " + timestamp + "\n" +
+			   "Pin Count: " + pins + "\n";
+	   if (blk == null)
+		   str += "No block in buffer\n";
+	   else str += "Holding Block" + blk.number() + "\n";
+	   return str;
    }
 }
