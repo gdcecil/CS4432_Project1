@@ -84,25 +84,52 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		return emptyBuffers.pop(); 
 	}
 	
+	
+	// Assumption: Blocks are not removed from buffer until replaced by another block
+	// This means that once filled, a buffer will never be empty unless being replaced
 	private Buffer chooseUnpinnedBufferClock() {
-		int size = clock.size();
-		return clock.get(0);
-//		while () {
-//			
-//		}
+		Buffer buff = clock.get(index);
+		if (clock.get(index).isEmpty()) {
+			index++;
+			if (clock.size() == index) {
+				index = 0;
+			}
+			return buff;
+		}
+		int initialIndex = index;
+		boolean fullFlag = true;
+		boolean endFlag = true;
+		while (endFlag) {
+			buff = clock.get(index);
+			if (!buff.isPinned()) {
+				fullFlag = false;
+				if (buff.hasSecondChance()) {
+					buff.setSecondChance(false);
+				} else {
+					return buff;
+				}
+			}	
+			index = (index + 1) % clock.size();
+			if (index == initialIndex) {
+				if (fullFlag == true) {
+					return null;
+				}
+			}
+		}
+		return null;
 	}
 	
+	// Replaced by clock replacement policy
 	private Buffer chooseEmptyBufferClock() {
-		if (emptyBuffers.size() == 0) {
-			return null;
-		}
-		emptyBuffers.pop();
 		Buffer buff = clock.get(index);
-		index++;
-		if (clock.size() == index) {
-			index = 0;
+		if (clock.get(index).isEmpty()) {
+			index++;
+			if (clock.size() == index) {
+				index = 0;
+			}
+			return buff;
 		}
-		return buff;
+		return null;
 	}
 
 }
