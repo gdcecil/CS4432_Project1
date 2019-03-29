@@ -12,6 +12,17 @@ public class CreateTestTable {
 			String s = "create table TEST(ID int, Name varchar(20), Year int)";
 			stmt.executeUpdate(s);
 			System.out.println("Table TEST created.");
+			
+			String setx = "INSERT INTO TEST(ID, Name, Year) VALUES (10, 'Fred', 2000)";
+			stmt.executeUpdate(setx);
+			System.out.println("Inserted Fred");
+			
+			String getx = "SELECT Name FROM TEST WHERE ID = 10";
+			ResultSet rs = stmt.executeQuery(getx);
+			while (rs.next()) {
+				String name = rs.getString("Name");
+				System.out.println(name);
+			}
 		}
 		catch(SQLException e) {
 			e.printStackTrace();

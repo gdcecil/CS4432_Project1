@@ -16,6 +16,24 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	}
 	
 	
+	synchronized Buffer pin(Block blk) {
+		//find the blk if it already in a buffer
+		Buffer buff = findExistingBuffer(blk);
+		if (buff == null) {
+			//if not in memory, pin to a new buffer
+			buff = chooseUnpinnedBuffer();
+			if (buff == null) {
+				return null;
+			}
+			buff.assignToBlock(blk);
+		}
+		if (buff.isPinned()) {
+			
+		}
+		buff.pin();
+		return buff;
+	}
+	
 	private Buffer findExistingBuffer(Block blk)
 	{
 		if (blk != null && fullBuffers.containsKey(blk.hashCode())) 
@@ -26,10 +44,9 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		return null; 
 	}
 	
+	//Returns the next 
 	private Buffer chooseUnpinnedBuffer() {
 		return emptyBuffers.pop();
-	}
-	
-	
+	}	
 
 }
