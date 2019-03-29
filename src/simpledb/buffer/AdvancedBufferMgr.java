@@ -3,17 +3,23 @@ package simpledb.buffer;
 import simpledb.file.*;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.util.ArrayList;
+
 
 public class AdvancedBufferMgr extends BasicBufferMgr {
 	private LinkedList<Buffer> emptyBuffers;
 	private LinkedList<Buffer> unpinnedBuffers;
-	private HashMap<Integer,Buffer> fullBuffers;	
+	private HashMap<Integer,Buffer> fullBuffers;
+	private ArrayList<Buffer> clock = new ArrayList<Buffer>();
+	private int index;
 	AdvancedBufferMgr(int numbuffs) {
 		super(numbuffs);
 		for (Buffer buff : bufferpool)
 		{
 			emptyBuffers.add(buff);
+			clock.add(buff);
 		}
+		index = 0;
 	}
 	
 	
@@ -21,17 +27,35 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		//find the blk if it already in a buffer
 		Buffer buff = findExistingBuffer(blk);
 		if (buff == null) {
-			//if not in memory, pin to a new buffer
-			buff = chooseUnpinnedBuffer();
+			//if not in memory, look for an empty space
+			buff = chooseEmptyBuffer();
 			if (buff == null) {
-				return null;
+				buff = chooseUnpinnedBuffer();
+				if (buff == null) {
+					return null;
+				}
 			}
 			buff.assignToBlock(blk);
 		}
-		if (buff.isPinned()) {
-			
-		}
 		buff.pin();
+		return buff;
+	}
+	
+	//Uses clock replacement policy to pin a new block
+	synchronized Buffer clockPin(Block blk) {
+		//Check if block is already in buffer
+		Buffer buff = findExistingBuffer(blk);
+		if (buff == null) {
+			//if not in memory already, look for next empty space
+			buff = chooseEmptyBufferClock();
+			if (buff == null) {
+				//if there are no empty buffers, run replacement policy
+				buff = chooseUnpinnedBufferClock();
+				if (buff == null) {
+					return null;
+				}
+			}
+		}
 		return buff;
 	}
 	
@@ -47,12 +71,38 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	
 	//Returns the next 
 	private Buffer chooseUnpinnedBuffer() {
-		Buffer buff = unpinnedBuffers.remove();
-		return buff;
+		if (unpinnedBuffers.size() == 0) {
+			return null;
+		}
+		return unpinnedBuffers.remove();
 	}	
 	
 	private Buffer chooseEmptyBuffer() {
-		return emptyBuffers.pop();
+		if (emptyBuffers.size() == 0) {
+			return null;
+		}
+		return emptyBuffers.pop(); 
+	}
+	
+	private Buffer chooseUnpinnedBufferClock() {
+		int size = clock.size();
+		return clock.get(0);
+//		while () {
+//			
+//		}
+	}
+	
+	private Buffer chooseEmptyBufferClock() {
+		if (emptyBuffers.size() == 0) {
+			return null;
+		}
+		emptyBuffers.pop();
+		Buffer buff = clock.get(index);
+		index++;
+		if (clock.size() == index) {
+			index = 0;
+		}
+		return buff;
 	}
 
 }
