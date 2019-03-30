@@ -1,5 +1,9 @@
 package simpledb.buffer;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+
 import simpledb.file.*;
 
 /**
@@ -115,5 +119,14 @@ class BasicBufferMgr {
          if (!buff.isPinned())
          return buff;
       return null;
+   }
+   
+   public String toString() {
+		String str = "";
+		for (Buffer buff: bufferpool) {
+			str += buff.toString();
+		}
+		System.out.println(str);
+		return str;
    }
 }

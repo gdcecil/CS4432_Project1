@@ -57,6 +57,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+         bufferMgr.toString();
          return buff;
       }
       catch(InterruptedException e) {
@@ -75,6 +76,7 @@ public class BufferMgr {
     */
    public synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
       try {
+    	 System.out.println("pinning new");
          long timestamp = System.currentTimeMillis();
          Buffer buff = bufferMgr.pinNew(filename, fmtr);
          while (buff == null && !waitingTooLong(timestamp)) {
@@ -83,6 +85,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+         bufferMgr.toString();
          return buff;
       }
       catch(InterruptedException e) {
