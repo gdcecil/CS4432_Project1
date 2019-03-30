@@ -26,6 +26,20 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		}
 		index = 0;
 	}
+	
+	/**
+	 * flush dirty buffers modified by specified transaction, in the 
+	 * clock buffer pool 
+	 * 
+	 * @param txnum transactionid
+	 */
+	@Override
+	synchronized void flushAll(int txnum) 
+	{
+		for (Buffer buff : clock)
+			if (buff.isModifiedBy(txnum))
+				buff.flush();
+	}
 
 	/**
 	 * pin a given block to a frame in the buffer pool 
