@@ -41,6 +41,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			buff.assignToBlock(blk);
 		}
 		buff.pin();
+		buff.setSecondChance(true);
 		return buff;
 	}
 	

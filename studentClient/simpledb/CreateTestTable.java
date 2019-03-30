@@ -35,13 +35,13 @@ public class CreateTestTable {
 			System.out.println("Table TEST Populated.");
 
 			// create a five attribute table 
-			s = "create table TESTMORE(ID int, Status varchar(8), Cost int)";
+			s = "create table TESTMORE(moreID int, Status varchar(8), Cost int)";
 			stmt.executeUpdate(s);
 			System.out.println("Table TESTMORE created.");
 
 
 			// insert some records into TESTMORE
-			s = "insert into TESTMORE(ID, Status, Cost) values ";
+			s = "insert into TESTMORE(moreID, Status, Cost) values ";
 			String[] testMoreVals = {
 					"(1, 'dead', -232)",
 					"(3, 'dying' , 100)", 
@@ -51,7 +51,21 @@ public class CreateTestTable {
 			for (int i = 1; i < testMoreVals.length; i++)
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
-
+			
+			//execute a query
+			s = "select Name, Status "
+					+ "from TEST, TESTMORE "
+					+ "where ID =moreID";
+			ResultSet rs = stmt.executeQuery(s);
+			
+			//print the results of the query
+			while(rs.next())
+			{
+				String name = rs.getString("Name");
+				String status = rs.getString("Status");
+				System.out.println(name + "\t" + status);
+			}
+			rs.close();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
