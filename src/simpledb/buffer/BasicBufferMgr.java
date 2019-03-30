@@ -110,7 +110,7 @@ class BasicBufferMgr {
       return null;
    }
    
-   private Buffer chooseUnpinnedBuffer() {
+   protected Buffer chooseUnpinnedBuffer() {
       for (Buffer buff : bufferpool)
          if (!buff.isPinned())
          return buff;

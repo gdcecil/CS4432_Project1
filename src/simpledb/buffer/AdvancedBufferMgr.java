@@ -51,7 +51,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			buff = chooseEmptyBufferClock();
 			if (buff == null) {
 				//if there are no empty buffers, run replacement policy
-				buff = chooseUnpinnedBufferClock();
+				buff = chooseUnpinnedBuffer();
 				if (buff == null) {
 					return null;
 				}
@@ -70,14 +70,6 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		return null; 
 	}
 	
-	//Returns the next 
-	private Buffer chooseUnpinnedBuffer() {
-		if (unpinnedBuffers.size() == 0) {
-			return null;
-		}
-		return unpinnedBuffers.remove();
-	}	
-	
 	private Buffer chooseEmptyBuffer() {
 		if (emptyBuffers.size() == 0) {
 			return null;
@@ -88,35 +80,68 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	
 	// Assumption: Blocks are not removed from buffer until replaced by another block
 	// This means that once filled, a buffer will never be empty unless being replaced
-	private Buffer chooseUnpinnedBufferClock() {
+	/**
+	 * find either an empty buffer frame or the next buffer to replace 
+	 * according to the clock replacement policy
+	 * 
+	 * @return an empty buffer in the pool or one that is unpinned, or null if
+	 * 		   there are no unpinned buffers in the pool
+	 */
+	@Override
+	protected Buffer chooseUnpinnedBuffer() {
+		
+		//check the buffer that the clock is currently looking at
 		Buffer buff = clock.get(index);
+		
+		
+		// we check if the current buffer frame is empty
+		// because of the way the clock replacement algorithm works 
+		// either the frame the clock is currently pointing at will be empty
+		// or no frame will be empty
 		if (clock.get(index).isEmpty()) {
-			index++;
-			if (clock.size() == index) {
-				index = 0;
-			}
+			
+			//increment the clock pointer
+			index = (index + 1) % clock.size();
+			
 			return buff;
 		}
+		
+		// if there's no empty frame use the clock replacement policy
+		// to find a buffer frame to replace
 		int initialIndex = index;
 		boolean fullFlag = true;
 		boolean endFlag = true;
+		
 		while (endFlag) {
+			
+			
 			buff = clock.get(index);
+			
+			//if the buffer isn't pinned, 
+			// check if the second chance bit is set 
+			// if it is, set it to false and move to the next 
+			// buffer in the pool. If it isn't, return this buffer
 			if (!buff.isPinned()) {
 				fullFlag = false;
 				if (buff.hasSecondChance()) {
 					buff.setSecondChance(false);
 				} else {
+					index = (index + 1) % clock.size();
 					return buff;
 				}
 			}	
+			
+			
 			index = (index + 1) % clock.size();
+			// if we have gone through all buffers without finding 
+			// an unpinned one, return null.
 			if (index == initialIndex) {
 				if (fullFlag == true) {
 					return null;
 				}
 			}
 		}
+		
 		return null;
 	}
 	
