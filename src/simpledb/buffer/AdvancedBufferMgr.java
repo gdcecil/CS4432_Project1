@@ -11,10 +11,12 @@ import java.util.ArrayList;
 
 public class AdvancedBufferMgr extends BasicBufferMgr {
 	private LinkedList<Buffer> emptyBuffers;
-	private LinkedList<Buffer> unpinnedBuffers;
+
 	private HashMap<Integer,Buffer> fullBuffers;
 	private ArrayList<Buffer> clock = new ArrayList<Buffer>();
+
 	private int index;
+
 	AdvancedBufferMgr(int numbuffs) {
 		super(numbuffs);
 		for (Buffer buff : bufferpool)
@@ -24,27 +26,39 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		}
 		index = 0;
 	}
-	
-	
+
+	/**
+	 * pin a given block to a frame in the buffer pool 
+	 * 
+	 * @param Block blk, block to pin 
+	 * 
+	 * @return buffer where the block was assigned, 
+	 * or null if there are no unpinned buffers
+	 */
 	synchronized Buffer pin(Block blk) {
 		//find the blk if it already in a buffer
 		Buffer buff = findExistingBuffer(blk);
+		
 		if (buff == null) {
-			//if not in memory, look for an empty space
-			buff = chooseEmptyBuffer();
+			// if the block doesn't exist in the buffer, 
+			// find an unpinnedbuffer and pin it
+			buff = chooseUnpinnedBuffer();
 			if (buff == null) {
-				buff = chooseUnpinnedBuffer();
-				if (buff == null) {
-					return null;
-				}
+				// if there are no unpinned buffers return null
+				return null;
 			}
+			// assign this block to the buffer we found
 			buff.assignToBlock(blk);
+			fullBuffers.put(blk.hashCode(), buff);
 		}
+		// pin this buffer frame
 		buff.pin();
+		// set its second chance bit
 		buff.setSecondChance(true);
+		
 		return buff;
 	}
-	
+
 	//Uses clock replacement policy to pin a new block
 	synchronized Buffer clockPin(Block blk) {
 		//Check if block is already in buffer
@@ -62,7 +76,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		}
 		return buff;
 	}
-	
+
 	private Buffer findExistingBuffer(Block blk)
 	{
 		if (blk != null && fullBuffers.containsKey(blk.hashCode())) 
@@ -72,15 +86,8 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		}
 		return null; 
 	}
-	
-	private Buffer chooseEmptyBuffer() {
-		if (emptyBuffers.size() == 0) {
-			return null;
-		}
-		return emptyBuffers.pop(); 
-	}
-	
-	
+
+
 	// Assumption: Blocks are not removed from buffer until replaced by another block
 	// This means that once filled, a buffer will never be empty unless being replaced
 	/**
@@ -92,34 +99,34 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 */
 	@Override
 	protected Buffer chooseUnpinnedBuffer() {
-		
+
 		//check the buffer that the clock is currently looking at
 		Buffer buff = clock.get(index);
-		
-		
+
+
 		// we check if the current buffer frame is empty
 		// because of the way the clock replacement algorithm works 
 		// either the frame the clock is currently pointing at will be empty
 		// or no frame will be empty
 		if (clock.get(index).isEmpty()) {
-			
+
 			//increment the clock pointer
 			index = (index + 1) % clock.size();
-			
+
 			return buff;
 		}
-		
+
 		// if there's no empty frame use the clock replacement policy
 		// to find a buffer frame to replace
 		int initialIndex = index;
 		boolean fullFlag = true;
 		boolean endFlag = true;
-		
+
 		while (endFlag) {
-			
-			
+
+
 			buff = clock.get(index);
-			
+
 			//if the buffer isn't pinned, 
 			// check if the second chance bit is set 
 			// if it is, set it to false and move to the next 
@@ -133,8 +140,8 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 					return buff;
 				}
 			}	
-			
-			
+
+
 			index = (index + 1) % clock.size();
 			// if we have gone through all buffers without finding 
 			// an unpinned one, return null.
@@ -144,10 +151,10 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 				}
 			}
 		}
-		
+
 		return null;
 	}
-	
+
 	// Replaced by clock replacement policy
 	private Buffer chooseEmptyBufferClock() {
 		Buffer buff = clock.get(index);
@@ -170,7 +177,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		try {
 			PrintWriter writer = new PrintWriter("buffer-output", "UTF-8");
 			writer.println(str);
-			
+
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
