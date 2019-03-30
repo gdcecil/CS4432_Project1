@@ -35,6 +35,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 * @return buffer where the block was assigned, 
 	 * or null if there are no unpinned buffers
 	 */
+	@Override
 	synchronized Buffer pin(Block blk) {
 		//find the blk if it already in a buffer
 		Buffer buff = findExistingBuffer(blk);
@@ -47,6 +48,12 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 				// if there are no unpinned buffers return null
 				return null;
 			}
+		
+			// if the buffer is not empty remove its entry from the hash table
+			if (! buff.isEmpty()) 
+			{
+				fullBuffers.remove(buff.block().hashCode());
+			}
 			// assign this block to the buffer we found
 			buff.assignToBlock(blk);
 			fullBuffers.put(blk.hashCode(), buff);
@@ -58,26 +65,56 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		
 		return buff;
 	}
-
-	//Uses clock replacement policy to pin a new block
-	synchronized Buffer clockPin(Block blk) {
-		//Check if block is already in buffer
-		Buffer buff = findExistingBuffer(blk);
-		if (buff == null) {
-			//if not in memory already, look for next empty space
-			buff = chooseEmptyBufferClock();
-			if (buff == null) {
-				//if there are no empty buffers, run replacement policy
-				buff = chooseUnpinnedBuffer();
-				if (buff == null) {
-					return null;
-				}
-			}
+	/**
+	 * Override the super pinNew method to be compatible 
+	 * with the clock replacement policy 
+	 *
+	 * @parem filename the name of the file 
+	 * @param fmtr formatter object to format the new block 
+	 * 
+	 * @return the pinned buffer or null if there are no unpinned buffers
+	 */
+	@Override
+	synchronized Buffer pinNew(String filename, PageFormatter fmtr)
+	{
+		// choose an unpinned buffer 
+		Buffer buff = chooseUnpinnedBuffer(); 
+		
+		// if there's no unpinned buffer, return 
+		if (buff == null)
+		{
+			return null;
 		}
+		
+		// if the buffer is not empty remove its entry from the hash table
+		if (! buff.isEmpty()) 
+		{
+			fullBuffers.remove( buff.block().hashCode());
+		}
+		// assign buffer to a new block
+		buff.assignToNew(filename, fmtr);
+		
+		
+		//but the buffer in the full buffers hash table 
+		fullBuffers.put(buff.block().hashCode(), buff);
+		
+		// pin it 
+		buff.pin();
+		
+		// set its second chance bit
+		buff.setSecondChance(true);
 		return buff;
 	}
 
-	private Buffer findExistingBuffer(Block blk)
+	/**
+	 * find an existing buffer in the pool that holds the given block
+	 * 
+	 * @param blk block to check the buffer pool for
+	 * 
+	 * @return the buffer with the given block or null if it doesn't
+	 */
+	@Override
+	protected Buffer findExistingBuffer(Block blk)
 	{
 		if (blk != null && fullBuffers.containsKey(blk.hashCode())) 
 		{
