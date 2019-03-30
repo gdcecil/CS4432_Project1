@@ -2,7 +2,6 @@ package simpledb.buffer;
 
 import simpledb.server.SimpleDB;
 import simpledb.file.*;
-import java.util.Date;
 
 /**
  * An individual buffer.
@@ -21,7 +20,7 @@ public class Buffer {
    private int modifiedBy = -1;  // negative means not modified
    private int logSequenceNumber = -1; // negative means no corresponding log record
    private boolean secondChance = true;
-   private final long timestamp;
+   private final int buffID;
 
    /**
     * Creates a new buffer, wrapping a new 
@@ -37,9 +36,8 @@ public class Buffer {
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
     */
-   public Buffer() {
-	   Date date = new Date(); 
-	   timestamp = date.getTime();
+   public Buffer(int id) {
+	   buffID = id;
    }
    
    /**
@@ -226,17 +224,17 @@ public class Buffer {
    /**
     * Get timestamp of this buffer 
     * 
-    * @return long timestamp
+    * @return int timestamp
     */
-   public long getTimestamp() 
+   public int id() 
    {
-	   return timestamp;
+	   return buffID;
    }
    
    @Override
    public String toString()
    {
-	   String str = "Timestamp: " + timestamp + "\n" +
+	   String str = "Buffer ID: " + buffID + "\n" +
 			   "Pin Count: " + pins + "\n";
 	   if (blk == null)
 		   str += "No block in buffer\n";
