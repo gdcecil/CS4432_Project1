@@ -1,7 +1,7 @@
 import java.sql.*;
 import simpledb.remote.SimpleDriver;
 
-public class FindTest {
+public class TestSingleBlock {
 	public static void main(String args[]) {
 		
 		// THE BUFFER SIZE IS 8 <- found in simpledb.server/SimpleDB.java - BUFFER_SIZE
