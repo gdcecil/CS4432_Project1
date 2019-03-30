@@ -238,7 +238,10 @@ public class Buffer {
 			   "Pin Count: " + pins + "\n";
 	   if (blk == null)
 		   str += "No block in buffer\n";
-	   else str += "Holding Block" + blk.number() + "\n";
+	   else {
+		   str += "Holding Block" + blk.number() + "\n";
+		   str += "BlockID " + blk.id() + "\n";
+	   }
 	   return str;
    }
 }
