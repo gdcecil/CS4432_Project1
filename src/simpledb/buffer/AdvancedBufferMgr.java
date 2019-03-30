@@ -3,6 +3,9 @@ package simpledb.buffer;
 import simpledb.file.*;
 import java.util.LinkedList;
 import java.util.HashMap;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 
@@ -158,4 +161,23 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		return null;
 	}
 
+	@Override
+	public String toString() {
+		String str = "";
+		for (Buffer buff: clock) {
+			str += buff.toString();
+		}
+		try {
+			PrintWriter writer = new PrintWriter("buffer-output", "UTF-8");
+			writer.println(str);
+			
+		} catch (FileNotFoundException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		} catch (UnsupportedEncodingException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		return str;
+	}
 }
