@@ -12,7 +12,7 @@ import java.util.ArrayList;
 public class AdvancedBufferMgr extends BasicBufferMgr {
 	private LinkedList<Buffer> emptyBuffers;
 
-	private HashMap<Integer,Buffer> fullBuffers;
+	private HashMap<Integer,Buffer> fullBuffers = new HashMap<Integer,Buffer>();
 	private ArrayList<Buffer> clock = new ArrayList<Buffer>();
 
 	private int index;
@@ -21,7 +21,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		super(numbuffs);
 		for (Buffer buff : bufferpool)
 		{
-			emptyBuffers.add(buff);
+			//emptyBuffers.add(buff);
 			clock.add(buff);
 		}
 		index = 0;
