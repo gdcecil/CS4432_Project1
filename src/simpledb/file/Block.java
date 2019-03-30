@@ -8,8 +8,10 @@ package simpledb.file;
  * @author Edward Sciore
  */
 public class Block {
+   private static int blockCount = 0;
    private String filename;
    private int blknum;
+   private int blkID;
    
    /**
     * Constructs a block reference 
@@ -20,6 +22,8 @@ public class Block {
    public Block(String filename, int blknum) {
       this.filename = filename;
       this.blknum   = blknum;
+      this.blkID = Block.blockCount;
+      Block.blockCount++;
    }
    
    /**
@@ -38,6 +42,9 @@ public class Block {
       return blknum;
    }
    
+   public int id() {
+	   return blkID;
+   }
    public boolean equals(Object obj) {
       Block blk = (Block) obj;
       return filename.equals(blk.filename) && blknum == blk.blknum;
