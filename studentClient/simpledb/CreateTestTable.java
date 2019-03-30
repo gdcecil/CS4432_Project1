@@ -52,20 +52,6 @@ public class CreateTestTable {
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
 			
-			//execute a query
-			s = "select Name, Status "
-					+ "from TEST, TESTMORE "
-					+ "where ID =moreID";
-			ResultSet rs = stmt.executeQuery(s);
-			
-			//print the results of the query
-			while(rs.next())
-			{
-				String name = rs.getString("Name");
-				String status = rs.getString("Status");
-				System.out.println(name + "\t" + status);
-			}
-			rs.close();
 		}
 		catch(SQLException e) {
 			e.printStackTrace();

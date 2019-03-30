@@ -170,7 +170,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		try {
 			PrintWriter writer = new PrintWriter("buffer-output", "UTF-8");
 			writer.println(str);
-			
+			writer.close();
 		} catch (FileNotFoundException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
