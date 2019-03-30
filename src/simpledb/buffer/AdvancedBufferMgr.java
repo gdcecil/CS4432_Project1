@@ -26,7 +26,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		}
 		index = 0;
 	}
-	
+
 	/**
 	 * flush dirty buffers modified by specified transaction, in the 
 	 * clock buffer pool 
@@ -53,7 +53,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	synchronized Buffer pin(Block blk) {
 		//find the blk if it already in a buffer
 		Buffer buff = findExistingBuffer(blk);
-		
+
 		if (buff == null) {
 			// if the block doesn't exist in the buffer, 
 			// find an unpinnedbuffer and pin it
@@ -62,7 +62,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 				// if there are no unpinned buffers return null
 				return null;
 			}
-		
+
 			// if the buffer is not empty remove its entry from the hash table
 			if (! buff.isEmpty()) 
 			{
@@ -73,10 +73,11 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			fullBuffers.put(blk.hashCode(), buff);
 		}
 		// pin this buffer frame
+		if (!buff.isPinned()) numAvailable--;
 		buff.pin();
 		// set its second chance bit
 		buff.setSecondChance(true);
-		
+
 		return buff;
 	}
 	/**
@@ -93,13 +94,13 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	{
 		// choose an unpinned buffer 
 		Buffer buff = chooseUnpinnedBuffer(); 
-		
+
 		// if there's no unpinned buffer, return 
 		if (buff == null)
 		{
 			return null;
 		}
-		
+
 		// if the buffer is not empty remove its entry from the hash table
 		if (! buff.isEmpty()) 
 		{
@@ -107,14 +108,15 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		}
 		// assign buffer to a new block
 		buff.assignToNew(filename, fmtr);
-		
-		
+
+		numAvailable--;
+
 		//but the buffer in the full buffers hash table 
 		fullBuffers.put(buff.block().hashCode(), buff);
-		
+
 		// pin it 
 		buff.pin();
-		
+
 		// set its second chance bit
 		buff.setSecondChance(true);
 		return buff;
@@ -154,6 +156,11 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		//check the buffer that the clock is currently looking at
 		Buffer buff = clock.get(index);
 
+		// if there's no empty frame use the clock replacement policy
+		// to find a buffer frame to replace
+		if (available() == 0)
+			return null;
+
 
 		// we check if the current buffer frame is empty
 		// because of the way the clock replacement algorithm works 
@@ -167,10 +174,8 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			return buff;
 		}
 
-		// if there's no empty frame use the clock replacement policy
-		// to find a buffer frame to replace
-		int initialIndex = index;
-		boolean fullFlag = true;
+
+		//boolean fullFlag = true;
 		boolean endFlag = true;
 
 		while (endFlag) {
@@ -183,7 +188,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			// if it is, set it to false and move to the next 
 			// buffer in the pool. If it isn't, return this buffer
 			if (!buff.isPinned()) {
-				fullFlag = false;
+				//fullFlag = false;
 				if (buff.hasSecondChance()) {
 					buff.setSecondChance(false);
 				} else {
@@ -191,31 +196,9 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 					return buff;
 				}
 			}	
-
-
 			index = (index + 1) % clock.size();
-			// if we have gone through all buffers without finding 
-			// an unpinned one, return null.
-			if (index == initialIndex) {
-				if (fullFlag == true) {
-					return null;
-				}
-			}
 		}
 
-		return null;
-	}
-
-	// Replaced by clock replacement policy
-	private Buffer chooseEmptyBufferClock() {
-		Buffer buff = clock.get(index);
-		if (clock.get(index).isEmpty()) {
-			index++;
-			if (clock.size() == index) {
-				index = 0;
-			}
-			return buff;
-		}
 		return null;
 	}
 
