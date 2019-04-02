@@ -25,7 +25,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		super(numbuffs);
 		for (Buffer buff : bufferpool)
 		{
-			//emptyBuffers.add(buff);
+			emptyBuffers.add(buff);
 			clock.add(buff);
 		}
 		index = 0;
@@ -156,50 +156,48 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 */
 	@Override
 	protected Buffer chooseUnpinnedBuffer() {
-
-		//check the buffer that the clock is currently looking at
-		Buffer buff = clock.get(index);
-
-		// if there's no empty frame use the clock replacement policy
-		// to find a buffer frame to replace
+		
+		// if there's no unpinned frame return null
 		if (available() == 0)
 			return null;
-
-
-		// we check if the current buffer frame is empty
-		// because of the way the clock replacement algorithm works 
-		// either the frame the clock is currently pointing at will be empty
-		// or no frame will be empty
-		if (clock.get(index).isEmpty()) {
-
-			//increment the clock pointer
+		
+		// if the buffer currently pointed to is empty return it 
+		// and leaved index unchanged
+		// should only occur the first time this is called.
+		if (clock.get(index).isEmpty()) return clock.get(index);
+		
+		// if the next buffer is empty, return it and increment the index
+		if (clock.get((index + 1) % clock.size()).isEmpty()) {
+			
+			//increment the clock pointer 
 			index = (index + 1) % clock.size();
-
+			Buffer buff = clock.get(index);
 			return buff;
 		}
 
 
-		//boolean fullFlag = true;
+		//does nothing
 		boolean endFlag = true;
 
+		//while true
 		while (endFlag) {
 
+			//look at the current buffer in the clock
+			Buffer buff = clock.get(index);
 
-			buff = clock.get(index);
-
-			//if the buffer isn't pinned, 
-			// check if the second chance bit is set 
-			// if it is, set it to false and move to the next 
-			// buffer in the pool. If it isn't, return this buffer
-			if (!buff.isPinned()) {
-				//fullFlag = false;
-				if (buff.hasSecondChance()) {
+			// check that the current buff is not pinned
+			if (!buff.isPinned()) 
+			{
+				// check the second chance bit
+				if (buff.hasSecondChance()) 
+				{
+					// set the second chance bit to false if it was previously true
 					buff.setSecondChance(false);
-				} else {
-					index = (index + 1) % clock.size();
-					return buff;
 				}
+				// if it's unpinned and secondchance = false return the buffer
+				else return buff; 
 			}	
+			//look at the next buffer
 			index = (index + 1) % clock.size();
 		}
 
