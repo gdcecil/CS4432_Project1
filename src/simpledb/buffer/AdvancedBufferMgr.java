@@ -4,6 +4,10 @@ import simpledb.file.*;
 import java.util.LinkedList;
 import java.util.HashMap;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
@@ -204,11 +208,35 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 
 	@Override
 	public String toString() {
+		System.out.println("Printing out bufferpool\n");
 		String str = "";
 		for (Buffer buff: clock) {
 			str += buff.toString();
+			str += "////////////////////\n";
+			
 		}
 		System.out.println(str);
+		
+//		try {
+//			writeFile(str);
+//		} catch (IOException e) {
+//			// TODO Auto-generated catch block
+//			e.printStackTrace();
+//		} finally {
+//			
+//		}
+		
 		return str;
 	}
+	
+//	private String writeFile(String str) throws IOException {
+//		FileWriter writer = new FileWriter("C:/Users/Griffin/Desktop/sample.txt");
+//		
+//		writer.write(str);
+//		writer.close();
+//		System.out.println(str);
+//		System.setOut(new PrintStream(new FileOutputStream("C:/Users/Griffin/Desktop/sample.txt")));
+//		System.out.println(str);
+//		return str;
+//	}
 }

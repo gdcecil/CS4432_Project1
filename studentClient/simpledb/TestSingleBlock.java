@@ -15,18 +15,28 @@ public class TestSingleBlock {
 			Statement stmt = conn.createStatement();
 			
 			//execute a query
-			String s = "select Name, Status "
-					+ "from TEST, TESTMORE "
-					+ "where ID =moreID";
+			String s = "select Name "
+					+ "from TEST "
+					+ "where ID = 1";
 			ResultSet rs = stmt.executeQuery(s);
 			
 			//print the results of the query
 			while(rs.next())
 			{
 				String name = rs.getString("Name");
-				String status = rs.getString("Status");
-				System.out.println(name + "\t" + status);
+				System.out.println(name);
 			}
+			
+			s = "select Name "
+					+ "from TEST "
+					+ "where ID = 1";
+			
+			rs = stmt.executeQuery(s);
+			while(rs.next()) {
+				String name = rs.getString("Name");
+				System.out.println(name);
+			}
+			
 			rs.close();
 		}
 		catch(Exception e) {
