@@ -29,7 +29,9 @@ class BufferList {
     * Pins the block and keeps track of the buffer internally.
     * @param blk a reference to the disk block
     */
-   void pin(Block blk) {
+   void pin(Block blk) {	   
+      System.out.println("Pinning Block " + blk.number() + "\n");
+      System.out.println("Block ID " + blk.id() + "\n");
       Buffer buff = bufferMgr.pin(blk);
       buffers.put(blk, buff);
       pins.add(blk);

@@ -7,14 +7,11 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 
 
 public class AdvancedBufferMgr extends BasicBufferMgr {
-	private LinkedList<Buffer> emptyBuffers;
+	private LinkedList<Buffer> emptyBuffers = new LinkedList<Buffer>();
 
 	private HashMap<Integer,Buffer> fullBuffers = new HashMap<Integer,Buffer>();
 	private ArrayList<Buffer> clock = new ArrayList<Buffer>();
@@ -57,7 +54,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	synchronized Buffer pin(Block blk) {
 		//find the blk if it already in a buffer
 		Buffer buff = findExistingBuffer(blk);
-
+		System.out.println("Advanced is pinning block with id " + blk.id() + "\n");
 		if (buff == null) {
 			// if the block doesn't exist in the buffer, 
 			// find an unpinnedbuffer and pin it
@@ -79,6 +76,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		// pin this buffer frame
 		if (!buff.isPinned()) numAvailable--;
 		buff.pin();
+		System.out.println(buff.id());
 		// set its second chance bit
 		buff.setSecondChance(true);
 
@@ -172,6 +170,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			//increment the clock pointer 
 			index = (index + 1) % clock.size();
 			Buffer buff = clock.get(index);
+			System.out.println("Storing in buffer " + buff.id() + "\n");
 			return buff;
 		}
 
