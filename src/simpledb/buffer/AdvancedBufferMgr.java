@@ -54,7 +54,6 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	synchronized Buffer pin(Block blk) {
 		//find the blk if it already in a buffer
 		Buffer buff = findExistingBuffer(blk);
-		System.out.println("Advanced is pinning block with id " + blk.id() + "\n");
 		if (buff == null) {
 			// if the block doesn't exist in the buffer, 
 			// find an unpinnedbuffer and pin it
@@ -163,7 +162,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		// and leaved index unchanged
 		// should only occur the first time this is called.
 		if (clock.get(index).isEmpty()) return clock.get(index);
-		
+		System.out.println("Replacing buffer");
 		// if the next buffer is empty, return it and increment the index
 		if (clock.get((index + 1) % clock.size()).isEmpty()) {
 			
@@ -206,6 +205,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	@Override
 	public String toString() {
 		System.out.println("Printing out bufferpool\n");
+		System.out.println("Current index " + index + "\n");
 		String str = "";
 		for (Buffer buff: clock) {
 			str += buff.toString();

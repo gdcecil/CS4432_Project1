@@ -93,6 +93,7 @@ class BasicBufferMgr {
     * @param buff the buffer to be unpinned
     */
    synchronized void unpin(Buffer buff) {
+	  System.out.println("Unpinning buffer \n");
       buff.unpin();
       if (!buff.isPinned())
          numAvailable++;

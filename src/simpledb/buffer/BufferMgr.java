@@ -51,7 +51,6 @@ public class BufferMgr {
    public synchronized Buffer pin(Block blk) {
       try {
          long timestamp = System.currentTimeMillis();
-         System.out.println(blk.id() + "\n");
          Buffer buff = bufferMgr.pin(blk);
          while (buff == null && !waitingTooLong(timestamp)) {
             wait(MAX_TIME);

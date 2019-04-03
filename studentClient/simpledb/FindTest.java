@@ -27,6 +27,8 @@ public class FindTest {
 				String status = rs.getString("Status");
 				System.out.println(name + "\t" + status);
 			}
+			
+			
 			rs.close();
 		}
 		catch(Exception e) {
