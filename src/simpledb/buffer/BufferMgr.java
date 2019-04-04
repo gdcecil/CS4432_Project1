@@ -33,6 +33,11 @@ public class BufferMgr {
     * Thus this constructor cannot be called until 
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
+    * 
+    * CS4432-Project1: Changed bufferMgr to be our own, more advanced
+    * manager AdvancedBufferMgr with a bufferpool size of numbuffers.
+    * See AdvancedBufferMgr.java for further details.
+    * 
     * @param numbuffers the number of buffer slots to allocate
     */
    public BufferMgr(int numbuffers) {
@@ -45,6 +50,10 @@ public class BufferMgr {
     * waiting until a buffer becomes available.
     * If no buffer becomes available within a fixed 
     * time period, then a {@link BufferAbortException} is thrown.
+    * 
+    * CS4432-Project1: added bufferMgr.toString() to print
+    * the state of the bufferpool prior to pinning.
+    * 
     * @param blk a reference to a disk block
     * @return the buffer pinned to that block
     */
@@ -58,6 +67,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+         // print the entire bufferpool in bufferMgr before pinning
          bufferMgr.toString();
          return buff;
       }
@@ -71,6 +81,11 @@ public class BufferMgr {
     * potentially waiting until a buffer becomes available.
     * If no buffer becomes available within a fixed 
     * time period, then a {@link BufferAbortException} is thrown.
+    * 
+    * CS4432-Project1: Added bufferMgr.toString() to print the
+    * bufferpool heald in the manager before pinning a new
+    * file.
+    * 
     * @param filename the name of the file
     * @param fmtr the formatter used to initialize the page
     * @return the buffer pinned to that block
@@ -86,6 +101,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
+         // print the entire bufferpool in bufferMgr before new pinnning
          bufferMgr.toString();
          return buff;
       }
@@ -122,6 +138,11 @@ public class BufferMgr {
       return bufferMgr.available();
    }
    
+   /**
+    * Checks if the time since starttime is greater than MAX_TIME
+    * @param starttime the beginning of the wait
+    * @return true if waiting for more than MAX_TIME
+    */
    private boolean waitingTooLong(long starttime) {
       return System.currentTimeMillis() - starttime > MAX_TIME;
    }
