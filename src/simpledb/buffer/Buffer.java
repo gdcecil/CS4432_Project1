@@ -19,8 +19,24 @@ public class Buffer {
    private int pins = 0;
    private int modifiedBy = -1;  // negative means not modified
    private int logSequenceNumber = -1; // negative means no corresponding log record
+   
+   //CS4432-Project1: keep track of a secondChance bit for the clock replacement policy
    private boolean secondChance = true;
+   
+   //CS4432-Project1: holds a unique int ID for the buffer
    private final int buffID;
+   
+   //CS4432-Project1: when set to true, disk pages are accessed as
+   //usual. When false, disk pages are not accessed. this is used 
+   //for testing purposes
+   private boolean diskInteraction = true;
+   
+   /*
+    *  CS4432-Project1
+    * keep track of the number of buffers constructed,
+    * used to assign each buffer a unique int id;
+    */
+   private static int bufferCount = 0;
 
    /**
     * Creates a new buffer, wrapping a new 
@@ -35,21 +51,35 @@ public class Buffer {
     * Thus this constructor cannot be called until 
     * {@link simpledb.server.SimpleDB#initFileAndLogMgr(String)} or
     * is called first.
+    * 
+    * CS4432-Project1: assigns the unqiue bufferID, using the bufferCount
+    * static variable.
     */
-   public Buffer(int id) {
-	   buffID = id;
+   public Buffer() {
+	   //CS4432-Project1: set buffer ID to the buffer count, 
+	   //and increment buffer count.
+	   synchronized(Buffer.class)
+	   {
+		   buffID = bufferCount;
+		   bufferCount++;
+	   }
    }
+   
    
    /**
     * Returns the integer value at the specified offset of the
     * buffer's page.
     * If an integer was not stored at that location,
     * the behavior of the method is unpredictable.
+    * 
+    * CS4432-Project1: if diskInteraction is false, instead
+    * return 0, and do not access the page.
+    * 
     * @param offset the byte offset of the page
     * @return the integer value at that offset
     */
    public int getInt(int offset) {
-      return contents.getInt(offset);
+      return diskInteraction ? contents.getInt(offset) : 0;
    }
 
    /**
@@ -57,11 +87,16 @@ public class Buffer {
     * buffer's page.
     * If a string was not stored at that location,
     * the behavior of the method is unpredictable.
+    * 
+    * CS4432-Project1: if diskInteraction is false, instead 
+    * return 0, and do not access the page.
+    * 
+    * access the file (for testing purposes).
     * @param offset the byte offset of the page
     * @return the string value at that offset
     */
    public String getString(int offset) {
-      return contents.getString(offset);
+      return diskInteraction ? contents.getString(offset) : "";
    }
 
    /**
@@ -73,6 +108,10 @@ public class Buffer {
     * and the LSN of the log record.
     * A negative lsn value indicates that a log record
     * was not necessary.
+    * 
+    * CS4432-Project1: if diskInteraction is false, do not write to page,
+    * but still update modified by and logSequenceNumber as appropriate.
+    * 
     * @param offset the byte offset within the page
     * @param val the new integer value to be written
     * @param txnum the id of the transaction performing the modification
@@ -82,7 +121,7 @@ public class Buffer {
       modifiedBy = txnum;
       if (lsn >= 0)
 	      logSequenceNumber = lsn;
-      contents.setInt(offset, val);
+      if (diskInteraction) contents.setInt(offset, val);
    }
 
    /**
@@ -94,6 +133,10 @@ public class Buffer {
     * was not necessary.
     * The buffer saves the id of the transaction
     * and the LSN of the log record.
+    * 
+    * CS4432-Project1: if diskInteraction is false, do not write to page,
+    * but still update modified by and logSequenceNumber as appropriate.
+    * 
     * @param offset the byte offset within the page
     * @param val the new string value to be written
     * @param txnum the id of the transaction performing the modification
@@ -103,7 +146,7 @@ public class Buffer {
       modifiedBy = txnum;
       if (lsn >= 0)
 	      logSequenceNumber = lsn;
-      contents.setString(offset, val);
+      if (diskInteraction) contents.setString(offset, val);
    }
 
    /**
@@ -121,11 +164,17 @@ public class Buffer {
     * The method ensures that the corresponding log
     * record has been written to disk prior to writing
     * the page to disk.
+    * 
+    * CS4432-Project1: if diskInteraction is false, do not write to disk
+    * and do not flush the log record. Still reset modifiedBy.
     */
    void flush() {
       if (modifiedBy >= 0) {
-         SimpleDB.logMgr().flush(logSequenceNumber);
-         contents.write(blk);
+         if (diskInteraction)
+         {
+        	 SimpleDB.logMgr().flush(logSequenceNumber);
+             contents.write(blk);
+         }
          modifiedBy = -1;
       }
    }
@@ -168,12 +217,18 @@ public class Buffer {
     * the buffer's page.
     * If the buffer was dirty, then the contents
     * of the previous page are first written to disk.
+    * 
+    * CS4432-Project1: if diskInteraction is false, 
+    * do not read the block into the page. Flush is still
+    * called, but that method will not write to disk either.
+    * The pin count is still reset, and the block is still set.
+    * 
     * @param b a reference to the data block
     */
    void assignToBlock(Block b) {
       flush();
       blk = b;
-      contents.read(blk);
+      if (diskInteraction) contents.read(blk);
       pins = 0;
    }
 
@@ -182,18 +237,30 @@ public class Buffer {
     * and appends the page to the specified file.
     * If the buffer was dirty, then the contents
     * of the previous page are first written to disk.
+    * 
+    * CS4432-Project1: if diskInteraction is false,
+    * do not assign the new block to this buffer. This method
+    * should not be called in situations where diskInteraction is 
+    * false (i.e. testing). Flush is still called and the pins
+    * are still set to 0. 
+    * 
     * @param filename the name of the file
     * @param fmtr a page formatter, used to initialize the page
     */
    void assignToNew(String filename, PageFormatter fmtr) {
       flush();
-      fmtr.format(contents);
-      blk = contents.append(filename);
+      if (diskInteraction) 
+      {
+    	  fmtr.format(contents);
+          blk = contents.append(filename);
+      }
       pins = 0;
    }
    
    /**
-    * set the second chance bit to the given value
+    * CS4432-Project1
+    * 
+    * Sets the second chance bit of this buffer to the given value.
     * 
     * @param boolean bit, set the second chance bit to this value
     * 
@@ -204,8 +271,12 @@ public class Buffer {
 	   secondChance = bit;
    }
    /**
+    * CS4432-Project1
     * 
-    * @return true if this buffer has a second chance
+    * Return the value of the second chance bit, i.e. if this
+    * buffer still has a second chance in the clock replacement policy.
+    * 
+    * @return the second chance bit.
     */
    public boolean hasSecondChance() 
    {
@@ -213,8 +284,10 @@ public class Buffer {
    }
    
    /**
-    * Check if there's a block in the buffer
-    * @return true if there is no block in this buffer
+    * CS4432-Project1
+    * 
+    * Check if there's a block currently in this buffer
+    * @return true if there is no block in this buffer, false otherwise.
     */
    public boolean isEmpty() 
    {
@@ -222,15 +295,42 @@ public class Buffer {
    }
    
    /**
-    * Get timestamp of this buffer 
+    * CS4432-Project1
     * 
-    * @return int timestamp
+    * Gets the unique integer ID for this buffer. 
+    * 
+    * @return Buffer ID
     */
    public int id() 
    {
 	   return buffID;
    }
    
+   /**
+    * CS4432-Project1
+    * 
+    * sets the boolean disk interaction to true if it's false and
+    * false if it's true. This determines whether or not this buffer
+    * will read/write to the disk or not. 
+    * 
+    * Turning off disk interactions is used for testing purposes.
+    */
+   void toggleDiskInteraction()
+   {
+	   diskInteraction = !diskInteraction;
+   }
+   
+   /**
+    * CS4432-Project1
+    * 
+    * Implementation of toString method for the buffer class. The
+    * string contains the buffer ID, the pin count, pin status
+    * (i.e. true if pin count > 0, false otherwise), second 
+    * chance bit, and, if there is a block in the buffer, 
+    * the toString representation of the block. 
+    * 
+    * @return String representing the fields of this buffer. 
+    */
    @Override
    public String toString()
    {
@@ -240,9 +340,9 @@ public class Buffer {
 		   str += "No block in buffer\n";
 	   else {
 		   str += "Holding Block " + blk.toString() + "\n";
-		   str += "Pin status " + isPinned() + "\n";
-		   str += "Second chance " + hasSecondChance() + "\n";
 	   }
+	   str += "Pin status " + isPinned() + "\n";
+	   str += "Second chance " + hasSecondChance() + "\n";
 	   return str;
    }
 }
