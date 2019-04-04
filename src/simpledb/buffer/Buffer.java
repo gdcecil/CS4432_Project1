@@ -57,7 +57,8 @@ public class Buffer {
     */
    public Buffer() {
 	   //CS4432-Project1: set buffer ID to the buffer count, 
-	   //and increment buffer count.
+	   //and increment buffer count. Sycnchronized to make sure
+	   //no to buffers get the same ID.
 	   synchronized(Buffer.class)
 	   {
 		   buffID = bufferCount;
@@ -309,15 +310,16 @@ public class Buffer {
    /**
     * CS4432-Project1
     * 
-    * sets the boolean disk interaction to true if it's false and
-    * false if it's true. This determines whether or not this buffer
-    * will read/write to the disk or not. 
+    * sets the boolean disk interaction to the given value. This determines 
+    * whether or not this buffer will read/write to the disk. 
     * 
     * Turning off disk interactions is used for testing purposes.
+    * 
+    * @param access, set diskInteraction to this value
     */
-   void toggleDiskInteraction()
+   void setDiskInteraction(boolean access)
    {
-	   diskInteraction = !diskInteraction;
+	   diskInteraction = access;
    }
    
    /**
