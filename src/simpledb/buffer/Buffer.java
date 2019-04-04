@@ -336,15 +336,15 @@ public class Buffer {
    @Override
    public String toString()
    {
-	   String str = "Buffer ID: " + buffID + "\n" +
-			   "Pin Count: " + pins + "\n";
+	   String str = "Buffer ID: " + buffID + "\r\n" +
+			   "Pin Count: " + pins + "\r\n";
 	   if (blk == null)
-		   str += "No block in buffer\n";
+		   str += "No block in buffer\r\n";
 	   else {
-		   str += "Holding Block " + blk.toString() + "\n";
+		   str += "Holding Block " + blk.toString() + "\r\n";
 	   }
-	   str += "Pin status " + isPinned() + "\n";
-	   str += "Second chance " + hasSecondChance() + "\n";
+	   str += "Pin status " + isPinned() + "\r\n";
+	   str += "Second chance " + hasSecondChance() + "\r\n";
 	   return str;
    }
 }
