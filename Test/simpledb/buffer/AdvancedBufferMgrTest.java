@@ -2,10 +2,42 @@ package simpledb.buffer;
 
 import simpledb.file.Block;
 
+/**
+ * Runs tests on AdvancedBufferMgr, specifically regarding the
+ * implementation of the clodck replacement policy.
+ * 
+ * Note: In the documentation throughout this file when we 
+ * refer to the "nth buffer" we mean the location of the buffer
+ * in the bufferList array. I.e. the first buffer is BufferList[0],
+ * and the last buffer is BufferList[numBuffs-1]. Do not confuse this
+ * with the buffer's unique ID, which is printed as part of the toString 
+ * method of buffer.
+ * 
+ * Griffin Cecil, Michael Warms
+ * @author mcwarms, gdcecil
+ *
+ */
 class AdvancedBufferMgrTest {
 
-	static void main(String[] args) {
-		// TODO Auto-generated method stub
+	/**
+	 * CS4432-Project1
+	 * 
+	 * Run the advancedBufferMgr tests, printing whether or not 
+	 * the tests succeed. 
+	 * @param args, do nothing with this.
+	 */
+	public static void main(String[] args) {
+		
+		boolean fullBuffTest = testFullBuffer();
+		if (fullBuffTest) System.out.println("\nFull buffer test passed.\n");
+		else System.out.println("\nFull buffer test failed.\n");
+		
+		boolean pinBuffTest = testPin();
+		if (pinBuffTest) System.out.println("\nPin test passed.\n");
+		else System.out.println("\nPin test failed.\n");
+		
+		if (fullBuffTest && pinBuffTest)
+			System.out.println("All tests passed.");
 	}
 
 	/**
@@ -15,7 +47,7 @@ class AdvancedBufferMgrTest {
 	 * all buffers are pinned.
 	 * @return true if tests pass. 
 	 */
-	boolean testFullBuffer()
+	static boolean testFullBuffer()
 	{
 		boolean results = true;
 
@@ -56,13 +88,13 @@ class AdvancedBufferMgrTest {
 	 * 
 	 * @return true if the tests pass
 	 */
-	boolean testPin()
+	static boolean testPin()
 	{
 		boolean results = true;
 
 		int numBuffs = 8; 
 
-		AdvancedBufferMgr mgr = new AdvancedBufferMgr(numBuffs);
+		AdvancedBufferMgr mgr = new AdvancedBufferMgr(numBuffs, true);
 
 		//get a list of buffers to use
 		Block[] blockList = generateBlockList(numBuffs);
@@ -105,9 +137,41 @@ class AdvancedBufferMgrTest {
 		{
 			if (bufferList[i].hasSecondChance()) secondChanceOK = false;
 		}
+		
+		//set secondchance bit of odd numbered buffers to true
+		for (int i = 1; i < numBuffs; i+=2)
+		{
+			bufferList[i].setSecondChance(true);
+		}
+		
+		//try pinning blocks in the even-numbered buffers (except for the last one,
+		//which is already pinned, and confirm that the advanced buffer manager adds them
+		//in order to the correct blocks
+		boolean pinOK2 = true;
+		for (int i = 0; i < numBuffs -1; i+= 2)
+		{ 
+			//pin a new block
+			b = mgr.pin(new Block("file", i+20));
+			
+			//the state of the pool before the loop is that the last buffer is 
+			//pinned, and the odd numbered buffers have their second chance bit 
+			//set to true, so we expect that the new blocks are pinned in the locations
+			//0,2,...,numBuffs-2, so we check these locations (they are indexed by i)
+			if (b.id()!= bufferList[i].id()) pinOK2 = false; 
+			
+		}
+		
+		//each pin above should first set an odd numbered buffer's second chance bit to
+		//false before moving and pinning in an even number buffer, so we verify that the second 
+		//chance bits are set to false in the odd-numbered buffers. 
+		boolean secondChanceOK2 = true;
+		for (int i = 1; i < numBuffs-1; i+=2)
+		{
+			if (bufferList[i].hasSecondChance()) secondChanceOK2 = false;
+		}
 
 		results = pinToEmptyOK && availableDecrementOK && allAvailableOK && pinOK1
-					&& secondChanceOK;
+					&& secondChanceOK && pinOK2 && secondChanceOK2;
 		return results;
 	}
 
@@ -121,7 +185,7 @@ class AdvancedBufferMgrTest {
 	 * @param offset, integer to start the block numbers at
 	 * @return
 	 */
-	/*ArrayList<Block> */Block[] generateBlockList(int n)
+	static Block[] generateBlockList(int n)
 	{
 		Block[] blockList = new Block[n];
 
