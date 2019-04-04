@@ -103,6 +103,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		// pin this buffer frame
 		if (!buff.isPinned()) numAvailable--;
 		buff.pin();
+		System.out.println(buff.id());
 		// set its second chance bit
 		buff.setSecondChance(true);
 
@@ -139,7 +140,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 
 		numAvailable--;
 
-		//but the buffer in the full buffers hash table 
+		// put the buffer in the full buffers hash table 
 		fullBuffers.put(buff.block().hashCode(), buff);
 
 		// pin it 
