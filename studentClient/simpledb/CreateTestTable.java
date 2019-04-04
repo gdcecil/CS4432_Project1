@@ -20,7 +20,7 @@ public class CreateTestTable {
 
 			// insert some records into TEST
 			s = "insert into TEST(ID, Name, Year) values ";
-			String[] testVals = {"0, 'rob', 2222)",
+			String[] testVals = {"(0, 'rob', 2222)",
 					"(1, 'greg', 2018)",
 					"(2, 'may', 2017)",
 					"(3, 'dan' , 1334)", 
@@ -30,8 +30,9 @@ public class CreateTestTable {
 					"(7, 'peg', 1922)",
 					"(8, 'sue', 3000)",
 					"(9, 'meg', 2002)"};
-			for (int i = 1; i < testVals.length; i++)
+			for (int i = 0; i < testVals.length; i++) {
 				stmt.executeUpdate(s + testVals[i]);
+			}
 			System.out.println("Table TEST Populated.");
 
 			// create a five attribute table 
@@ -48,7 +49,7 @@ public class CreateTestTable {
 					"(5, 'dead', 2)",
 					"(7, 'alive', 5)",
 					"(9, 'alive', 700000)"};
-			for (int i = 1; i < testMoreVals.length; i++)
+			for (int i = 0; i < testMoreVals.length; i++)
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
 			

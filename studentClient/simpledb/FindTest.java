@@ -14,22 +14,29 @@ public class FindTest {
 			
 			Statement stmt = conn.createStatement();
 			
-			//execute a query
-			String s = "select Name, Status "
-					+ "from TEST, TESTMORE "
-					+ "where ID =moreID";
-			ResultSet rs = stmt.executeQuery(s);
+			String s = "select Name "
+					+ "from TEST";
+			ResultSet newrs = stmt.executeQuery(s);
 			
-			//print the results of the query
-			while(rs.next())
+			while(newrs.next())
 			{
-				String name = rs.getString("Name");
-				String status = rs.getString("Status");
-				System.out.println(name + "\t" + status);
+				String id = newrs.getString("Name");
+				System.out.println(id);			
 			}
+			newrs.close();
 			
+			s = "select Name, Status "
+					+ "from test, testmore " 
+					+ "where id = moreid";
 			
-			rs.close();
+			ResultSet otherrs = stmt.executeQuery(s);
+			
+			while(otherrs.next()) {
+				String name = otherrs.getString("Name");
+				System.out.println(name);
+			}
+			otherrs.close();
+			
 		}
 		catch(Exception e) {
 			e.printStackTrace();
