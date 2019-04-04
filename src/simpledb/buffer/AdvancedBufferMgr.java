@@ -1,7 +1,6 @@
 package simpledb.buffer;
 
 import simpledb.file.*;
-import java.util.LinkedList;
 import java.util.HashMap;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -11,21 +10,45 @@ import java.util.ArrayList;
 
 
 public class AdvancedBufferMgr extends BasicBufferMgr {
-	private LinkedList<Buffer> emptyBuffers = new LinkedList<Buffer>();
-
 	private HashMap<Integer,Buffer> fullBuffers = new HashMap<Integer,Buffer>();
-	private ArrayList<Buffer> clock = new ArrayList<Buffer>();
+	
+	//private ArrayList<Buffer> clock = new ArrayList<Buffer>();
 
-	private int index;
-
+	private int index = 0;
+	
+	/**
+	 * CS4432-Project1
+	 * 
+	 * Constructor that takes a number of buffers, and 
+	 * then calls the constructor for the superclass, BasicBufferManager, 
+	 * with this value.
+	 * 
+	 * @param numbuffs, number of buffers to manage.
+	 */
 	AdvancedBufferMgr(int numbuffs) {
 		super(numbuffs);
-		for (Buffer buff : bufferpool)
+		//for (Buffer buff : bufferpool) clock.add(buff);
+	}
+	
+	/**
+	 * CS4432-Project1
+	 * 
+	 * Alternate constructor used for testing purposes that
+	 * calls the usual constructor and then turns off disk interaction 
+	 * for each buffer if output is true.
+	 * 
+	 * @param numbuffs, number of buffers
+	 * @param output, if true turn off disk interaction
+	 */
+	AdvancedBufferMgr(int numbuffs, boolean noDiskInteraction)
+	{
+		this(numbuffs);
+		
+		if (noDiskInteraction) 
 		{
-			emptyBuffers.add(buff);
-			clock.add(buff);
+			for (Buffer b : bufferpool)
+				b.setDiskInteraction(false);
 		}
-		index = 0;
 	}
 
 	/**
@@ -34,16 +57,21 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 * 
 	 * @param txnum transactionid
 	 */
-	@Override
-	synchronized void flushAll(int txnum) 
-	{
-		for (Buffer buff : clock)
-			if (buff.isModifiedBy(txnum))
-				buff.flush();
-	}
+//	@Override
+//	synchronized void flushAll(int txnum) 
+//	{
+//		for (Buffer buff : clock)
+//			if (buff.isModifiedBy(txnum))
+//				buff.flush();
+//	}
 
 	/**
-	 * pin a given block to a frame in the buffer pool 
+	 * CS4432-Project1
+	 *
+	 * Pin a given block to a frame in the buffer pool. This method follows
+	 * the same logic as the superclass pin, but here we makes sure to update
+	 * the hash table of full buffers, and the second chance bit of the pinned
+	 * block. 
 	 * 
 	 * @param Block blk, block to pin 
 	 * 
@@ -161,17 +189,32 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		// if the buffer currently pointed to is empty return it 
 		// and leaved index unchanged
 		// should only occur the first time this is called.
-		if (clock.get(index).isEmpty()) return clock.get(index);
+		
+		//if (clock.get(index).isEmpty()) return clock.get(index);
+		if (bufferpool[index].isEmpty()) return bufferpool[index];
+		
 		System.out.println("Replacing buffer");
 		// if the next buffer is empty, return it and increment the index
-		if (clock.get((index + 1) % clock.size()).isEmpty()) {
+		
+//		if (clock.get((index + 1) % clock.size()).isEmpty()) {
+//			
+//			//increment the clock pointer 
+//			index = (index + 1) % clock.size();
+//			Buffer buff = clock.get(index);
+//			System.out.println("Storing in buffer " + buff.id() + "\n");
+//			return buff;
+//		}
+		
+		if (bufferpool[(index+1) % bufferpool.length].isEmpty()) {
 			
 			//increment the clock pointer 
-			index = (index + 1) % clock.size();
-			Buffer buff = clock.get(index);
+			index = (index + 1) % bufferpool.length;
+			Buffer buff = bufferpool[index];
 			System.out.println("Storing in buffer " + buff.id() + "\n");
 			return buff;
 		}
+		
+		
 
 
 		//does nothing
@@ -181,7 +224,9 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		while (endFlag) {
 
 			//look at the current buffer in the clock
-			Buffer buff = clock.get(index);
+			
+			//Buffer buff = clock.get(index);
+			Buffer buff = bufferpool[index];
 
 			// check that the current buff is not pinned
 			if (!buff.isPinned()) 
@@ -196,7 +241,8 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 				else return buff; 
 			}	
 			//look at the next buffer
-			index = (index + 1) % clock.size();
+			//index = (index + 1) % clock.size();
+			index = (index + 1) % bufferpool.length;
 		}
 
 		return null;
@@ -207,11 +253,18 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		System.out.println("Printing out bufferpool\n");
 		System.out.println("Current index " + index + "\n");
 		String str = "";
-		for (Buffer buff: clock) {
+		
+//		for (Buffer buff: clock) {
+//			str += buff.toString();
+//			str += "////////////////////\n";
+//			
+//		}
+		for (Buffer buff: bufferpool) {
 			str += buff.toString();
 			str += "////////////////////\n";
 			
 		}
+		
 		System.out.println(str);
 		
 //		try {
@@ -225,6 +278,13 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		
 		return str;
 	}
+	
+	
+//	public int getIndex()
+//	{
+//		return index;
+//	}
+
 	
 //	private String writeFile(String str) throws IOException {
 //		FileWriter writer = new FileWriter("C:/Users/Griffin/Desktop/sample.txt");
