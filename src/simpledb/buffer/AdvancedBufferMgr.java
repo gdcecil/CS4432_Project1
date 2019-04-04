@@ -2,13 +2,13 @@ package simpledb.buffer;
 
 import simpledb.file.*;
 import java.util.HashMap;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.util.ArrayList;
 
-
+/**
+ * 
+ * Griffin Cecil, Michael Warms
+ * @author mcwarms, gdcecil
+ *
+ */
 public class AdvancedBufferMgr extends BasicBufferMgr {
 	/*Hashmap to track the buffers in bufferpool which currently hold a block */
 	private HashMap<Integer,Buffer> fullBuffers = new HashMap<Integer,Buffer>();
@@ -99,12 +99,11 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			buff.assignToBlock(blk);
 			// update the hashtable to reflect this change
 			fullBuffers.put(blk.hashCode(), buff);
-		}
+		} else System.out.println("Block in buffer" );
 		// pin this buffer frame
 		if (!buff.isPinned()) numAvailable--;
 		buff.pin();
 		System.out.println(buff.id());
-		
 		// set its second chance bit
 		buff.setSecondChance(true);
 
@@ -193,25 +192,14 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		
 		//if (clock.get(index).isEmpty()) return clock.get(index);
 		if (bufferpool[index].isEmpty()) return bufferpool[index];
-		
-		System.out.println("Replacing buffer");
 		// if the next buffer is empty, return it and increment the index
-		
-//		if (clock.get((index + 1) % clock.size()).isEmpty()) {
-//			
-//			//increment the clock pointer 
-//			index = (index + 1) % clock.size();
-//			Buffer buff = clock.get(index);
-//			System.out.println("Storing in buffer " + buff.id() + "\n");
-//			return buff;
-//		}
+
 		
 		if (bufferpool[(index+1) % bufferpool.length].isEmpty()) {
 			
 			//increment the clock pointer 
 			index = (index + 1) % bufferpool.length;
 			Buffer buff = bufferpool[index];
-			System.out.println("Storing in buffer " + buff.id() + "\n");
 			return buff;
 		}
 		
@@ -248,53 +236,27 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 
 		return null;
 	}
-
+	
+	/**
+	 * CS4432-Project1 
+	 * 
+	 * toString method for Advanced buffer manager. The string has the 
+	 * current index (the pointer for the clock replacement policy) and 
+	 * the toString() of each buffer in the bufferpool.
+	 * 
+	 * @return String representation of the buffer pool
+	 */
 	@Override
 	public String toString() {
-		System.out.println("Printing out bufferpool\n");
-		System.out.println("Current index " + index + "\n");
-		String str = "";
 		
-//		for (Buffer buff: clock) {
-//			str += buff.toString();
-//			str += "////////////////////\n";
-//			
-//		}
+		String str = "Printing out bufferpool\r\n\r\n"+"Current index "
+						+ index + "\r\n\r\n";
 		for (Buffer buff: bufferpool) {
 			str += buff.toString();
-			str += "///////////////////\r\n";
+			str += "////////////////////\r\n";
 			
 		}
-		
-		System.out.println(str);
-		
-//		try {
-//			writeFile(str);
-//		} catch (IOException e) {
-//			// TODO Auto-generated catch block
-//			e.printStackTrace();
-//		} finally {
-//			
-//		}
-		
 		return str;
 	}
-	
-	
-//	public int getIndex()
-//	{
-//		return index;
-//	}
 
-	
-//	private String writeFile(String str) throws IOException {
-//		FileWriter writer = new FileWriter("C:/Users/Griffin/Desktop/sample.txt");
-//		
-//		writer.write(str);
-//		writer.close();
-//		System.out.println(str);
-//		System.setOut(new PrintStream(new FileOutputStream("C:/Users/Griffin/Desktop/sample.txt")));
-//		System.out.println(str);
-//		return str;
-//	}
 }

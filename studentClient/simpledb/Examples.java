@@ -38,6 +38,14 @@ public class Examples {
 	public static void main(String[] args) {
 		Connection conn = null;
 		try {
+			
+			//File used to test SimpleDB and our modified version
+			//Statements used aim to test:
+			// - Creating and inserting into a table
+			// - Joining two tables (Querying on a joined table)
+			// - Querying with multiple qualifications
+			// - Querying with no results
+			// - Querying
 
 			//connect to the DB
 			Driver d = new SimpleDriver();
@@ -82,7 +90,7 @@ public class Examples {
 					"(7, 'alive', 5)",
 					"(9, 'alive', 700000)",
 					"(10, 'alive', 5)"};
-			for (int i = 0; i < testMoreVals.length; i++)
+			for (int i = 1; i < testMoreVals.length; i++)
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
 			
@@ -120,10 +128,10 @@ public class Examples {
 //			
 //			Output from unmodified SimpleDB:
 //				
-//				dan dying
-//				alice dead
-//				peg alive
-//				meg alive
+//			dan dying
+//			alice dead
+//			peg alive
+//			meg alive
 			
 			s = "select Name, Status "
 					+ "from test, testmore " 
@@ -150,8 +158,7 @@ public class Examples {
 //				and Cost = 5
 //				
 //			Output from unmodified SimpleDB
-//			
-//				carl 5
+//			carl 5
 			
 			
 			s = "select Name, Cost "
@@ -213,9 +220,7 @@ public class Examples {
 						
 			}
 			newrs.close();
-			
-			
-			
+
 		}
 		catch(SQLException e) {
 			e.printStackTrace();

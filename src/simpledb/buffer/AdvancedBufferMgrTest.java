@@ -53,9 +53,9 @@ class AdvancedBufferMgrTest {
 
 		//number of buffers to use
 		int numBuffs = 8;
-
+		
 		AdvancedBufferMgr mgr = new AdvancedBufferMgr(numBuffs, true);
-
+		
 		//get a list of buffers to use
 		Block[] blockList = generateBlockList(numBuffs);
 
@@ -68,6 +68,10 @@ class AdvancedBufferMgrTest {
 		{
 			bufferList[i] = mgr.pin(blockList[i]);
 		}
+		
+		//First print out the intitial buffer pool
+		System.out.println(mgr);
+		
 
 		//check that there are no buffers available
 		boolean availableOK1 = mgr.numAvailable==0;
@@ -145,7 +149,7 @@ class AdvancedBufferMgrTest {
 		}
 		
 		//try pinning blocks in the even-numbered buffers (except for the last one,
-		//which is already pinned, and confirm that the advanced buffer manager adds them
+		//which is already pinned, and  confirm that the advanced buffer manager adds them
 		//in order to the correct blocks
 		boolean pinOK2 = true;
 		for (int i = 0; i < numBuffs -1; i+= 2)
@@ -173,6 +177,15 @@ class AdvancedBufferMgrTest {
 		results = pinToEmptyOK && availableDecrementOK && allAvailableOK && pinOK1
 					&& secondChanceOK && pinOK2 && secondChanceOK2;
 		return results;
+	}
+
+	/**
+	 * CS4432-project1
+	 * @return
+	 */
+	static boolean testBlockAlreadyExists()
+	{
+		return false;
 	}
 
 	/**

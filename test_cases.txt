@@ -11,25 +11,20 @@ previously implemented*/
 
 //Pinning a new block while buffer is empty will place it in buffer 0
 
-Before pin:
-
-
-
-After pin:
-
 //Pinning a new block with non-empty bufferpool containing free space will place new block
-//in empty space directly after current pointed-to buffer -
+//in empty space directly after current pointed-to buffer
 
-//Pinning a new block with a full, all-pinned bufferpool will return null - 
+//Pinning a new block with a full, all-pinned bufferpool will cause the system to throw
+//an error after *100* tries
 
 //Pinning a block that is already in buffer and has its second chance set to false will
 //set the second chance to true
 
-//Unpinning a buffer with a pin = 1 will cause the buffer to be replaceable 
+//Unpinning a buffer with a pin = 1 will cause the buffer to be replaceable
 
 //Unpinning a buffer with a pin > 1 will cause the buffer to still be pinned
 
 //Pinning a new block in buffer when full, with all buffers unpinned with second chances
 //will cause the currently pointed-to buffer to have its second chance removed first and
-//subsequently replaced -
+//subsequently replaced
 
