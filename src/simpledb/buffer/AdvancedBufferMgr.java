@@ -1,7 +1,7 @@
 package simpledb.buffer;
-
 import simpledb.file.*;
 import java.util.HashMap;
+import simpledb.buffer.Buffer;
 
 /**
  * 
@@ -12,10 +12,8 @@ import java.util.HashMap;
 public class AdvancedBufferMgr extends BasicBufferMgr {
 	private HashMap<Integer,Buffer> fullBuffers = new HashMap<Integer,Buffer>();
 	
-	//private ArrayList<Buffer> clock = new ArrayList<Buffer>();
-
 	private int index = 0;
-	
+
 	/**
 	 * CS4432-Project1
 	 * 
@@ -27,9 +25,8 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 */
 	AdvancedBufferMgr(int numbuffs) {
 		super(numbuffs);
-		//for (Buffer buff : bufferpool) clock.add(buff);
 	}
-	
+
 	/**
 	 * CS4432-Project1
 	 * 
@@ -43,7 +40,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	AdvancedBufferMgr(int numbuffs, boolean noDiskInteraction)
 	{
 		this(numbuffs);
-		
+
 		if (noDiskInteraction) 
 		{
 			for (Buffer b : bufferpool)
@@ -57,13 +54,13 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 * 
 	 * @param txnum transactionid
 	 */
-//	@Override
-//	synchronized void flushAll(int txnum) 
-//	{
-//		for (Buffer buff : clock)
-//			if (buff.isModifiedBy(txnum))
-//				buff.flush();
-//	}
+	//	@Override
+	//	synchronized void flushAll(int txnum) 
+	//	{
+	//		for (Buffer buff : clock)
+	//			if (buff.isModifiedBy(txnum))
+	//				buff.flush();
+	//	}
 
 	/**
 	 * CS4432-Project1
@@ -99,11 +96,10 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			// assign this block to the buffer we found
 			buff.assignToBlock(blk);
 			fullBuffers.put(blk.hashCode(), buff);
-		} else System.out.println("Block in buffer" );
+		} 
 		// pin this buffer frame
 		if (!buff.isPinned()) numAvailable--;
 		buff.pin();
-		System.out.println(buff.id());
 		// set its second chance bit
 		buff.setSecondChance(true);
 
@@ -181,29 +177,29 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 */
 	@Override
 	protected Buffer chooseUnpinnedBuffer() {
-		
+
 		// if there's no unpinned frame return null
 		if (available() == 0)
 			return null;
-		
+
 		// if the buffer currently pointed to is empty return it 
 		// and leaved index unchanged
 		// should only occur the first time this is called.
-		
+
 		//if (clock.get(index).isEmpty()) return clock.get(index);
 		if (bufferpool[index].isEmpty()) return bufferpool[index];
 		// if the next buffer is empty, return it and increment the index
 
-		
+
 		if (bufferpool[(index+1) % bufferpool.length].isEmpty()) {
-			
+
 			//increment the clock pointer 
 			index = (index + 1) % bufferpool.length;
 			Buffer buff = bufferpool[index];
 			return buff;
 		}
-		
-		
+
+
 
 
 		//does nothing
@@ -213,7 +209,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		while (endFlag) {
 
 			//look at the current buffer in the clock
-			
+
 			//Buffer buff = clock.get(index);
 			Buffer buff = bufferpool[index];
 
@@ -236,7 +232,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 
 		return null;
 	}
-	
+
 	/**
 	 * CS4432-Project1 
 	 * 
@@ -248,13 +244,14 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 	 */
 	@Override
 	public String toString() {
-		
-		String str = "Printing out bufferpool\r\n\r\n"+"Current index "
-						+ index + "\r\n\r\n";
+
+		String str = "\r\n\r\nCurrent index: "
+				+ index + "\r\n\r\n";
+		str += "////////////////////\r\n";
 		for (Buffer buff: bufferpool) {
 			str += buff.toString();
 			str += "////////////////////\r\n";
-			
+
 		}
 		return str;
 	}
