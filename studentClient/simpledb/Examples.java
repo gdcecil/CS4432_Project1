@@ -1,20 +1,43 @@
 import java.sql.*; 
 import simpledb.remote.SimpleDriver;
 
+//File used to test both SimpleDB and our modified version
+//  These tests ensure that our database is capable of
+//  performing the same actions as simpleDB accurately
+
+//To run this file, first go to CS4432_Project1/src/simpledb.server
+//and run startup.java with the argument CS4432
+//Once startup is running, run this file without arguments.
+//If you'd like to run this file again, stop running startup.java,
+//delete the CS4432 file that startup created (likely in the home folder)
+//and follow these instructions from the beginning.
+
+//Examples consists of two tables with the following attributes
+//	TEST
+//			ID	Name	Year
+
+//	TESTMORE
+//			moreID	Status	Cost
+
+//Test and TESTMORE share primary keys in ID and moreID
+
+//Statements used in this file test:
+// - Creating and inserting into a table
+// - Joining two tables (Querying on a joined table)
+// - Querying with multiple qualifications
+// - Querying with no results
+// - Delete entry in table
+
+//The output for each query when run on vanilla SimpleDB is
+//given before each statement
+//The output when Examples.java is run on CS4432_Project1 is
+//given at the end of the file
+
 public class Examples {
 
 	public static void main(String[] args) {
 		Connection conn = null;
 		try {
-			
-			//File used to test SimpleDB and our modified version
-			//Statements used aim to test:
-			// - Creating and inserting into a table
-			// - Joining two tables (Querying on a joined table)
-			// - Querying with multiple qualifications
-			// - Querying with no results
-			// - Delete entry in table
-
 
 			//connect to the DB
 			Driver d = new SimpleDriver();
@@ -63,7 +86,7 @@ public class Examples {
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
 			
-//			Print entire table TEST
+//			Creating and inserting into a table
 //			Output from unmodified SimpleDB:
 			
 //			greg
@@ -191,6 +214,8 @@ public class Examples {
 			}
 			newrs.close();
 			
+			
+			
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
@@ -235,9 +260,11 @@ public class Examples {
 //peg alive
 //meg alive
 //carl alive
+
 //select Name, Cost from test, testmore where id = moreid and year = 3000 cost = 5
 //5
 //carl 5
+
 //select Cost from testmore
 //-232
 //100
@@ -245,6 +272,7 @@ public class Examples {
 //5
 //700000
 //5
+
 //Deleted entry
 //1 dead -232
 //3 dying 100

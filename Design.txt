@@ -3,19 +3,53 @@ implemented in our project, CS4432_Project1
 
 	Our implementation of the simpleDB utilizes a clock replacement policy
 	rather than a scan policy. The implementation of this policy can be found
-	in the AdvancedBufferMgr.java class. This class contains a HashMap that
-	tracks the position of blocks currently contained in the bufferpool.
+	in the AdvancedBufferMgr.java (henceforth reffered to as Advanced)
+	class. This class contains a HashMap that stores buffers kept in the
+	bufferpool. The key for each buffer is the hash of the block stored
+	found by calling blk.hash(). If Advanced ever needs to find a block that
+	is already within a buffer in the bufferpool, it accesses the hashmap using 
+	the hash of the block it is looking for, a more efficient process than 
+	scanning. The hashmap returns the buffer containing the block as a value.
 	AdvancedBufferMgr has a superclass, BasicBufferMgr, which stores the
 	bufferpool and number of remaining empty buffers as well as the
 	additional functions flushAll() and available() which remain unchanged.
-	Whenever AdvancedBufferMgr.pinNew() is called, the class will locate
-	the next empty buffer in the bufferpool by checking whether numAvailable
-	is greater than 0. If it is, AdvancedBufferMgr will pin  
+	Whenever AdvancedBufferMgr.pinNew() is called, the class will first
+	check if there are any empty buffers remaining in the bufferpool by checking 
+	whether numAvailable is greater than 0. If numAvalaible is greater than 0, 
+	the attribute Index in AdvancedBufferManager will be pointing to one less
+	than the next empty index. Advanced will increment the index and pin
+	the new block to the empty buffer found there. If the bufferpool is full
+	when either pin() or pinNew() are called, Advanced will first check whether
+	the buffer currently in position index of the bufferpool is pinned. If not,
+	It will check the second chance bit of the buffer. If that is also not true,
+	Advanced will replace the block in that buffer with the new block, pinning
+	it and setting its second chance to true. If the buffer was pinned, Advanced
+	increments its index (or sets it back to 0 if pointing to the end of the
+	bufferpool) and checks the next position of the bufferpool in the same
+	manner. Each buffer in the bufferpool tracks its own pin status and
+	can be accessed by Advanced using the isPinned() method of Buffer.
+	If the buffer was unpinned but the second chance property was set to
+	true, Advanced will set the second chance to false and increment its index,
+	repeating this process with the next buffer. In this way, if all buffers
+	are unpinned with second chances set to true, Advanced will increment through
+	the pool setting all second chances to false until it returns to the position
+	it started at and replaces the buffer found there. If a block in the buffer
+	was replaced during a pin() or pinNew(), Buffer will check whether its
+	modifiedBy attribute was changed. If it is not -1, Buffer will call 
+	BasicBufferMgr.flush() to write the changes to disk. When Advanced pins
+	a block in a buffer, the buffer will increment the blocks pin count. In this
+	way, a buffer may have a pin greater than 1. When a buffer must unpin, the
+	pin count is decremeneted (but cannot be decremented past 0). When a block
+	replaces another block in a buffer, Advanced removes the buffer containing
+	the old block from the hashmap and adds the buffer containing the new block
+	with a hashmap key of the hashed block. If the block is inserted in an empty
+	buffer, Advanced will simply add the buffer to the hashmap.
 
 
 
 The following files were added to the database in CS4432_Project1
 	- src/simpledb.buffer/AdvancedBufferMgr.java
+	- src/simpledb.buffer/AdvancedBufferMgrTest.java
 	- studentClient/simpledb/Examples.java
 
 The following files include major modifications affecting the functionality
@@ -27,6 +61,15 @@ of the databased
 AdvancedBufferMgr.java
 	This class extends BasicBufferMgr.java. When constructed, AdvancedBufferMgr
 	constructs a BasicBufferMgr using the provided numbuffs.
+	
+AdvancedBufferMgrTest.java
+	This class is used to test the functionality of the AdvancedBufferMgr. This
+	class creates instances of AdvancedBufferMgr and fills their bufferpools
+	with set files. The class then calls various pin, flush, and printing
+	functions to determine the state of the bufferpool and whether certain
+	methods acted as intended.
+	For more information, refer to the documentation within
+	AdvancedBufferMgrTest.java
 	
 	
 BasicBufferMgr.java
@@ -42,13 +85,14 @@ BasicBufferMgr.java
 Buffer.java	
 
 	Added a secondChance attribute to track whether the block inside the buffer may
-	be relaced during a pin operation. 
-		hasSecondChance() returns the secondChance attribute
-		setSecondChance(bool) sets the secondChance attribute to the given bool
+	be relaced during a pin operation. This tracking is necessary for implementing
+	a clock replacement policy
+		hasSecondChance(): returns the secondChance attribute
+		setSecondChance(bool): sets the secondChance attribute to the given bool
 		
 	Added a buffID attribute to the buffer that is set upon construction and is
-	unique to each buffer. The buffID identifies buffers during testing
-		id() returns the value of buffID
+	unique to each buffer. The buffID identifies buffers during testing.
+		id(): returns the value of buffID
 	
 	Added a diskInteraction attribute to track whether the buffer was made for testing
 	purposes. If diskInteraction is true, the following methods do not write to disk

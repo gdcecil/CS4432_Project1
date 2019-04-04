@@ -192,6 +192,9 @@ public class Buffer {
     */
    void unpin() {
       pins--;
+      if (pins < 0) {
+    	  pins = 0;
+      }
    }
 
    /**
