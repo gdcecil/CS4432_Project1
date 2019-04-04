@@ -30,7 +30,6 @@ class BufferList {
     * @param blk a reference to the disk block
     */
    void pin(Block blk) {	   
-      System.out.println("Pinning Block " + blk.toString() + "\n");
       Buffer buff = bufferMgr.pin(blk);
       buffers.put(blk, buff);
       pins.add(blk);

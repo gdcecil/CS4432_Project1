@@ -13,7 +13,7 @@ public class Examples {
 			// - Joining two tables (Querying on a joined table)
 			// - Querying with multiple qualifications
 			// - Querying with no results
-			// - Querying 
+			// - Delete entry in table
 
 
 			//connect to the DB
@@ -59,7 +59,7 @@ public class Examples {
 					"(7, 'alive', 5)",
 					"(9, 'alive', 700000)",
 					"(10, 'alive', 5)"};
-			for (int i = 1; i < testMoreVals.length; i++)
+			for (int i = 0; i < testMoreVals.length; i++)
 				stmt.executeUpdate(s + testMoreVals[i]);
 			System.out.println("Table TESTMORE Populated.");
 			
@@ -97,10 +97,10 @@ public class Examples {
 //			
 //			Output from unmodified SimpleDB:
 //				
-//			dan dying
-//			alice dead
-//			peg alive
-//			meg alive
+//				dan dying
+//				alice dead
+//				peg alive
+//				meg alive
 			
 			s = "select Name, Status "
 					+ "from test, testmore " 
@@ -127,7 +127,8 @@ public class Examples {
 //				and Cost = 5
 //				
 //			Output from unmodified SimpleDB
-//			carl 5
+//			
+//				carl 5
 			
 			
 			s = "select Name, Cost "
@@ -157,6 +158,39 @@ public class Examples {
 			}
 			newrs.close();
 			
+//			Delete a value from a table and query all entries of the table
+//			Queries:
+//				delete from testmore
+//				where moreid = 9
+//			
+//				select *
+//				from testmore
+//			
+//			Output from unmodified SimpleDB:
+//			
+//				1 dead -232
+//				3 dying 100
+//				5 dead 2
+//				7 alive 5
+//				10 alive 5		
+			
+			s = "delete from testmore "
+					+ "where moreid = 9";
+			stmt.executeUpdate(s);
+			System.out.println("Deleted entry");
+			
+			s = "select moreID, status, cost "
+					+ "from testmore";
+			newrs = stmt.executeQuery(s);
+			while(newrs.next()) {
+				int id = newrs.getInt("moreid");
+				String status = newrs.getString("Status");
+				int cost = newrs.getInt("Cost");
+				System.out.println(id + " " + status + " " + cost);						
+						
+			}
+			newrs.close();
+			
 		}
 		catch(SQLException e) {
 			e.printStackTrace();
@@ -172,3 +206,48 @@ public class Examples {
 	}
 
 }
+
+//For your convenience, the output from running each statement
+//in this file has been printed below.
+
+//Table TEST created.
+//Table TEST Populated.
+//Table TESTMORE created.
+//Table TESTMORE Populated.
+
+//select Name from TEST
+//rob
+//greg
+//may
+//dan
+//ted
+//alice
+//carl
+//peg
+//sue
+//meg
+//carl
+
+//select Name, Status from test, testmore where id = moreid
+//greg dead
+//dan dying
+//alice dead
+//peg alive
+//meg alive
+//carl alive
+//select Name, Cost from test, testmore where id = moreid and year = 3000 cost = 5
+//5
+//carl 5
+//select Cost from testmore
+//-232
+//100
+//2
+//5
+//700000
+//5
+//Deleted entry
+//1 dead -232
+//3 dying 100
+//5 dead 2
+//7 alive 5
+//10 alive 5

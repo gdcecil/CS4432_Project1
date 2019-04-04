@@ -104,6 +104,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 		if (!buff.isPinned()) numAvailable--;
 		buff.pin();
 		System.out.println(buff.id());
+		
 		// set its second chance bit
 		buff.setSecondChance(true);
 
@@ -140,7 +141,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 
 		numAvailable--;
 
-		//but the buffer in the full buffers hash table 
+		// put the buffer in the full buffers hash table 
 		fullBuffers.put(buff.block().hashCode(), buff);
 
 		// pin it 
@@ -261,7 +262,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 //		}
 		for (Buffer buff: bufferpool) {
 			str += buff.toString();
-			str += "////////////////////\n";
+			str += "///////////////////\r\n";
 			
 		}
 		

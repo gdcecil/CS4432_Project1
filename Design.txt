@@ -1,0 +1,61 @@
+This file describes the changes in design between SimpleDB and the database
+implemented in our project, CS4432_Project1
+
+	Our implementation of the simpleDB utilizes a clock replacement policy
+	rather than a scan policy. The implementation of this policy can be found
+	in the AdvancedBufferMgr.java class. This class contains a HashMap that
+	tracks the position of blocks currently contained in the bufferpool.
+	AdvancedBufferMgr has a superclass, BasicBufferMgr, which stores the
+	bufferpool and number of remaining empty buffers as well as the
+	additional functions flushAll() and available() which remain unchanged.
+	Whenever AdvancedBufferMgr.pinNew() is called, the class will locate
+	the next empty buffer in the bufferpool by checking whether numAvailable
+	is greater than 0. If it is, AdvancedBufferMgr will pin  
+
+
+
+The following files were added to the database in CS4432_Project1
+	- src/simpledb.buffer/AdvancedBufferMgr.java
+	- studentClient/simpledb/Examples.java
+
+The following files include major modifications affecting the functionality
+of the databased
+	- BasicBufferMgr.java
+	- Buffer.java
+	- BufferMgr.java	
+
+AdvancedBufferMgr.java
+	This class extends BasicBufferMgr.java. When constructed, AdvancedBufferMgr
+	constructs a BasicBufferMgr using the provided numbuffs.
+	
+	
+BasicBufferMgr.java
+	
+	This class is overridden by AdvancedBufferMgr.java for the following methods:
+		- chooseUnpinnedBuffer() 
+		- findExistingBuffer()
+		- pinNew()
+		- pin()
+		- toString()
+		
+		
+Buffer.java	
+
+	Added a secondChance attribute to track whether the block inside the buffer may
+	be relaced during a pin operation. 
+		hasSecondChance() returns the secondChance attribute
+		setSecondChance(bool) sets the secondChance attribute to the given bool
+		
+	Added a buffID attribute to the buffer that is set upon construction and is
+	unique to each buffer. The buffID identifies buffers during testing
+		id() returns the value of buffID
+	
+	Added a diskInteraction attribute to track whether the buffer was made for testing
+	purposes. If diskInteraction is true, the following methods do not write to disk
+	when called:
+		setString()
+		flush()
+		assignToBlock()
+		assignToNew()
+	
+	
