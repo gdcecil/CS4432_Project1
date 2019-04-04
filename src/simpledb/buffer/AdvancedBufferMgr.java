@@ -10,8 +10,9 @@ import simpledb.buffer.Buffer;
  *
  */
 public class AdvancedBufferMgr extends BasicBufferMgr {
+	/*Hashmap to track the buffers in bufferpool which currently hold a block */
 	private HashMap<Integer,Buffer> fullBuffers = new HashMap<Integer,Buffer>();
-	
+
 	private int index = 0;
 
 	/**
@@ -95,6 +96,7 @@ public class AdvancedBufferMgr extends BasicBufferMgr {
 			}
 			// assign this block to the buffer we found
 			buff.assignToBlock(blk);
+			// update the hashtable to reflect this change
 			fullBuffers.put(blk.hashCode(), buff);
 		} 
 		// pin this buffer frame
