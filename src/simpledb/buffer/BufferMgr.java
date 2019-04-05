@@ -83,7 +83,7 @@ public class BufferMgr {
     * time period, then a {@link BufferAbortException} is thrown.
     * 
     * CS4432-Project1: Added bufferMgr.toString() to print the
-    * bufferpool heald in the manager before pinning a new
+    * bufferpool held in the manager before pinning a new
     * file.
     * 
     * @param filename the name of the file
@@ -101,7 +101,7 @@ public class BufferMgr {
          }
          if (buff == null)
             throw new BufferAbortException();
-         // print the entire bufferpool in bufferMgr before new pinnning
+         // print the entire bufferpool in bufferMgr before new pinning
          bufferMgr.toString();
          return buff;
       }

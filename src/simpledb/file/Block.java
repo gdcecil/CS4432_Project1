@@ -42,9 +42,6 @@ public class Block {
       return blknum;
    }
    
-   public int id() {
-	   return blkID;
-   }
    public boolean equals(Object obj) {
       Block blk = (Block) obj;
       return filename.equals(blk.filename) && blknum == blk.blknum;
