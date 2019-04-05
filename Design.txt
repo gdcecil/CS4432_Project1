@@ -1,6 +1,8 @@
 This file describes the changes in design between SimpleDB and the database
 implemented in our project, CS4432_Project1
 
+OVERVIEW
+
 	Our implementation of the simpleDB utilizes a clock replacement policy
 	rather than a scan policy. The implementation of this policy can be found
 	in the AdvancedBufferMgr.java (henceforth reffered to as Advanced)

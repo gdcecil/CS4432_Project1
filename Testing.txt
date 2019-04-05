@@ -1,35 +1,1497 @@
-Cases to test with output evidence
-/*Testing the correctness of our changes to SimpleDB in maintaining the correct values
-for SQL statements and handling the buffer in a more efficient manner than was 
-previously implemented*/
+///////////////////////////////////////////
+//This file contains output from the test//
+//class AdvancedBufferMgrTest.java. The  //
+//file has been modified to illustrate   //
+//aspects which prove our buffer manager //
+//correctly handles the buffer as        //
+//intended. For a full description of the//
+//behavior of the buffer, see the        //
+//OVERVIEW section of Design.txt         //
+//Each case described in this file tests //
+//multiple aspects of the buffer manager.//
+//Those cases are described before the   //
+//output of the tests is shown.          //
+///////////////////////////////////////////
 
-//Test SQL statements//
+CASE 1: Pinning and unpinning blocks until the buffer is full
+	During this test, 8 blocks are pinned and then unpinned to 
+	the bufferpool in succession. For each pin, the current
+	index shows which Buffer ID the manager is currently
+	pointing to. In this test, the manager correctly fills
+	all empty space by placing new blocks into the next
+	available buffer and not affecting the second chance bit
+	of the filled buffers. Upon completion, the current index
+	points at Buffer ID 7, the last filled buffer.
+
+(testPin) Here is our empty buffer pool:
+
+Current index: 0
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+(testPin) Buffer pool after pinning and unpinning block [file file, block 0]:
+
+Current index: 0
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
 
 
 
-//Test Buffer Behavior//
-
-//Pinning a new block while buffer is empty will place it in buffer 0
-
-Before pin:
+Unpinning buffer 
 
 
+(testPin) Buffer pool after pinning and unpinning block [file file, block 1]:
 
-After pin:
+Current index: 1
 
-//Pinning a new block with non-empty bufferpool containing free space will place new block
-//in empty space directly after current pointed-to buffer -
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
 
-//Pinning a new block with a full, all-pinned bufferpool will return null - 
 
-//Pinning a block that is already in buffer and has its second chance set to false will
-//set the second chance to true
 
-//Unpinning a buffer with a pin = 1 will cause the buffer to be replaceable 
+Unpinning buffer 
 
-//Unpinning a buffer with a pin > 1 will cause the buffer to still be pinned
 
-//Pinning a new block in buffer when full, with all buffers unpinned with second chances
-//will cause the currently pointed-to buffer to have its second chance removed first and
-//subsequently replaced -
+(testPin) Buffer pool after pinning and unpinning block [file file, block 2]:
 
+Current index: 2
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+
+(testPin) Buffer pool after pinning and unpinning block [file file, block 3]:
+
+Current index: 3
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+
+(testPin) Buffer pool after pinning and unpinning block [file file, block 4]:
+
+Current index: 4
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+
+(testPin) Buffer pool after pinning and unpinning block [file file, block 5]:
+
+Current index: 5
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+
+(testPin) Buffer pool after pinning and unpinning block [file file, block 6]:
+
+Current index: 6
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+
+(testPin) Buffer pool after pinning and unpinning block [file file, block 7]:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 0
+Holding Block [file file, block 7]
+Pin status false
+Second chance true
+////////////////////
+
+
+CASE 2: Pinning a block when the file is full but all blocks are
+unpinned
+	After the previous step, every buffer is filled and unpinned.
+	Their second chance bits have also not been affected. After
+	checking to see if there is empty space, the manager should
+	try to make space by removing an unpinned block. In this
+	case, the manager should check the buffer it is currently
+	pointing to and set its second chance bit to false. It will
+	then go through each buffer in order setting their second
+	chance bits to false. Once it reaches Buffer ID 7 once more,
+	it will check the second chance bit and replace the block
+	there with the new block shown below. The following is the
+	output after running the manager's replacement policy.
+
+
+(testPin) Buffer pool after pinning block [file file, block -1]:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 7
+Pin Count: 1
+Holding Block [file file, block -1]
+Pin status true
+Second chance true
+////////////////////
+
+
+CASE 3: Skipping buffers with second chances
+	In this case, the first output shows the buffer pool
+	with all the second chance bits of odd numbered buffers
+	set to true.
+	First, the manager must find space for a new block and
+	is pointing to the pinned Buffer ID 7. Because this
+	buffer is pinned, the manager should check it and point
+	to the next buffer without changing anything in it. The
+	output below follows this logic and replaces buffer 0
+	which had a second chance bit set to false.
+	Next, for each subsequent pin, the manager checks for
+	a new block to replace. In each instance, it sets the
+	odd-numbered block's second chances to false and then
+	replaces the following even-numbered buffer which was
+	already set to false. By the end, all even-numbered
+	buffers should be filled with pinned, second chanced
+	blocks.
+
+(testPin) Buffer pool after setting the second chance bits of the odd numbered buffers to true:
+(with respect to their position in the buffer pool array)
+:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 0
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 7
+Pin Count: 1
+Holding Block [file file, block -1]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+
+(testPin) Buffer pool after pinning block [file file, block 20]:
+
+Current index: 0
+
+////////////////////
+Buffer ID: 0
+Pin Count: 1
+Holding Block [file file, block 20]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 2
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 7
+Pin Count: 1
+Holding Block [file file, block -1]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+
+(testPin) Buffer pool after pinning block [file file, block 22]:
+
+Current index: 2
+
+////////////////////
+Buffer ID: 0
+Pin Count: 1
+Holding Block [file file, block 20]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 2
+Pin Count: 1
+Holding Block [file file, block 22]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 4
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 7
+Pin Count: 1
+Holding Block [file file, block -1]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+
+(testPin) Buffer pool after pinning block [file file, block 24]:
+
+Current index: 4
+
+////////////////////
+Buffer ID: 0
+Pin Count: 1
+Holding Block [file file, block 20]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 2
+Pin Count: 1
+Holding Block [file file, block 22]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 4
+Pin Count: 1
+Holding Block [file file, block 24]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 6
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 7
+Pin Count: 1
+Holding Block [file file, block -1]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+
+(testPin) Buffer pool after pinning block [file file, block 26]:
+
+Current index: 6
+
+////////////////////
+Buffer ID: 0
+Pin Count: 1
+Holding Block [file file, block 20]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 1
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 2
+Pin Count: 1
+Holding Block [file file, block 22]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 3
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 4
+Pin Count: 1
+Holding Block [file file, block 24]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 5
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 6
+Pin Count: 1
+Holding Block [file file, block 26]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 7
+Pin Count: 1
+Holding Block [file file, block -1]
+Pin status true
+Second chance true
+////////////////////
+
+
+CASE 4: Starting over and pinning new blocks in every buffer
+	We start this case by creating a new buffer and manager
+	and filling each buffer in the pool with a pinned block.
+	The testing class then checks the manager's numAvailable
+	which should result in 0, the number of empty buffers.
+	This check is signified by the "Full buffer check
+	passed" line.
+		
+
+Pin test passed.
+
+
+(testFullBuffer) Buffer pool after pinning 8 blocks:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 8
+Pin Count: 1
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 9
+Pin Count: 1
+Holding Block [file file, block 1]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 10
+Pin Count: 1
+Holding Block [file file, block 2]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 11
+Pin Count: 1
+Holding Block [file file, block 3]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 12
+Pin Count: 1
+Holding Block [file file, block 4]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 13
+Pin Count: 1
+Holding Block [file file, block 5]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 14
+Pin Count: 1
+Holding Block [file file, block 6]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 15
+Pin Count: 1
+Holding Block [file file, block 7]
+Pin status true
+Second chance true
+////////////////////
+
+
+Full buffer test passed.
+
+
+CASE 5: Finding a block already in the buffer pool.
+	This case tests that the manager will not pin a block again
+	that is already in the buffer pool. In the following output
+	when the manager attempts to pin, it finds the block in
+	buffer ID 16 and does not add it again.
+
+(testBlockAlreadyExists) Buffer pool after adding the block [file file, block 0]:
+
+Current index: 0
+
+////////////////////
+Buffer ID: 16
+Pin Count: 1
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 17
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 18
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 19
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 20
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 21
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 22
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 23
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+(testBlockAlreadyExists) Buffer pool after adding the block [file file, block 0] again:
+
+Current index: 0
+
+////////////////////
+Buffer ID: 16
+Pin Count: 2
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 17
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 18
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 19
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 20
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 21
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 22
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 23
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+Current index: 0
+
+////////////////////
+Buffer ID: 16
+Pin Count: 2
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 17
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 18
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 19
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 20
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 21
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 22
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+Buffer ID: 23
+Pin Count: 0
+No block in buffer
+Pin status false
+Second chance true
+////////////////////
+
+
+
+CASE 6: 
+	In this case, the manager fills a new buffer pool with
+	pinned blocks until it is full. It then pins the same
+	blocks a second time, which should increment the pin
+	counter of each block so they are set to 2. 
+	In order to test this, each block is then unpinned once.
+	The next print out shows that each block is still
+	pinned after having their pin decremented.
+	Then, each block is unpinned once more. The output
+	for this step shows that now each block is completely
+	unpinned (pin of 0) and the number of available spaces
+	for new pins is 8, one for each unpinned buffer.
+	Finally, during the last step our test class also set
+	the second chance bits of every block to be false. The
+	manager then pins every block again and the final print
+	shows that each block has been pinned and their second
+	chance bits have subsequently been set to true again as
+	a cause of being pinned.
+
+
+(testBlockAlreadyExists) New buffer pool with 8 blocks pinned:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 24
+Pin Count: 1
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 25
+Pin Count: 1
+Holding Block [file file, block 1]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 26
+Pin Count: 1
+Holding Block [file file, block 2]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 27
+Pin Count: 1
+Holding Block [file file, block 3]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 28
+Pin Count: 1
+Holding Block [file file, block 4]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 29
+Pin Count: 1
+Holding Block [file file, block 5]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 30
+Pin Count: 1
+Holding Block [file file, block 6]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 31
+Pin Count: 1
+Holding Block [file file, block 7]
+Pin status true
+Second chance true
+////////////////////
+
+
+(testBlockAlreadyExists) Buffer pool after calling pin on every block that is in the buffer pool (i.e. each buffer is pinned for a second time:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 24
+Pin Count: 2
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 25
+Pin Count: 2
+Holding Block [file file, block 1]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 26
+Pin Count: 2
+Holding Block [file file, block 2]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 27
+Pin Count: 2
+Holding Block [file file, block 3]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 28
+Pin Count: 2
+Holding Block [file file, block 4]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 29
+Pin Count: 2
+Holding Block [file file, block 5]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 30
+Pin Count: 2
+Holding Block [file file, block 6]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 31
+Pin Count: 2
+Holding Block [file file, block 7]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+(testBlockAlreadyExists) Buffer pool after calling unpin on every buffer:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 24
+Pin Count: 1
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 25
+Pin Count: 1
+Holding Block [file file, block 1]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 26
+Pin Count: 1
+Holding Block [file file, block 2]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 27
+Pin Count: 1
+Holding Block [file file, block 3]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 28
+Pin Count: 1
+Holding Block [file file, block 4]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 29
+Pin Count: 1
+Holding Block [file file, block 5]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 30
+Pin Count: 1
+Holding Block [file file, block 6]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 31
+Pin Count: 1
+Holding Block [file file, block 7]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+Unpinning buffer 
+
+(testBlockAlreadyExists) Buffer pool after calling unpin again on every bufferand setting each buffer's second chance bit to false:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 24
+Pin Count: 0
+Holding Block [file file, block 0]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 25
+Pin Count: 0
+Holding Block [file file, block 1]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 26
+Pin Count: 0
+Holding Block [file file, block 2]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 27
+Pin Count: 0
+Holding Block [file file, block 3]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 28
+Pin Count: 0
+Holding Block [file file, block 4]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 29
+Pin Count: 0
+Holding Block [file file, block 5]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 30
+Pin Count: 0
+Holding Block [file file, block 6]
+Pin status false
+Second chance false
+////////////////////
+Buffer ID: 31
+Pin Count: 0
+Holding Block [file file, block 7]
+Pin status false
+Second chance false
+////////////////////
+
+
+
+(testBlockAlreadyExists) Buffer pool after calling pin on each block that's already in the pool:
+
+Current index: 7
+
+////////////////////
+Buffer ID: 24
+Pin Count: 1
+Holding Block [file file, block 0]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 25
+Pin Count: 1
+Holding Block [file file, block 1]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 26
+Pin Count: 1
+Holding Block [file file, block 2]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 27
+Pin Count: 1
+Holding Block [file file, block 3]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 28
+Pin Count: 1
+Holding Block [file file, block 4]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 29
+Pin Count: 1
+Holding Block [file file, block 5]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 30
+Pin Count: 1
+Holding Block [file file, block 6]
+Pin status true
+Second chance true
+////////////////////
+Buffer ID: 31
+Pin Count: 1
+Holding Block [file file, block 7]
+Pin status true
+Second chance true
+////////////////////
+
+
+
+
+Duplicate block pin test passed.
+
+All tests passed.

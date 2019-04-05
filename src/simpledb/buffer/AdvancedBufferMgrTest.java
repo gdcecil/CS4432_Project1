@@ -98,7 +98,9 @@ class AdvancedBufferMgrTest {
 		//check that we can't pin a block, as all buffers are full
 		boolean pinOK1 = mgr.pin(new Block("file", -1)) == null;
 
-
+		//This point needs to print out letting us know that the buffers
+		//are still the same
+		
 		results = availableOK1 && pinOK1;
 		return results;
 	}
