@@ -1,17 +1,17 @@
-///////////////////////////////////////////
-//This file contains output from the test//
-//class AdvancedBufferMgrTest.java. The  //
-//file has been modified to illustrate   //
-//aspects which prove our buffer manager //
-//correctly handles the buffer as        //
-//intended. For a full description of the//
-//behavior of the buffer, see the        //
-//OVERVIEW section of Design.txt         //
-//Each case described in this file tests //
-//multiple aspects of the buffer manager.//
-//Those cases are described before the   //
-//output of the tests is shown.          //
-///////////////////////////////////////////
+/////////////////////////////////////////////
+// This file contains output from the test //
+// class AdvancedBufferMgrTest.java. The   //
+// file has been modified to illustrate    //
+// aspects which prove our buffer manager  //
+// correctly handles the buffer as         //
+// intended. For a full description of the //
+// behavior of the buffer, see the         //
+// OVERVIEW section of Design.txt          //
+// Each case described in this file tests  //
+// multiple aspects of the buffer manager. //
+// Those cases are described before the    //
+// output of the tests is shown.           //
+/////////////////////////////////////////////
 
 CASE 1: Pinning and unpinning blocks until the buffer is full
 	During this test, 8 blocks are pinned and then unpinned to 
