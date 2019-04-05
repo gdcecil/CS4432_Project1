@@ -27,6 +27,8 @@ import simpledb.file.Block;
  * rather than testing them we test the behavior of Pin and other methods of 
  * AdvancedBufferMgr that are actually called by other classes.
  * 
+ * Note3: AdvancedBufferMgrTest can be run without the simpledb server.
+ * 
  * Griffin Cecil, Michael Warms
  * @author mcwarms, gdcecil
  *
