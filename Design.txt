@@ -100,6 +100,15 @@ OVERVIEW
 	test out buffer manager without the database itself. 
 
 
+
+MODIFIED FILES
+
+	The following lists the files added or modified in order to implement
+our buffer policy described above. Within each file, functions marked with
+"CS4432-Project1" in their header have been created or modified by our group.
+The function header also provides an explanation for each change.
+
+
 The following files were added to the database in CS4432_Project1
 	- src/simpledb.buffer/AdvancedBufferMgr.java
 	- src/simpledb.buffer/AdvancedBufferMgrTest.java
@@ -112,16 +121,19 @@ of the databased
 	- BufferMgr.java	
 
 AdvancedBufferMgr.java
-	This class extends BasicBufferMgr.java. When constructed, AdvancedBufferMgr
+
+		This class extends BasicBufferMgr.java. When constructed, AdvancedBufferMgr
 	constructs a BasicBufferMgr using the provided numbuffs.
 	
 AdvancedBufferMgrTest.java
-	This class is used to test the functionality of the AdvancedBufferMgr. This
-	class creates instances of AdvancedBufferMgr and fills their bufferpools
+	
+		This class is used to test the functionality of the AdvancedBufferMgr.
+	This class creates instances of AdvancedBufferMgr and fills their bufferpools
 	with set files. The class then calls various pin, flush, and printing
 	functions to determine the state of the bufferpool and whether certain
 	methods acted as intended.
-	For more information, refer to the documentation within
+	
+		For more information, refer to the documentation within
 	AdvancedBufferMgrTest.java
 	
 	
@@ -137,19 +149,19 @@ BasicBufferMgr.java
 		
 Buffer.java	
 
-	Added a secondChance attribute to track whether the block inside the buffer may
-	be relaced during a pin operation. This tracking is necessary for implementing
+		Added a secondChance attribute to track whether the block inside the buffer
+	may be relaced during a pin operation. This tracking is necessary for implementing
 	a clock replacement policy
 		hasSecondChance(): returns the secondChance attribute
 		setSecondChance(bool): sets the secondChance attribute to the given bool
 		
-	Added a buffID attribute to the buffer that is set upon construction and is
+		Added a buffID attribute to the buffer that is set upon construction and is
 	unique to each buffer. The buffID identifies buffers during testing.
 		id(): returns the value of buffID
 	
-	Added a diskInteraction attribute to track whether the buffer was made for testing
-	purposes. If diskInteraction is true, the following methods do not write to disk
-	when called:
+		Added a diskInteraction attribute to track whether the buffer was made for 
+	testing purposes. If diskInteraction is true, the following methods do not write
+	to disk when called:
 		setString()
 		flush()
 		assignToBlock()
