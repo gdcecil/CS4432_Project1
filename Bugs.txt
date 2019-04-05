@@ -2,15 +2,20 @@
 ///Known Bugs///
 ////////////////
 
+The following bugs can be found in vanilla SimpleDB and have not
+been addressed during this project. This list is taken directly
+from the README.txt found packaged with SimpleDB:
 
-None
-
-
+	* The "*" abbreviation in the select clause is not supported.
+    * There are no null values.
+    * There are no explicit joins or outer joins in the from clause.
+    * The union and except keywords are not supported.
+    * Insert statements take explicit values only, not queries.
+    * Update statements can have only one assignment in the set clause.
 
 
 ////////////////
 //Unknown Bugs//
 ////////////////
 
-
-Yes
+No

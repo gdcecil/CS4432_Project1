@@ -14,8 +14,9 @@
 /////////////////////////////////////////////
 
 CASE 1: Pinning and unpinning blocks until the buffer is full
-	During this test, 8 blocks are pinned and then unpinned to 
-	the bufferpool in succession. For each pin, the current
+
+		During this test, 8 blocks are pinned and then unpinned
+	to the bufferpool in succession. For each pin, the current
 	index shows which Buffer ID the manager is currently
 	pointing to. In this test, the manager correctly fills
 	all empty space by placing new blocks into the next
@@ -547,7 +548,8 @@ Second chance true
 
 CASE 2: Pinning a block when the file is full but all blocks are
 unpinned
-	After the previous step, every buffer is filled and unpinned.
+
+		After the previous step, every buffer is filled and unpinned.
 	Their second chance bits have also not been affected. After
 	checking to see if there is empty space, the manager should
 	try to make space by removing an unpinned block. In this
@@ -616,16 +618,19 @@ Second chance true
 
 
 CASE 3: Skipping buffers with second chances
-	In this case, the first output shows the buffer pool
+
+		In this case, the first output shows the buffer pool
 	with all the second chance bits of odd numbered buffers
 	set to true.
-	First, the manager must find space for a new block and
-	is pointing to the pinned Buffer ID 7. Because this
+	
+		First, the manager must find space for a new block
+	and is pointing to the pinned Buffer ID 7. Because this
 	buffer is pinned, the manager should check it and point
 	to the next buffer without changing anything in it. The
 	output below follows this logic and replaces buffer 0
 	which had a second chance bit set to false.
-	Next, for each subsequent pin, the manager checks for
+	
+		Next, for each subsequent pin, the manager checks for
 	a new block to replace. In each instance, it sets the
 	odd-numbered block's second chances to false and then
 	replaces the following even-numbered buffer which was
@@ -919,7 +924,8 @@ Second chance true
 
 
 CASE 4: Starting over and pinning new blocks in every buffer
-	We start this case by creating a new buffer and manager
+
+		We start this case by creating a new buffer and manager
 	and filling each buffer in the pool with a pinned block.
 	The testing class then checks the manager's numAvailable
 	which should result in 0, the number of empty buffers.
@@ -1160,19 +1166,24 @@ Second chance true
 
 
 
-CASE 6: 
-	In this case, the manager fills a new buffer pool with
-	pinned blocks until it is full. It then pins the same
-	blocks a second time, which should increment the pin
-	counter of each block so they are set to 2. 
-	In order to test this, each block is then unpinned once.
-	The next print out shows that each block is still
-	pinned after having their pin decremented.
-	Then, each block is unpinned once more. The output
+CASE 6: Pinning buffers twice, unpinning buffers with pin
+count of 2 twice, pinning a block sets second chance to True.
+	
+		In this case, the manager fills a new buffer pool
+	with pinned blocks until it is full. It then pins the 
+	same blocks a second time, which should increment the
+	pin counter of each block so they are set to 2. 
+	
+		In order to test this, each block is then unpinned
+	once. The next print out shows that each block is
+	still pinned after having their pin decremented.
+	
+		Then, each block is unpinned once more. The output
 	for this step shows that now each block is completely
 	unpinned (pin of 0) and the number of available spaces
 	for new pins is 8, one for each unpinned buffer.
-	Finally, during the last step our test class also set
+	
+		Finally, during the last step our test class also set
 	the second chance bits of every block to be false. The
 	manager then pins every block again and the final print
 	shows that each block has been pinned and their second
