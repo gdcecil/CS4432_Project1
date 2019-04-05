@@ -20,6 +20,40 @@ you might need to delete this file to ensure the database is deleted.)
 10. The database will now be ready to run.
 
 
+*////////////////////////////////*
+*// Running SQL examples       //*
+*////////////////////////////////*
+
+Before running the SQL examples found in Examples.java, make sure you follow the
+installation instructions above and that the startup server is running.
+
+NOTE: The provided Examples.sql file is a read only file, Examples.java contains
+a working version of the SQL statements wrapped in JDBC.
+
+1. In Eclipse, open the project to the root directory, CS4432_Project1
+2. In the project explorer, navigate to CS4432_Project1/studentClient/simpledb
+3. Right-click on Examples.java
+4. Select Run As > Java Application
+5. The output will be displayed in the console. You may need to switch the
+displayed console to view the ouput.
+
+
+*////////////////////////////////*
+*// Running Buffer Tests       //*
+*////////////////////////////////*
+
+In order to run the buffer tests, the startup server does NOT need to be running.
+
+NOTE: The output of this file has already been provided and annotated in
+Testing.txt for your convenience.
+
+1. In Eclipse, open the project to the root directory, CS4432_Project1
+2. In the project explorer, navigate to CS4432_Project1/src/simpledb.buffer
+3. Right-click on AdvancedBufferMgrTest.java
+4. Select Run As > Java Application
+5. The output will be displayed in the console. You may need to switch the
+displayed console to view the ouput.
+
 
 DELIVERABLES
 - README.txt which you are currently reading
