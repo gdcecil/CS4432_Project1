@@ -1,3 +1,11 @@
+/* This file is a conversion of Examples.java*/
+/* into pure SQL statements. This file is for*/
+/* reference only. If you would like to run  */
+/* this file, follow the instructions in     */
+/* README.txt to run Examples.java. The      */
+/* output for these statements can also be   */
+/* found in Examples.java.                   */
+
 CREATE TABLE "TEST"
 	(
 	"ID" INTEGER,
