@@ -7,7 +7,8 @@ import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.index.Index;
 import simpledb.index.hash.HashIndex; 
-import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
+import simpledb.index.btree.BTreeIndex;
+import simpledb.index.extensihash.ExtensiHashIndex;
 
 
 /**
@@ -19,7 +20,7 @@ import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
  * @author Edward Sciore
  */
 public class IndexInfo {
-   private String idxname, fldname;
+   private String indextype, idxname, fldname;
    private Transaction tx;
    private TableInfo ti;
    private StatInfo si;
@@ -31,8 +32,9 @@ public class IndexInfo {
     * @param fldname the name of the indexed field
     * @param tx the calling transaction
     */
-   public IndexInfo(String idxname, String tblname, String fldname,
+   public IndexInfo(String indextype, String idxname, String tblname, String fldname,
                     Transaction tx) {
+	  this.indextype = indextype;
       this.idxname = idxname;
       this.fldname = fldname;
       this.tx = tx;
@@ -46,8 +48,19 @@ public class IndexInfo {
     */
    public Index open() {
       Schema sch = schema();
-      // Create new HashIndex for hash indexing
-      return new HashIndex(idxname, sch, tx);
+      
+       //Create index based on type stored in IndexInfo
+       if (indextype == "sh") {
+         return new HashIndex(idxname, sch, tx);
+       } else if (indextype == "bt") {
+         return new BTreeIndex(idxname, sch, tx);
+       } else if (indextype == "eh") {
+         return new ExtensiHashIndex(idxname, sch, tx);
+       } else {
+         //Not supposed to reach this point, should handle error
+    	 return new HashIndex(idxname, sch, tx);
+       }     
+      
    }
    
    /**
@@ -65,8 +78,21 @@ public class IndexInfo {
       TableInfo idxti = new TableInfo("", schema());
       int rpb = BLOCK_SIZE / idxti.recordLength();
       int numblocks = si.recordsOutput() / rpb;
-      // Call HashIndex.searchCost for hash indexing
-      return HashIndex.searchCost(numblocks, rpb);
+
+      //Call searchcost based on the type of index
+      if (indextype == "sh") {
+	    return HashIndex.searchCost(numblocks, rpb);
+	  } else if (indextype == "bt") {
+	    return BTreeIndex.searchCost(numblocks, rpb);
+	  }
+      //commented out until implemented in extensihash
+//	  else if (indextype == "eh") {
+//	    return ExtensiHashIndex.searchCost(numblocks,rpb);
+//	  } 
+	  else {
+	  //Not supposed to reach this point, should handle error
+	     return HashIndex.searchCost(numblocks, rpb);
+	  }
    }
    
    /**
