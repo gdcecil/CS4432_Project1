@@ -37,6 +37,7 @@ public class IndexUpdatePlanner implements UpdatePlanner {
          System.out.println("Modify field " + fldname + " to val " + val);
          s.setVal(fldname, val);
          
+         //Retrieves index (if it exists) and inserts
          IndexInfo ii = indexes.get(fldname);
          if (ii != null) {
             Index idx = ii.open();
