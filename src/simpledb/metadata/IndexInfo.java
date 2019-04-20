@@ -8,7 +8,7 @@ import simpledb.record.*;
 import simpledb.index.Index;
 import simpledb.index.hash.HashIndex; 
 import simpledb.index.btree.BTreeIndex;
-import simpledb.extensihash.ExtensiHashIndex;
+import simpledb.index.extensihash.ExtensiHashIndex;
 
 
 /**
