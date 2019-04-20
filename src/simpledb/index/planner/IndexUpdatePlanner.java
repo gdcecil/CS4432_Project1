@@ -60,6 +60,7 @@ public class IndexUpdatePlanner implements UpdatePlanner {
       while(s.next()) {
          // first, delete the record's RID from every index
          RID rid = s.getRid();
+         //Gets each index and deletes the entry
          for (String fldname : indexes.keySet()) {
             Constant val = s.getVal(fldname);
             Index idx = indexes.get(fldname).open();
