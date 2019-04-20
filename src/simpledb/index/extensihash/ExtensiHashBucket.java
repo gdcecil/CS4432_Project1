@@ -14,19 +14,21 @@ public class ExtensiHashBucket {
 	private Transaction tx;
 	private int slotsize;
 	private int localDepth;
+	private int bucketNum;
 
-	public ExtensiHashBucket (Block currentblk, TableInfo ti, Transaction tx, int localDepth) 
+	public ExtensiHashBucket (Block currentblk, 
+			TableInfo ti, 
+			Transaction tx, 
+			int localDepth,
+			int bucketNum) 
 	{
 		this.currentblk = currentblk; 
 		this.ti = ti;
 		this.tx = tx; 
 		slotsize = ti.recordLength();
 		tx.pin(currentblk);
-	}
-
-	public ExtensiHashBucket (Block currentblk, TableInfo ti, Transaction tx)
-	{
-		this(currentblk, ti, tx, 0);
+		this.localDepth=localDepth;
+		this.bucketNum = bucketNum;
 	}
 
 	/**
@@ -39,22 +41,23 @@ public class ExtensiHashBucket {
 	 * modulo 2^(old local depth) and this bucket will hold the lower one while the
 	 * new bucketw will hold the greater one
 	 * 
-	 * @return Block of the new split bu
+	 * @return Block of the new split bucket
 	 */
 	public Block split() 
 	{
+		int bigKey = bucketNum+(1<< localDepth);
+		
 		localDepth++;
-		Block bigKeyBlk = appendNew(localDepth); 
-		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, localDepth);
 
-		int littleKey = 1 <<localDepth; 
-
-		int newPos = 0;
-		int oldPos = INT_SIZE + INT_SIZE;
+		Block bigKeyBlk = appendNew(localDepth, bigKey); 
+		
+		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, localDepth, bigKey);
+		
+		moveRecords(bigKeyBucket, bigKey);
 		return bigKeyBlk;
 	}
-	
-	
+
+
 	/** 
 	 * Moves records to extensiHashBucket dest if they satisfy 
 	 * record.dataval.hashcode() % localdepth == modPredicate.
@@ -64,19 +67,48 @@ public class ExtensiHashBucket {
 	 */
 	private void moveRecords(ExtensiHashBucket dest, int modPredicate)
 	{
-		
+		int recLen = ti.recordLength();
+		Schema sch = ti.schema();
+
+		int destSlot = 0;
+		int pos = 0; 
+
+		while (pos < getNumRecs())
+		{
+			if (getVal(pos,"dataval").hashCode() % (1<<localDepth) == modPredicate)
+			{
+				for (String fldname : sch.fields()) 
+				{
+					dest.insert(destSlot);
+					dest.setVal(destSlot, fldname, getVal(pos, fldname));
+					delete(pos);
+					destSlot++;
+				}
+
+			}
+			else
+			{
+				pos+= recLen;
+			}
+		}
 	}
-	
+
 	/**
 	 * Appends a new block to the end of the specified B-tree file,
 	 * having the specified flag value.
 	 * @param flag the initial value of the flag
 	 * @return a reference to the newly-created block
 	 */
-	public Block appendNew(int localdepth) {
-		return tx.append(ti.fileName(), new BucketFormatter(ti, localdepth));
+	public Block appendNew(int localdepth, int bucketNum) {
+		return tx.append(ti.fileName(), new BucketFormatter(ti, localdepth, bucketNum));
 	}
-	
+
+
+	private void setBucketNum(int newBucketNum)
+	{
+		tx.setInt(currentblk, BucketFormatter.BUCKET_NUM_OFFSET, newBucketNum);
+	}
+
 	/* CS4432-Project2
 	 * 
 	 * The following methods were copied from simpledb.index.btree. They are 
