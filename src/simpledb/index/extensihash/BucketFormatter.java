@@ -10,10 +10,16 @@ import simpledb.record.TableInfo;
 public class BucketFormatter implements PageFormatter {
 	private TableInfo ti; 
 	private int localDepth;
+	private int num;
+	static final int LOCAL_DEPTH_OFFSET = 0;
+	static final int BUCKET_NUM_OFFSET = INT_SIZE;
+	static final int RECORD_COUNT_OFFSET = 2*INT_SIZE;
+	static final int RECORD_START_OFFSET = 3*INT_SIZE;
 
-	public BucketFormatter (TableInfo ti, int localDepth) { 
+	public BucketFormatter (TableInfo ti, int localDepth, int num) { 
 		this.ti = ti;
 		this.localDepth = localDepth;
+		this.num = num;
 
 	}
 
@@ -28,10 +34,11 @@ public class BucketFormatter implements PageFormatter {
 	 * 
 	 */
 	public void format(Page p) {
-		p.setInt(0, localDepth);
-		p.setInt(INT_SIZE, 0);
+		p.setInt(LOCAL_DEPTH_OFFSET, localDepth);
+		p.setInt(BUCKET_NUM_OFFSET, num);
+		p.setInt(RECORD_COUNT_OFFSET, 0);
 		int recSize = ti.recordLength(); 
-		for (int pos = 2*INT_SIZE; pos + recSize <= BLOCK_SIZE; pos += recSize)
+		for (int pos = RECORD_START_OFFSET; pos + recSize <= BLOCK_SIZE; pos += recSize)
 		{
 			makeDefaultRecord(p, pos);
 		}

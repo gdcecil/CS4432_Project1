@@ -19,7 +19,7 @@ public class ExtensiHashIndex implements Index {
 	
 	public ExtensiHashIndex(String idxname, Schema sch, Transaction tx)
 	{
-		this.tx = tx;
+		this.tx = tx; 
 	}
 
 	@Override
