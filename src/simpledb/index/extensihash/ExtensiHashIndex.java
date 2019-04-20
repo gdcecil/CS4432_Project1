@@ -1,4 +1,4 @@
-package simpledb.extensihash;
+package simpledb.index.extensihash;
 
 import static java.sql.Types.INTEGER;
 import simpledb.file.Block;
