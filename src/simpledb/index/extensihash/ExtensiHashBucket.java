@@ -3,31 +3,20 @@ package simpledb.index.extensihash;
 import static java.sql.Types.INTEGER;
 import static simpledb.file.Page.*;
 import simpledb.file.Block;
-import simpledb.index.btree.BTPageFormatter;
 import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
 
-public class ExtensiHashBucket {
-	private Block currentblk; 
-	private TableInfo ti;
-	private Transaction tx;
-	private int slotsize;
-	private int localDepth;
+class ExtensiHashBucket extends ExtensiHashPage{
 	private int bucketNum;
 
-	public ExtensiHashBucket (Block currentblk, 
+	ExtensiHashBucket (Block currentblk, 
 			TableInfo ti, 
 			Transaction tx, 
 			int localDepth,
 			int bucketNum) 
 	{
-		this.currentblk = currentblk; 
-		this.ti = ti;
-		this.tx = tx; 
-		slotsize = ti.recordLength();
-		tx.pin(currentblk);
-		this.localDepth=localDepth;
+		super (currentblk, ti, tx, localDepth);
 		this.bucketNum = bucketNum;
 	}
 
@@ -45,13 +34,13 @@ public class ExtensiHashBucket {
 	 */
 	public Block split() 
 	{
-		int bigKey = bucketNum+(1<< localDepth);
+		int bigKey = bucketNum+(1<< depth);
 		
-		localDepth++;
+		depth++;
 
-		Block bigKeyBlk = appendNew(localDepth, bigKey); 
+		Block bigKeyBlk = appendNew(depth, bigKey); 
 		
-		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, localDepth, bigKey);
+		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, depth, bigKey);
 		
 		moveRecords(bigKeyBucket, bigKey);
 		return bigKeyBlk;
@@ -75,7 +64,7 @@ public class ExtensiHashBucket {
 
 		while (pos < getNumRecs())
 		{
-			if (getVal(pos,"dataval").hashCode() % (1<<localDepth) == modPredicate)
+			if (getVal(pos,"dataval").hashCode() % (1<<depth) == modPredicate)
 			{
 				for (String fldname : sch.fields()) 
 				{
@@ -100,14 +89,14 @@ public class ExtensiHashBucket {
 	 * @return a reference to the newly-created block
 	 */
 	public Block appendNew(int localdepth, int bucketNum) {
-		return tx.append(ti.fileName(), new BucketFormatter(ti, localdepth, bucketNum));
+		return tx.append(ti.fileName(), new EHPageFormatter(ti, localdepth, bucketNum));
 	}
 
 
-	private void setBucketNum(int newBucketNum)
+	/*private void setBucketNum(int newBucketNum)
 	{
 		tx.setInt(currentblk, BucketFormatter.BUCKET_NUM_OFFSET, newBucketNum);
-	}
+	}*/
 
 	/* CS4432-Project2
 	 * 
@@ -116,36 +105,19 @@ public class ExtensiHashBucket {
 	 * B-Tree structure, so we use them here as well.
 	 */
 
-	/**
+	/*
 	 * Calculates the position where the first record having
 	 * the specified search key should be, then returns
 	 * the position before it.
 	 * @param searchkey the search key
 	 * @return the position before where the search key goes
-	 */
+	 
 	public int findSlotBefore(Constant searchkey) {
 		int slot = 0;
 		while (slot < getNumRecs() && getDataVal(slot).compareTo(searchkey) < 0)
 			slot++;
 		return slot-1;
-	}
-
-	/**
-	 * Closes the page by unpinning its buffer.
-	 */
-	public void close() {
-		if (currentblk != null)
-			tx.unpin(currentblk);
-		currentblk = null;
-	}
-
-	/**
-	 * Returns true if the block is full.
-	 * @return true if the block is full
-	 */
-	public boolean isFull() {
-		return slotpos(getNumRecs()+1) >= BLOCK_SIZE;
-	}
+	}*/
 
 
 	/**
@@ -167,85 +139,8 @@ public class ExtensiHashBucket {
 		return new RID(getInt(slot, "block"), getInt(slot, "id"));
 	}
 
-	/**
-	 * Deletes the index record at the specified slot.
-	 * @param slot the slot of the deleted index record
-	 */
-	public void delete(int slot) {
-		for (int i=slot+1; i<getNumRecs(); i++)
-			copyRecord(i, i-1);
-		setNumRecs(getNumRecs()-1);
-		return;
-	}
-
-	/**
-	 * Returns the number of index records in this page.
-	 * @return the number of index records in this page
-	 */
-	public int getNumRecs() {
-		return tx.getInt(currentblk, INT_SIZE);
-	}
-
-
-	private int getInt(int slot, String fldname) {
-		int pos = fldpos(slot, fldname);
-		return tx.getInt(currentblk, pos);
-	}
-
-	private String getString(int slot, String fldname) {
-		int pos = fldpos(slot, fldname);
-		return tx.getString(currentblk, pos);
-	}
-
-	private Constant getVal(int slot, String fldname) {
-		int type = ti.schema().type(fldname);
-		if (type == INTEGER)
-			return new IntConstant(getInt(slot, fldname));
-		else
-			return new StringConstant(getString(slot, fldname));
-	}
-
-	private void setInt(int slot, String fldname, int val) {
-		int pos = fldpos(slot, fldname);
-		tx.setInt(currentblk, pos, val);
-	}
-
-	private void setString(int slot, String fldname, String val) {
-		int pos = fldpos(slot, fldname);
-		tx.setString(currentblk, pos, val);
-	}
-
-	private void setVal(int slot, String fldname, Constant val) {
-		int type = ti.schema().type(fldname);
-		if (type == INTEGER)
-			setInt(slot, fldname, (Integer)val.asJavaVal());
-		else
-			setString(slot, fldname, (String)val.asJavaVal());
-	}
-
-	private void setNumRecs(int n) {
-		tx.setInt(currentblk, INT_SIZE, n);
-	}
-
-	private void insert(int slot) {
-		for (int i=getNumRecs(); i>slot; i--)
-			copyRecord(i-1, i);
-		setNumRecs(getNumRecs()+1);
-	}
-
-	private void copyRecord(int from, int to) {
-		Schema sch = ti.schema();
-		for (String fldname : sch.fields())
-			setVal(to, fldname, getVal(from, fldname));
-	}
-
-	private int fldpos(int slot, String fldname) {
-		int offset = ti.offset(fldname);
-		return slotpos(slot) + offset;
-	}
-
-	private int slotpos(int slot) {
-		return INT_SIZE + INT_SIZE + (slot * slotsize);
+	protected int slotpos(int slot) {
+		return INT_SIZE + INT_SIZE + INT_SIZE + (slot * slotsize);
 	}
 
 }
