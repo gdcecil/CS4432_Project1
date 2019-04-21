@@ -1,0 +1,52 @@
+Insert into test1 time: 172 Seconds
+/////////////////////////////
+Query: Select a1, a2 from test1 Where a1=1
+Run time: 17 Milliseconds
+Query output: 
+797
+848
+321
+958
+149
+244
+604
+812
+293
+652
+530
+367
+/////////////////////////////
+/////////////////////////////
+Query: Select a1, a2 from test2 Where a1=1
+Run time: 3 Milliseconds
+Query output: 
+797
+848
+321
+958
+149
+244
+604
+812
+293
+652
+530
+367
+/////////////////////////////
+/////////////////////////////
+Query: Select a1, a2 from test3 Where a1=1
+Run time: 3 Milliseconds
+Query output: 
+797
+848
+321
+958
+149
+244
+604
+812
+293
+652
+530
+367
+/////////////////////////////
