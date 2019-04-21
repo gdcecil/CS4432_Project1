@@ -1,5 +1,9 @@
 package simpledb.index.planner;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.PrintStream;
 import java.util.Iterator;
 import java.util.Map;
 
@@ -41,6 +45,21 @@ public class IndexUpdatePlanner implements UpdatePlanner {
          IndexInfo ii = indexes.get(fldname);
          if (ii != null) {
             Index idx = ii.open();
+            
+            //Print to file the cost of accessing the blocks
+            int cost = ii.blocksAccessed();
+            System.out.println("Cost of access: " + cost);
+//            try {
+//				PrintStream file = new PrintStream(new FileOutputStream("C:/Users/Griffin/Desktop/iocost.txt", true));
+//				PrintStream console = System.out;
+//				System.setOut(file);
+//				System.out.println(cost);
+//				System.setOut(console);
+//			} catch (FileNotFoundException e) {
+//				// TODO Auto-generated catch block
+//				e.printStackTrace();
+//			}
+            
             idx.insert(val, rid);
             idx.close();
          }

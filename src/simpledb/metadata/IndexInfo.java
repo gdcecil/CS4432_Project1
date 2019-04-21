@@ -47,14 +47,14 @@ public class IndexInfo {
     * @return the Index object associated with this information
     */
    public Index open() {
-      Schema sch = schema();
-      
+       Schema sch = schema();
+       System.out.println("Index type: " + indextype + " with name: " + idxname);
        //Create index based on type stored in IndexInfo
-       if (indextype == "sh") {
+       if (indextype.equals("sh")) {
          return new HashIndex(idxname, sch, tx);
-       } else if (indextype == "bt") {
+       } else if (indextype.equals("bt")) {
          return new BTreeIndex(idxname, sch, tx);
-       } else if (indextype == "eh") {
+       } else if (indextype.equals("eh")) {
          return new ExtensiHashIndex(idxname, sch, tx);
        } else {
          //Not supposed to reach this point, should handle error
@@ -81,8 +81,10 @@ public class IndexInfo {
 
       //Call searchcost based on the type of index
       if (indextype == "sh") {
+    	System.out.println("cost of static hash");
 	    return HashIndex.searchCost(numblocks, rpb);
 	  } else if (indextype == "bt") {
+		System.out.println("cost of BTree");
 	    return BTreeIndex.searchCost(numblocks, rpb);
 	  }
       //commented out until implemented in extensihash
