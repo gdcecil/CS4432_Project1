@@ -7,6 +7,8 @@ import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
 
+import java.lang.Exception;
+
 
 /**
  * CS4432-Project2
@@ -29,11 +31,17 @@ import simpledb.tx.Transaction;
  * @author mcwarms, gdcecil
  *
  */
-class ExtensiHashDir extends ExtensiHashPage {
-
-	ExtensiHashDir (Block currentblk, TableInfo ti, Transaction tx, int globalDepth)
+class ExtensiHashDir extends ExtensiHashPage 
+{
+	private TableInfo bucketsTi;
+	
+	ExtensiHashDir (Block currentblk, 
+					TableInfo ti, 
+					TableInfo bucketsTi,
+					Transaction tx)
 	{
-		super (currentblk, ti, tx, globalDepth);
+		super (currentblk, ti, tx);
+		this.bucketsTi = bucketsTi;
 	}
 	
 	/**
@@ -45,9 +53,14 @@ class ExtensiHashDir extends ExtensiHashPage {
 	 * with bucket numbers equivalent modulo 2^(old depth) reference the
 	 * same bucket.
  	 */
-	private void incrementGlobalDepth()
+	private void incrementGlobalDepth() throws BucketOverflowException
 	{
 		int oldNum = getNumRecs(); 
+		
+		if (slotpos(2*oldNum -1) >= BLOCK_SIZE)
+		{
+			throw new BucketOverflowException (tx.size(bucketsTi.fileName()), depth + 1);
+		}
 		
 		for (int pos = 0; pos < 2*oldNum; pos+=2)
 		{
@@ -59,6 +72,11 @@ class ExtensiHashDir extends ExtensiHashPage {
 		incrementDepth();
 	}
 	
+	public void updateDirEntry (int bucketNum, int block)
+	{
+		
+	}
+	
 	
 	@Override
 	protected int slotpos(int slot) {
@@ -66,4 +84,31 @@ class ExtensiHashDir extends ExtensiHashPage {
 		return INT_SIZE+INT_SIZE+INT_SIZE + (slot * slotsize);
 	}
 
+}
+
+class BucketOverflowException extends Exception
+{
+	private int idxBlocks; 
+	private int oldDepth;
+	
+	BucketOverflowException (int idxBlocks, int oldDepth)
+	{
+		super ("Directory overflow:\n" +
+				idxBlocks+ " Index Blocks\n"
+				+ oldDepth + "old depth\n");
+		
+		this.idxBlocks = idxBlocks; 
+		this.oldDepth = oldDepth;
+	}
+	
+	int getOldDepth()
+	{
+		return oldDepth;
+	}
+	
+	int getNumBlocks()
+	{
+		return idxBlocks;
+	}
+	
 }

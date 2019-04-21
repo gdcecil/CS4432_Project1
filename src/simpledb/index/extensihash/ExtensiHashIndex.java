@@ -12,25 +12,41 @@ import simpledb.query.Constant;
 import simpledb.record.RID;
 
 public class ExtensiHashIndex implements Index {
+	
 	private Transaction tx;
-	private TableInfo ti;
+	
+	private TableInfo bucketsTi;
 	private TableInfo dirTi;
-	private Schema dirSch;
-	private Block dir;
+	
+	private Block dirBlk;
+	private Block idxBlk;
+	
+	private ExtensiHashDir dir;
+	
 	private Constant searchkey = null;
 	
 	public ExtensiHashIndex(String idxname, Schema sch, Transaction tx)
 	{
 		this.tx = tx; 
-		ti = new TableInfo(idxname, sch);
+		bucketsTi = new TableInfo(idxname, sch);
 		
-		dirSch = new Schema();
+		Schema dirSch = new Schema();
 		dirSch.addIntField("BlockNum");
-
-		if (tx.size(ti.fileName()) == 0)
+		
+		String dirName = idxname + "dir";
+		dirTi = new TableInfo(dirName, dirSch);
+		
+		
+		
+		if (tx.size(dirTi.fileName()) == 0) 
 		{
-			tx.append(ti.fileName(), new EHPageFormatter(ti, 0));
+			dirBlk = tx.append(dirTi.fileName(), new EHPageFormatter(dirTi, 0));
+			
+			idxBlk = tx.append(bucketsTi.fileName(), new EHPageFormatter(bucketsTi, 0, 0));
 		}
+		
+		dir = new ExtensiHashDir(dirBlk, dirTi, bucketsTi, this.tx);
+		
 	}
 
 	@Override

@@ -12,11 +12,10 @@ class ExtensiHashBucket extends ExtensiHashPage{
 
 	ExtensiHashBucket (Block currentblk, 
 			TableInfo ti, 
-			Transaction tx, 
-			int localDepth,
+			Transaction tx,
 			int bucketNum) 
 	{
-		super (currentblk, ti, tx, localDepth);
+		super (currentblk, ti, tx);
 		this.bucketNum = bucketNum;
 	}
 
@@ -40,7 +39,8 @@ class ExtensiHashBucket extends ExtensiHashPage{
 
 		Block bigKeyBlk = appendNew(depth, bigKey); 
 		
-		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, depth, bigKey);
+		//TODO fix this depth
+		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, bigKey);
 		
 		moveRecords(bigKeyBucket, bigKey);
 		return bigKeyBlk;
