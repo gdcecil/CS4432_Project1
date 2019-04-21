@@ -13,13 +13,24 @@ import simpledb.record.RID;
 
 public class ExtensiHashIndex implements Index {
 	private Transaction tx;
-	private TableInfo dir;
-	private Block dirBlock;
+	private TableInfo ti;
+	private TableInfo dirTi;
+	private Schema dirSch;
+	private Block dir;
 	private Constant searchkey = null;
 	
 	public ExtensiHashIndex(String idxname, Schema sch, Transaction tx)
 	{
 		this.tx = tx; 
+		ti = new TableInfo(idxname, sch);
+		
+		dirSch = new Schema();
+		dirSch.addIntField("BlockNum");
+
+		if (tx.size(ti.fileName()) == 0)
+		{
+			tx.append(ti.fileName(), new EHPageFormatter(ti, 0));
+		}
 	}
 
 	@Override

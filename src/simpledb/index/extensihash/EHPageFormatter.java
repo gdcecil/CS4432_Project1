@@ -7,21 +7,30 @@ import simpledb.buffer.PageFormatter;
 import simpledb.file.Page;
 import simpledb.record.TableInfo;
 
-public class BucketFormatter implements PageFormatter {
+public class EHPageFormatter implements PageFormatter {
 	private TableInfo ti; 
-	private int localDepth;
-	private int num;
-	static final int LOCAL_DEPTH_OFFSET = 0;
+	private int depth;
+	private int bucketNum = -1;
+	private boolean isBucket = false;
 	static final int BUCKET_NUM_OFFSET = INT_SIZE;
 	static final int RECORD_COUNT_OFFSET = 2*INT_SIZE;
 	static final int RECORD_START_OFFSET = 3*INT_SIZE;
+	
+	public EHPageFormatter (TableInfo ti, int depth) 
+	{
+		this.ti = ti; 
+		this.depth = depth;
+	}
 
-	public BucketFormatter (TableInfo ti, int localDepth, int num) { 
-		this.ti = ti;
-		this.localDepth = localDepth;
-		this.num = num;
+	public EHPageFormatter (TableInfo ti, int depth, int bucketNum) 
+	{ 
+		this(ti, depth);
+		this.bucketNum = bucketNum;
+		this.isBucket = true;
 
 	}
+	
+	
 
 	/**
 	 * CS4432-Project2:
@@ -34,11 +43,23 @@ public class BucketFormatter implements PageFormatter {
 	 * 
 	 */
 	public void format(Page p) {
-		p.setInt(LOCAL_DEPTH_OFFSET, localDepth);
-		p.setInt(BUCKET_NUM_OFFSET, num);
-		p.setInt(RECORD_COUNT_OFFSET, 0);
+		
+		
+		p.setInt(0, depth); //store global/local depth
+		
+		p.setInt(INT_SIZE, 0); //store number of records
+		
+		int recStart = 2 * INT_SIZE;
+		
+		if (isBucket) 
+		{
+			p.setInt(2*INT_SIZE, bucketNum);
+			recStart = 3*INT_SIZE;
+		}
+		
 		int recSize = ti.recordLength(); 
-		for (int pos = RECORD_START_OFFSET; pos + recSize <= BLOCK_SIZE; pos += recSize)
+		
+		for (int pos = recStart; pos + recSize <= BLOCK_SIZE; pos += recSize)
 		{
 			makeDefaultRecord(p, pos);
 		}
