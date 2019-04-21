@@ -6,7 +6,7 @@ import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.index.Index;
-
+import simpledb.index.hash.HashIndex;
 import simpledb.index.Index;
 import simpledb.query.Constant;
 import simpledb.record.RID;
@@ -91,6 +91,10 @@ public class ExtensiHashIndex implements Index {
 		// TODO Auto-generated method stub
 		dir.close();
 
+	}
+	
+	public static int searchCost(int numblocks, int rpb) {
+		return numblocks / HashIndex.NUM_BUCKETS;
 	}
 
 }
