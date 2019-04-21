@@ -7,7 +7,8 @@ import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
 
-class ExtensiHashBucket extends ExtensiHashPage{
+class ExtensiHashBucket extends ExtensiHashPage
+{
 	private int bucketNum;
 
 	ExtensiHashBucket (Block currentblk, 
@@ -17,6 +18,15 @@ class ExtensiHashBucket extends ExtensiHashPage{
 	{
 		super (currentblk, ti, tx);
 		this.bucketNum = bucketNum;
+	}
+	
+	public void insertIndexRecord(Constant dataval, RID rid) 
+	{
+		insert(getNumRecs());
+		setVal(getNumRecs(), "dataval",dataval);
+		setInt(getNumRecs(), "id", rid.id());
+		setInt(getNumRecs(), "block", rid.blockNumber());
+		
 	}
 
 	/**
@@ -35,14 +45,18 @@ class ExtensiHashBucket extends ExtensiHashPage{
 	{
 		int bigKey = bucketNum+(1<< depth);
 		
-		depth++;
+		setDepth(depth+1);
 
 		Block bigKeyBlk = appendNew(depth, bigKey); 
 		
-		//TODO fix this depth
+		
 		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, bigKey);
+		bigKeyBucket.setDepth(depth);
 		
 		moveRecords(bigKeyBucket, bigKey);
+		
+		bigKeyBucket.close();
+		
 		return bigKeyBlk;
 	}
 
@@ -83,7 +97,7 @@ class ExtensiHashBucket extends ExtensiHashPage{
 	}
 
 	/**
-	 * Appends a new block to the end of the specified B-tree file,
+	 * Appends a new block to the end of the specified file,
 	 * having the specified flag value.
 	 * @param flag the initial value of the flag
 	 * @return a reference to the newly-created block
@@ -142,5 +156,7 @@ class ExtensiHashBucket extends ExtensiHashPage{
 	protected int slotpos(int slot) {
 		return INT_SIZE + INT_SIZE + INT_SIZE + (slot * slotsize);
 	}
+
+	
 
 }

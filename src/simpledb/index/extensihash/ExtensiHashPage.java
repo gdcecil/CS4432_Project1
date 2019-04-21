@@ -37,15 +37,21 @@ public abstract class ExtensiHashPage
 	
 	/**
 	 * CS4432-Project2
-	 * Increment the depth (global/local as appropriate) of this page.
+	 * Set the depth (global/local as appropriate) of this page to the 
+	 * specified value.
 	 * 
 	 * @author mcwarms, gdcecil
 	 */
-	protected void incrementDepth() {
-		this.depth++;
+	protected void setDepth(int depth) {
+		this.depth=depth;
 		tx.setInt(currentblk, 0, depth);
 	}
 	
+	protected int getDepth() 
+	{
+		return depth;
+	}
+	 
 	
 	/* CS4432-Project2
 	 * 
@@ -223,6 +229,8 @@ public abstract class ExtensiHashPage
 		int offset = ti.offset(fldname);
 		return slotpos(slot) + offset;
 	}
+	
+	
 
 	/**
 	 * CS4432-Project2

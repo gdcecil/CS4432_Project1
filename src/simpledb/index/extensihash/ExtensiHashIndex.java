@@ -31,7 +31,7 @@ public class ExtensiHashIndex implements Index {
 		bucketsTi = new TableInfo(idxname, sch);
 		
 		Schema dirSch = new Schema();
-		dirSch.addIntField("BlockNum");
+		dirSch.addIntField(ExtensiHashDir.DIR_FIELD);
 		
 		String dirName = idxname + "dir";
 		dirTi = new TableInfo(dirName, dirSch);
@@ -42,16 +42,24 @@ public class ExtensiHashIndex implements Index {
 		{
 			dirBlk = tx.append(dirTi.fileName(), new EHPageFormatter(dirTi, 0));
 			
-			idxBlk = tx.append(bucketsTi.fileName(), new EHPageFormatter(bucketsTi, 0, 0));
+			tx.append(bucketsTi.fileName(), new EHPageFormatter(bucketsTi, 0, 0));
+			
+			dir = new ExtensiHashDir(new Block(dirTi.fileName(),0),dirTi, bucketsTi, this.tx);
+			
+			dir.updateDirEntry(0,idxBlk.number());
+			
+			dir.close();
 		}
 		
-		dir = new ExtensiHashDir(dirBlk, dirTi, bucketsTi, this.tx);
+		
+		
 		
 	}
 
 	@Override
 	public void beforeFirst(Constant searchkey) {
 		close();
+		
 
 	}
 
@@ -69,8 +77,7 @@ public class ExtensiHashIndex implements Index {
 
 	@Override
 	public void insert(Constant dataval, RID datarid) {
-		// TODO Auto-generated method stub
-
+		dir.insertIndexRecord(dataval, datarid);
 	}
 
 	@Override
@@ -82,6 +89,7 @@ public class ExtensiHashIndex implements Index {
 	@Override
 	public void close() {
 		// TODO Auto-generated method stub
+		dir.close();
 
 	}
 
