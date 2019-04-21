@@ -23,14 +23,16 @@ public abstract class ExtensiHashPage
 	protected int slotsize;
 	protected int depth;
 	
-	public ExtensiHashPage (Block currentblk, TableInfo ti, Transaction tx, int depth) 
+	public ExtensiHashPage (Block currentblk, 
+							TableInfo ti, 
+							Transaction tx) 
 	{
 		this.currentblk = currentblk; 
 		this.ti = ti;
 		this.tx = tx; 
 		slotsize = ti.recordLength();
 		tx.pin(currentblk);
-		this.depth=depth;
+		this.depth=tx.getInt(currentblk, 0);
 	}
 	
 	/**
