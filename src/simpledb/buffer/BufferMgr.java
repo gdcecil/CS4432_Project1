@@ -92,7 +92,7 @@ public class BufferMgr {
     */
    public synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
       try {
-    	 System.out.println("pinning new");
+    	 //System.out.println("pinning new");
          long timestamp = System.currentTimeMillis();
          Buffer buff = bufferMgr.pinNew(filename, fmtr);
          while (buff == null && !waitingTooLong(timestamp)) {
