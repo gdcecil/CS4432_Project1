@@ -43,12 +43,10 @@ public class CreateTestTables {
      "( a1 int," +
      "  a2 int"+
    ")");
-   /*
    s.executeUpdate("Create table test4" +
      "( a1 int," +
      "  a2 int"+
    ")");
-   */
    s.executeUpdate("Create table test5" +
      "( a1 int," +
      "  a2 int"+
@@ -57,7 +55,7 @@ public class CreateTestTables {
    
    s.executeUpdate("create sh index idx1 on test2 (a1)");
    s.executeUpdate("create bt index idx2 on test3 (a1)");
-   //s.executeUpdate("create eh index idx3 on test4 (a1)");
+   s.executeUpdate("create eh index idx3 on test4 (a1)");
 
    //Track time to fill relations
    LocalTime time1 = LocalTime.now();
@@ -82,17 +80,11 @@ public class CreateTestTables {
    {
     if(i!=5)
     {
-     //TEMP: skip table 4 - extensihash table
-     if (i == 4) {
-    	 
-     } else {
-	     rand=new Random(1);// ensure every table gets the same data
-	     for(int j=0;j<maxSize;j++)
-	     {
-//	        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
-		    s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+j+ ")");
+     rand=new Random(1);// ensure every table gets the same data
+     for(int j=0;j<maxSize;j++)
+     {
+        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
 
-	     }
      }
     }
     else//case where i=5
@@ -183,27 +175,27 @@ public class CreateTestTables {
    
    rs.close();
    
-//   //Query test3 based on a1=1, should use idx2 (Extensihash) w/ fldname a2
-//   time7 = LocalTime.now();
-//   
-//   query = "Select a1, a2 from test4 Where a1=1";
-//   rs = s.executeQuery(query);
-//   
-//   time8 = LocalTime.now();
-//   
-//   System.out.println("/////////////////////////////");
-//   System.out.println("B-TREE INDEX");
-//   System.out.println("Query: " + query);
-//   System.out.println("Run time: " + time7.until(time8, MILLIS) + " Milliseconds");
-//   System.out.println("Query output: ");
-//   while(rs.next())
-//	{
-//		int a2 = rs.getInt("a2");
-//		System.out.println(a2);
-//	}
-//   System.out.println("/////////////////////////////");
-//   
-//   rs.close();
+   //Query test3 based on a1=1, should use idx2 (Extensihash) w/ fldname a2
+   time7 = LocalTime.now();
+   
+   query = "Select a1, a2 from test4 Where a1=1";
+   rs = s.executeQuery(query);
+   
+   time8 = LocalTime.now();
+   
+   System.out.println("/////////////////////////////");
+   System.out.println("B-TREE INDEX");
+   System.out.println("Query: " + query);
+   System.out.println("Run time: " + time7.until(time8, MILLIS) + " Milliseconds");
+   System.out.println("Query output: ");
+   while(rs.next())
+	{
+		int a2 = rs.getInt("a2");
+		System.out.println(a2);
+	}
+   System.out.println("/////////////////////////////");
+   
+   rs.close();
    
    //Query test1 joined with test5 based on a1=a1, should use no index)
    time9 = LocalTime.now();
@@ -275,27 +267,27 @@ public class CreateTestTables {
    rs.close();
    
    //Query test4 joined with test5 based on a2=1, should use idx3 (Extensihash)
-//   time15 = LocalTime.now();
-//   
-//   query = "Select a1, a2 from test4, test5 Where a1=a2";
-//   rs = s.executeQuery(query);
-//   
-//   time16 = LocalTime.now();
-//   
-//   System.out.println("/////////////////////////////");
-//   System.out.println("JOINED EXTENSIHASH INDEX");
-//   System.out.println("Query: " + query);
-//   System.out.println("Run time: " + time15.until(time16, MILLIS) + " Milliseconds");
-//   System.out.println("Query output: ");
-//   while(rs.next())
-//	{
-//		int a1 = rs.getInt("a1");
-//		int a2 = rs.getInt("a2");
-//		System.out.println("a1: " + a1 + " a2: " + a2);
-//	}
-//   System.out.println("/////////////////////////////");
-//   
-//   rs.close();
+   time15 = LocalTime.now();
+   
+   query = "Select a1, a2 from test4, test5 Where a1=a2";
+   rs = s.executeQuery(query);
+   
+   time16 = LocalTime.now();
+   
+   System.out.println("/////////////////////////////");
+   System.out.println("JOINED EXTENSIHASH INDEX");
+   System.out.println("Query: " + query);
+   System.out.println("Run time: " + time15.until(time16, MILLIS) + " Milliseconds");
+   System.out.println("Query output: ");
+   while(rs.next())
+	{
+		int a1 = rs.getInt("a1");
+		int a2 = rs.getInt("a2");
+		System.out.println("a1: " + a1 + " a2: " + a2);
+	}
+   System.out.println("/////////////////////////////");
+   
+   rs.close();
    
    
    //Print out of all time data collected
