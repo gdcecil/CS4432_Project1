@@ -9,24 +9,63 @@ import simpledb.tx.Transaction;
 
 class ExtensiHashBucket extends ExtensiHashPage
 {
-	private int bucketNum;
+	private int currentSlot = -1;
+	private Constant searchkey = null;
 
 	ExtensiHashBucket (Block currentblk, 
 			TableInfo ti, 
-			Transaction tx,
-			int bucketNum) 
+			Transaction tx) 
 	{
 		super (currentblk, ti, tx);
-		this.bucketNum = bucketNum;
+	}
+
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Inserts the index entry (consisting of a dataval and an RID) into this bucket page.
+	 * 
+	 * If there is already an entry with the same dataval, the new index entry is inserted 
+	 * directly before that entry. Otherwise, the new entry is inserted at slot 0.
+	 * 
+	 * Modifies currentSlot and searchkey, but this is never the instance 
+	 * of bucket used in ExtensiHashIndex (as this is only called when
+	 * insertIndexRecord is called in ExtensiHashDir, which creates an 
+	 * local instance of this class for that purpose.
+	 * 
+	 * @param dataval, dataval for entry to insert
+	 * @param rid, contains id and block number for entry to insert
+	 */
+	void insertIndexRecord(Constant dataval, RID rid) 
+	{
+		//move before the first entry with dataval searchkey
+		moveBeforeValue(dataval);
+		
+		//if next() (i.e. if there is already an index entry with
+		//searchkey as its dataval), insert at currentslot. Otherwise,
+		//insert at slot 0.
+		int position = next() ? currentSlot : 0;
+
+		//move records over to make room for the new entry, and 
+		//update the record count.
+		insert(position);
+		
+		//set the fields of the index entry
+		setVal(position, "dataval",dataval);
+		setInt(position, "id", rid.id());
+		setInt(position, "block", rid.blockNumber());
+		
+		resetSearchInfo();
+		
 	}
 	
-	public void insertIndexRecord(Constant dataval, RID rid) 
+	void setBucketNum(int num)
 	{
-		insert(getNumRecs());
-		setVal(getNumRecs(), "dataval",dataval);
-		setInt(getNumRecs(), "id", rid.id());
-		setInt(getNumRecs(), "block", rid.blockNumber());
-		
+		tx.setInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET, num);
+	}
+
+	int getBucketNum()
+	{
+		return tx.getInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET);
 	}
 
 	/**
@@ -43,99 +82,99 @@ class ExtensiHashBucket extends ExtensiHashPage
 	 */
 	public Block split() 
 	{
-		int bigKey = bucketNum+(1<< depth);
-		
-		setDepth(depth+1);
+		// store depth in local variable
+		int localDepth = getDepth();
 
-		Block bigKeyBlk = appendNew(depth, bigKey); 
-		
-		
-		ExtensiHashBucket bigKeyBucket = new ExtensiHashBucket(bigKeyBlk, ti, tx, bigKey);
-		bigKeyBucket.setDepth(depth);
-		
-		moveRecords(bigKeyBucket, bigKey);
-		
-		bigKeyBucket.close();
-		
-		return bigKeyBlk;
+		// if bucketnum is congruent k (mod 2^depth), the only values in 0,1,...,(2^(Depth+1))-1
+		// that are congurent to k (mod 2^(depth)) are k and k+2^(depth), so the bucket numbers of
+		// the split blocks are k and k+2^(depth). 
+		int bucketNum = getBucketNum();
+		int newBucketNum = bucketNum+(1 << localDepth);
+
+		// increment local depth
+		setDepth(localDepth+1);
+
+		// append a new block for the split bucket 
+		// this bucket has the same local depth and number bucketNum+2^(old depth)
+		Block newBlk = appendNew(getDepth(), newBucketNum); 
+
+
+		//wrap the new page in an ExtensiHashBucket, and move index entries whose 
+		//corresponding bucket number equals newBucketNum to the new page
+		ExtensiHashBucket newBucket = new ExtensiHashBucket(newBlk, ti, tx);
+		moveRecords(newBucket);
+
+		//close the extensiHashBucket object
+		newBucket.close();
+
+		//return the block of the new bucket
+		return newBlk;
 	}
 
 
 	/** 
-	 * Moves records to extensiHashBucket dest if they satisfy 
-	 * record.dataval.hashcode() % localdepth == modPredicate.
+	 * CS4432-Project2
+	 * 
+	 * Moves index records from this bucket to bucket dest if they satisfy 
+	 * record.dataval.hashcode() % localdepth == modPredicate (deleting them 
+	 * from this bucket as well).
 	 * 
 	 * @param dest
 	 * @param modPredicate
 	 */
-	private void moveRecords(ExtensiHashBucket dest, int modPredicate)
+	private void moveRecords(ExtensiHashBucket dest)
 	{
-		int recLen = ti.recordLength();
+		// store depth, record size, the index schema, and the
+		// destination bucket number in local variables
+		int depth = getDepth();
+		int recSize = ti.recordLength();
 		Schema sch = ti.schema();
+		int bucketNum = dest.getBucketNum();
 
-		int destSlot = 0;
-		int pos = 0; 
-
-		while (pos < getNumRecs())
+		//iterate through the index entries on this page
+		for (int pos = 0; pos < getNumRecs();)
 		{
-			if (getVal(pos,"dataval").hashCode() % (1<<depth) == modPredicate)
+			//if the bucket number for an index entry matches the dest bucket number,  
+			//copy the index entry to dest
+			Constant value = getDataVal(pos);
+			if (computeBucketNumber(value, depth) == bucketNum)
 			{
-				for (String fldname : sch.fields()) 
-				{
-					dest.insert(destSlot);
-					dest.setVal(destSlot, fldname, getVal(pos, fldname));
-					delete(pos);
-					destSlot++;
-				}
+				//insert the index record into dest
+				dest.insertIndexRecord(getDataVal(pos), getDataRID(pos));
 
+				//delete the index record from this page. Delete moves the index
+				//entries over to fill the empty slot, so no need to increment pos
+				delete(pos);
 			}
-			else
-			{
-				pos+= recLen;
-			}
+			else pos+= recSize;
 		}
 	}
 
 	/**
-	 * Appends a new block to the end of the specified file,
-	 * having the specified flag value.
-	 * @param flag the initial value of the flag
+	 * CS4432-Project2
+	 * 
+	 * Appends a new block to the end of the specified file, setting the depth
+	 * to the specificed value, and the bucketnum to the specified value. 
+	 * 
+	 * This is the appendNew() method from BTreePage, edited to use the 
+	 * EHPageFormatter and pass localDepth and BucketNum as arguments.
+	 * 
+	 * @param localdepth, number to write in the depth slot of the new block 
+	 * @param bucketNum, number to write in the bucketNum slot of the new block
 	 * @return a reference to the newly-created block
 	 */
 	public Block appendNew(int localdepth, int bucketNum) {
 		return tx.append(ti.fileName(), new EHPageFormatter(ti, localdepth, bucketNum));
 	}
 
-
-	/*private void setBucketNum(int newBucketNum)
-	{
-		tx.setInt(currentblk, BucketFormatter.BUCKET_NUM_OFFSET, newBucketNum);
-	}*/
-
-	/* CS4432-Project2
-	 * 
-	 * The following methods were copied from simpledb.index.btree. They are 
-	 * all I/O methodst that don't have anything in particular to do with the 
-	 * B-Tree structure, so we use them here as well.
-	 */
-
 	/*
-	 * Calculates the position where the first record having
-	 * the specified search key should be, then returns
-	 * the position before it.
-	 * @param searchkey the search key
-	 * @return the position before where the search key goes
-	 
-	public int findSlotBefore(Constant searchkey) {
-		int slot = 0;
-		while (slot < getNumRecs() && getDataVal(slot).compareTo(searchkey) < 0)
-			slot++;
-		return slot-1;
-	}*/
-
+	 * Start methods taken from BTreePage
+	 */
 
 	/**
 	 * Returns the dataval of the record at the specified slot.
+	 * 
+	 * @author Edward Sciore
 	 * @param slot the integer slot of an index record
 	 * @return the dataval of the record at that slot
 	 */
@@ -146,17 +185,129 @@ class ExtensiHashBucket extends ExtensiHashPage
 
 	/**
 	 * Returns the dataRID value stored in the specified leaf index record.
+	 * 
+	 * @author Edward Sciore
 	 * @param slot the slot of the desired index record
 	 * @return the dataRID value store at that slot
 	 */
-	public RID getDataRid(int slot) {
+	private RID getDataRID(int slot) {
 		return new RID(getInt(slot, "block"), getInt(slot, "id"));
 	}
-
-	protected int slotpos(int slot) {
-		return INT_SIZE + INT_SIZE + INT_SIZE + (slot * slotsize);
+	
+	/*
+	 * End methods taken from BTreePage
+	 */
+	
+	/**
+	 * CS4432-Project2 
+	 * 
+	 * Get the RID from the current index entry.
+	 * 
+	 * @return RID of index entry at slot currentSlot
+	 */
+	public RID getCurrentRID()
+	{
+		return getDataRID(currentSlot);
+	}
+	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Delete the index entry at current slot
+	 */
+	public void deleteCurrentEntry()
+	{
+		delete(currentSlot);
 	}
 
-	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * First resets the currentslot and searchkey. If there is no index entry 
+	 * with dataval search key, current info is not changed from its default
+	 * value (-1).
+	 * 
+	 * Sets private variable currentSlot to the slot before the first index 
+	 * entry having the specified search key (If the slot with the search key 
+	 * is zero, then currentSlot is set to -1).
+	 *
+	 * Also sets private variable searchkey to the specified searchkey (this 
+	 * occurs whether or not the given searchkey was found in the bucket).
+	 * 
+	 * @param searchkey, value to search for 
+	 */
+	public void moveBeforeValue(Constant searchkey)
+	{
+		//reset the currentSlot and searchkey to default values
+		resetSearchInfo();
+		//set the current searchkey to the specified value
+		this.searchkey = searchkey;
+
+		//keep track of whether we have found an index entry with dataval searchkey
+		boolean found = false;
+
+		//iterate through the records in this bucket while we haven't found
+		//an index entry with dataval searchkey, or until we've checked every record
+		for (int pos = 0; (pos < getNumRecs()) && (!found); pos++)
+		{
+			//check if dataval of index equals searchkey 
+			if (getVal(pos, "dataval").equals(searchkey))
+			{
+				//set currentSlot to the position before the first index
+				//entry with dataval searchkey
+				currentSlot = pos-1;
+
+				//set found to true (this breaks out of the loop)
+				found = true;
+			}
+		}
+
+	}
+
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Increments currentslot. Then if current slot holds a record and the dataval at the 
+	 * new currentSlot is still equal to the search key, this returns true. 
+	 * 
+	 * If the currentslot is past the records in the bucket or its dataval is not equal to the 
+	 * search key, currentSlot is set to -1, searchkey is set to null, and then this returns false;
+	 * 
+	 * @return true if the next slot has an index entry with dataval == searchkey, and false otherwise.
+	 */
+	public boolean next()
+	{
+
+		boolean hasNext;
+
+		//increment the current slot
+		currentSlot++;
+
+		//if the next slot doesn't hold a record, or if the search key is null, 
+		//or the dataval of the entry in the next slot is not equal to searchkey,
+		//reset the currentSlot and Searchkey to default values and return false.
+		if (currentSlot >= getNumRecs() || 
+				searchkey == null ||
+				! getVal(currentSlot,"dataval").equals(searchkey))
+		{
+			resetSearchInfo();
+			hasNext = false;
+		}
+		//otherwise, return true false.
+		else hasNext = true;
+
+		return hasNext;
+	}
+
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Set the currentSlot to -1 and the searchkey to null. 
+	 */
+	private void resetSearchInfo()
+	{
+		currentSlot = -1; 
+		searchkey = null;
+	}
 
 }
