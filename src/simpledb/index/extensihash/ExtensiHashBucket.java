@@ -309,5 +309,27 @@ class ExtensiHashBucket extends ExtensiHashPage
 		currentSlot = -1; 
 		searchkey = null;
 	}
+	
+	public String toString()
+	{
+		String out = "Block " + blk.number() + " in file " + ti.fileName() + "\n";
+		
+		out += "Local Depth: " + getDepth() + "\n";
+		out += "Number of index entries: " + getNumRecs() + "\n";
+		out += "Bucket Number: " + Integer.toBinaryString(getBucketNum()) + "\n";
+		
+		for (int slot = 0; slot < getNumRecs(); slot++)
+		{
+			out += "Slot " + slot + ":\n";
+			Schema sch = ti.schema(); 
+			for (String fldname : sch.fields())
+			{
+				out += "\t\t" + fldname + " = " + getVal(slot, fldname).toString() + "\n";
+			}
+			
+		}
+		
+		return out;
+	}
 
 }

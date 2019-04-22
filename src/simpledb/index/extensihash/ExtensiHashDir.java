@@ -218,12 +218,32 @@ class ExtensiHashDir extends ExtensiHashPage
 		return new Block (bucketsTi.fileName(), getInt(key, DIR_FIELD));
 	}
 
-
-
 	@Override
 	protected int slotpos(int slot) {
 		// TODO Auto-generated method stub
 		return INT_SIZE+INT_SIZE+INT_SIZE + (slot * slotsize);
+	}
+	
+	@Override
+	public String toString()
+	{
+		String out = "Block " + blk.number() + " in file " + ti.fileName() + "\n";
+		out += "Global Depth: " + getDepth() + "\n";
+		out += "Number of directory entries: " + getNumRecs() + "\n";
+		
+		for (int slot = 0; slot < getNumRecs(); slot++)
+		{
+			out += "Bucket Number " + Integer.toBinaryString(slot) + ":\n";
+			
+			Block b = new Block (bucketsTi.fileName(), getInt(slot, DIR_FIELD));
+			
+			ExtensiHashBucket bucket = new ExtensiHashBucket(b, bucketsTi, tx);
+			
+			out += bucket.toString();
+			bucket.close();
+		}
+		
+		return out;
 	}
 
 }

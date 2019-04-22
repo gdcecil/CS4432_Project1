@@ -1,12 +1,10 @@
 package simpledb.index.extensihash;
 
-import static java.sql.Types.INTEGER;
 import simpledb.file.Block;
 import simpledb.tx.Transaction;
 import simpledb.record.*;
 import simpledb.index.Index;
 import simpledb.index.hash.HashIndex;
-import simpledb.index.Index;
 import simpledb.query.Constant;
 import simpledb.record.RID;
 
@@ -48,7 +46,6 @@ public class ExtensiHashIndex implements Index {
 
 	}
 
-	@Override
 	public void beforeFirst(Constant searchkey) 
 	{
 		//close previous instances of ExtensiHashDir and ExtensiHashBucket
@@ -106,7 +103,7 @@ public class ExtensiHashIndex implements Index {
 
 	}
 
-	@Override
+	
 	public void close() {
 		if (dir != null) dir.close();
 		if (bucket != null) bucket.close();
@@ -114,6 +111,20 @@ public class ExtensiHashIndex implements Index {
 
 	public static int searchCost(int numblocks, int rpb) {
 		return numblocks / HashIndex.NUM_BUCKETS;
+	}
+	
+	@Override
+	public String toString()
+	{
+		close();
+		
+		dir = new ExtensiHashDir(dirTi, bucketsTi, tx);
+		
+		String out = dir.toString();
+		
+		dir.close();
+		
+		return out;
 	}
 
 }
