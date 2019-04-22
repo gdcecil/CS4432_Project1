@@ -5,19 +5,22 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.Random;
 import simpledb.remote.SimpleDriver;
+import simpledb.tx.Transaction;
+import simpledb.index.extensihash.ExtensiHashIndex;
+import simpledb.record.Schema;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
+
 public class CreateTestTables {
- final static int maxSize=100;
+ final static int maxSize=10000;
  /**
   * @param args
   */
  public static void main(String[] args) {
   // TODO Auto-generated method stub
-	 
-  
+	   
   Connection conn=null;
   Driver d = new SimpleDriver();
   String host = "localhost"; //you may change it if your SimpleDB server is running on a different machine
@@ -83,8 +86,7 @@ public class CreateTestTables {
      rand=new Random(1);// ensure every table gets the same data
      for(int j=0;j<maxSize;j++)
      {
-        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
-
+        s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+j+ ")");
      }
     }
     else//case where i=5
@@ -99,6 +101,17 @@ public class CreateTestTables {
    time2 = LocalTime.now();
    System.out.println("Insert into tables time: " + time1.until(time2, SECONDS) + " Seconds");
    
+   Transaction tx = new Transaction();
+   Schema sch = new Schema();
+   sch.addIntField("block");
+   sch.addIntField("id");
+   sch.addIntField("dataval");
+   
+   ExtensiHashIndex idx = new ExtensiHashIndex("idx3", sch, tx);
+   System.out.println(idx.toString());
+   idx.close();
+   
+   
    /* TEST CASES
     * Test 1: Query each table based on the same attribute
     * 	The time of each query is printed as well as the result	.
@@ -112,7 +125,7 @@ public class CreateTestTables {
    //Query test1 on a1=1, does not use an index
    time1 = LocalTime.now();
    
-   String query = "Select a1, a2 from test1 Where a1=1";
+   String query = "Select a2 from test1 Where a1=1";
    ResultSet rs = s.executeQuery(query);
    
    time2 = LocalTime.now();
@@ -184,7 +197,7 @@ public class CreateTestTables {
    time8 = LocalTime.now();
    
    System.out.println("/////////////////////////////");
-   System.out.println("B-TREE INDEX");
+   System.out.println("Extensihash INDEX");
    System.out.println("Query: " + query);
    System.out.println("Run time: " + time7.until(time8, MILLIS) + " Milliseconds");
    System.out.println("Query output: ");
