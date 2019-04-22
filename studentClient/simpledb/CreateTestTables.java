@@ -48,11 +48,12 @@ public class CreateTestTables {
      "( a1 int," +
      "  a2 int"+
    ")");
+   */
    s.executeUpdate("Create table test5" +
      "( a1 int," +
      "  a2 int"+
    ")");
-	*/
+	
    
    s.executeUpdate("create sh index idx1 on test2 (a1)");
    s.executeUpdate("create bt index idx2 on test3 (a1)");
@@ -62,15 +63,20 @@ public class CreateTestTables {
    LocalTime time1 = LocalTime.now();
 
    //Insert values into i<number of tables + 1
-   for(int i=1;i<4;i++)
+   for(int i=1;i<6;i++)
    {
     if(i!=5)
     {
-     rand=new Random(1);// ensure every table gets the same data
-     for(int j=0;j<maxSize;j++)
-     {
-        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
-     
+     //TEMP: skip table 4 - extensihash table
+     if (i == 4) {
+    	 
+     } else {
+	     rand=new Random(1);// ensure every table gets the same data
+	     for(int j=0;j<maxSize;j++)
+	     {
+	        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
+	     
+	     }
      }
     }
     else//case where i=5
@@ -101,6 +107,7 @@ public class CreateTestTables {
    time2 = LocalTime.now();
    
    System.out.println("/////////////////////////////");
+   System.out.println("NO INDEX");
    System.out.println("Query: " + query);
    System.out.println("Run time: " + time1.until(time2, MILLIS) + " Milliseconds");
    System.out.println("Query output: ");
@@ -122,6 +129,7 @@ public class CreateTestTables {
    time2 = LocalTime.now();
    
    System.out.println("/////////////////////////////");
+   System.out.println("HASH INDEX");
    System.out.println("Query: " + query);
    System.out.println("Run time: " + time1.until(time2, MILLIS) + " Milliseconds");
    System.out.println("Query output: ");
@@ -143,6 +151,7 @@ public class CreateTestTables {
    time2 = LocalTime.now();
    
    System.out.println("/////////////////////////////");
+   System.out.println("B-TREE INDEX");
    System.out.println("Query: " + query);
    System.out.println("Run time: " + time1.until(time2, MILLIS) + " Milliseconds");
    System.out.println("Query output: ");
