@@ -17,41 +17,64 @@ import simpledb.tx.Transaction;
  */
 public abstract class ExtensiHashPage 
 {
-	protected Block currentblk; 
+	protected Block blk; 
 	protected TableInfo ti;
 	protected Transaction tx;
 	protected int slotsize;
-	protected int depth;
 	
 	public ExtensiHashPage (Block currentblk, 
 							TableInfo ti, 
 							Transaction tx) 
 	{
-		this.currentblk = currentblk; 
+		this.blk = currentblk; 
 		this.ti = ti;
 		this.tx = tx; 
 		slotsize = ti.recordLength();
 		tx.pin(currentblk);
-		this.depth=tx.getInt(currentblk, 0);
 	}
 	
 	/**
 	 * CS4432-Project2
-	 * Set the depth (global/local as appropriate) of this page to the 
+	 * 
+	 * In an extensible hash table, only the D rightmost bits are considered
+	 * when computing the corresponding bucket number for a key, where D is depth. 
+	 * 
+	 * That is, we compute (hashcode) % 2^D.
+	 * 
+	 * This method is implemented statically, as this calculation is used when the depth
+	 * does not correspond to the actual depth of the extensible hash index.
+	 * 
+	 * @param val, val to hash and compute
+	 * @param depth, power of two for the modulus 
+	 * @return bucket number for the given value, if global depth = depth
+	 */
+	static int computeBucketNumber (Constant val, int depth)
+	{
+		return val.hashCode() % (1 << depth);
+	}
+	
+	/**
+	 * CS4432-Project2
+	 * Set the depth (interpreted to be global/local as appropriate) of this page to the 
 	 * specified value.
 	 * 
 	 * @author mcwarms, gdcecil
 	 */
 	protected void setDepth(int depth) {
-		this.depth=depth;
-		tx.setInt(currentblk, 0, depth);
+		tx.setInt(blk, EHPageFormatter.DEPTH_OFFSET, depth);
 	}
 	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Get the depth (interpreted to be global/local as appropriate) of this page
+	 * 
+	 * @return depth depth of this index page
+	 */
 	protected int getDepth() 
 	{
-		return depth;
+		return tx.getInt(blk, EHPageFormatter.DEPTH_OFFSET);
 	}
-	 
 	
 	/* CS4432-Project2
 	 * 
@@ -61,13 +84,17 @@ public abstract class ExtensiHashPage
 	 * 
 	 */
 	
+	/*
+	 * Start methods taken from BTreepage
+	 */
+	
 	/**
 	 * Closes the page by unpinning its buffer.
 	 */
 	public void close() {
-		if (currentblk != null)
-			tx.unpin(currentblk);
-		currentblk = null;
+		if (blk != null)
+			tx.unpin(blk);
+		blk = null;
 	}
 	
 	/**
@@ -89,7 +116,7 @@ public abstract class ExtensiHashPage
 	 * @return the number of index records in this page
 	 */
 	public int getNumRecs() {
-		return tx.getInt(currentblk, INT_SIZE);
+		return tx.getInt(blk, INT_SIZE);
 	}
 	
 	/**
@@ -109,7 +136,7 @@ public abstract class ExtensiHashPage
 	
 	/**
 	 * Creates space for a new record at the specified slot by
-	 * moving all the records at and afterslot by one slot.
+	 * moving all the records at and after 0slot by one slot.
 	 * 
 	 * @author Edward Sciore
 	 * 
@@ -120,6 +147,7 @@ public abstract class ExtensiHashPage
 			copyRecord(i-1, i);
 		setNumRecs(getNumRecs()+1);
 	}
+
 	/**
 	 * 
 	 * @author Edward Sciore
@@ -141,7 +169,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected int getInt(int slot, String fldname) {
 		int pos = fldpos(slot, fldname);
-		return tx.getInt(currentblk, pos);
+		return tx.getInt(blk, pos);
 	}
 	/** 
 	 * @author Edward Sciore
@@ -152,7 +180,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected String getString(int slot, String fldname) {
 		int pos = fldpos(slot, fldname);
-		return tx.getString(currentblk, pos);
+		return tx.getString(blk, pos);
 	}
 	
 	/**
@@ -179,7 +207,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected void setInt(int slot, String fldname, int val) {
 		int pos = fldpos(slot, fldname);
-		tx.setInt(currentblk, pos, val);
+		tx.setInt(blk, pos, val);
 	}
 	/**
 	 * @author Edward Sciore
@@ -190,7 +218,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected void setString(int slot, String fldname, String val) {
 		int pos = fldpos(slot, fldname);
-		tx.setString(currentblk, pos, val);
+		tx.setString(blk, pos, val);
 	}
 	
 	/**
@@ -215,7 +243,7 @@ public abstract class ExtensiHashPage
 	 * @param n
 	 */
 	protected void setNumRecs(int n) {
-		tx.setInt(currentblk, INT_SIZE, n);
+		tx.setInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET, n);
 	}
 	
 	/**
@@ -230,21 +258,26 @@ public abstract class ExtensiHashPage
 		return slotpos(slot) + offset;
 	}
 	
+	/*
+	 * End methods taken from BTreePage
+	 */
+	
 	
 
 	/**
 	 * CS4432-Project2
 	 * 
-	 * Computes the the offset (relative to the start of the block) 
-	 * of the record at the specified slot (relative to the start of the 
-	 * records). 
+	 * Edited from the slotpos method in BTreePage to support the usage of
+	 * of a symbolic constant. 
 	 * 
-	 * This depends on the metadata of the page, so its implementation 
-	 * is left to subclasses.
+	 * @author Edward Sciore
 	 * 
 	 * @param slot
 	 * @return 
 	 */
-	protected abstract int slotpos(int slot);
+	protected int slotpos(int slot)
+	{
+		return EHPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
+	}
 
 }
