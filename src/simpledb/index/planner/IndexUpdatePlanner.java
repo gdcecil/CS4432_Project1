@@ -49,16 +49,16 @@ public class IndexUpdatePlanner implements UpdatePlanner {
             //Print to file the cost of accessing the blocks
             int cost = ii.blocksAccessed();
             System.out.println("Cost of access: " + cost);
-//            try {
-//				PrintStream file = new PrintStream(new FileOutputStream("C:/Users/Griffin/Desktop/iocost.txt", true));
-//				PrintStream console = System.out;
-//				System.setOut(file);
-//				System.out.println(cost);
-//				System.setOut(console);
-//			} catch (FileNotFoundException e) {
-//				// TODO Auto-generated catch block
-//				e.printStackTrace();
-//			}
+            try {
+				PrintStream file = new PrintStream(new FileOutputStream("C:/Users/Griffin/Desktop/iocost.txt", true));
+				PrintStream console = System.out;
+				System.setOut(file);
+				System.out.println(cost);
+				System.setOut(console);
+			} catch (FileNotFoundException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
             
             idx.insert(val, rid);
             idx.close();
