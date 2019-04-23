@@ -127,8 +127,6 @@ class ExtensiHashBucket extends ExtensiHashPage
 		// store depth, record size, the index schema, and the
 		// destination bucket number in local variables
 		int depth = getDepth();
-		int recSize = ti.recordLength();
-		Schema sch = ti.schema();
 		int bucketNum = dest.getBucketNum();
 
 		//iterate through the index entries on this page
@@ -146,7 +144,7 @@ class ExtensiHashBucket extends ExtensiHashPage
 				//entries over to fill the empty slot, so no need to increment pos
 				delete(pos);
 			}
-			else pos+= recSize;
+			else pos++;
 		}
 	}
 

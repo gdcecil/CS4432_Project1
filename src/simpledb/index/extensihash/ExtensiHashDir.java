@@ -144,7 +144,7 @@ class ExtensiHashDir extends ExtensiHashPage
 			Block newblk = bucket.split();
 			
 			//Compute the bucket number of the new bucket, given by oldBucketNum + 2^(old local depth).
-			int newBucketNum = oldBucketNum + (1 << bucket.getDepth());
+			int newBucketNum = oldBucketNum + (1 << (bucket.getDepth()-1));
 			
 			/*
 			 * This bucket might be referenced multiple times in the directory. If it is, its directory entries 
@@ -217,6 +217,7 @@ class ExtensiHashDir extends ExtensiHashPage
 	{
 		return new Block (bucketsTi.fileName(), getInt(key, DIR_FIELD));
 	}
+	
 
 	@Override
 	protected int slotpos(int slot) {

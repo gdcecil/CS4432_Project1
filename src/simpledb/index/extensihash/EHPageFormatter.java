@@ -7,11 +7,40 @@ import simpledb.buffer.PageFormatter;
 import simpledb.file.Page;
 import simpledb.record.TableInfo;
 
-public class EHPageFormatter implements PageFormatter {
+/**
+ * EHPageFormatter formats a block for usage as either an EH directory 
+ * or an EH bucket. 
+ * 
+ * Blocks are formatted in the same way in either case: 
+ * 
+ * At offset 0, an integer depth is stored (interpreted to be global or local
+ * as required).
+ *  
+ * At offset INT_SIZE, an integer bucket number is stored (the directory doesn't
+ * use this slot, but since both bucket and directory are formatted in the same
+ * way, the slot is still created in a directory block).
+ * 
+ * At offset 2*INT_SIZE, an integer is used to store the number of records (i.e. 
+ * index entries or directory entries) in the block. 
+ * 
+ * At offset 3*INT_SIZE, records are stored. 
+ * 
+ * On disk, the block will look like
+ *
+ * |	Depth	|  BucketNum | Num Records|  Rec0  |  Rec1  | ... |
+ * 
+ * @author mcwarms, gdcecil
+ *
+ */
+public class EHPageFormatter implements PageFormatter 
+{
+	//info 
 	private TableInfo ti; 
-	private int depth=0;
+	private int depth = 0;
 	private int bucketNum = 0;
 	private boolean isBucket = false;
+	
+	//keep offsets as static constants
 	static final int DEPTH_OFFSET = 0;
 	static final int BUCKET_NUM_OFFSET = INT_SIZE;
 	static final int RECORD_COUNT_OFFSET = INT_SIZE+INT_SIZE;

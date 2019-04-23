@@ -116,7 +116,7 @@ public abstract class ExtensiHashPage
 	 * @return the number of index records in this page
 	 */
 	public int getNumRecs() {
-		return tx.getInt(blk, INT_SIZE);
+		return tx.getInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET);
 	}
 	
 	/**

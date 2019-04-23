@@ -40,6 +40,8 @@ public class ExtensiHashIndex implements Index {
 			dir = new ExtensiHashDir(dirTi, bucketsTi, this.tx);
 
 			dir.updateDirEntry(0, firstIdxBlk.number());
+			
+			dir.setNumRecs(1);
 
 			dir.close();
 		}

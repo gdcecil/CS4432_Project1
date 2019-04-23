@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=10000;
+ final static int maxSize=100;
  /**
   * @param args
   */
@@ -100,16 +100,7 @@ public class CreateTestTables {
    
    time2 = LocalTime.now();
    System.out.println("Insert into tables time: " + time1.until(time2, SECONDS) + " Seconds");
-   
-   Transaction tx = new Transaction();
-   Schema sch = new Schema();
-   sch.addIntField("block");
-   sch.addIntField("id");
-   sch.addIntField("dataval");
-   
-   ExtensiHashIndex idx = new ExtensiHashIndex("idx3", sch, tx);
-   System.out.println(idx.toString());
-   idx.close();
+  
    
    
    /* TEST CASES
