@@ -78,22 +78,27 @@ public class IndexInfo {
       TableInfo idxti = new TableInfo("", schema());
       int rpb = BLOCK_SIZE / idxti.recordLength();
       int numblocks = si.recordsOutput() / rpb;
-
+      System.out.println("Not finding an indextype");
       //Call searchcost based on the type of index
-      if (indextype == "sh") {
+      if (indextype.equals("sh")) {
     	System.out.println("cost of static hash");
+		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
 	    return HashIndex.searchCost(numblocks, rpb);
-	  } else if (indextype == "bt") {
+	  } else if (indextype.equals("bt")) {
 		System.out.println("cost of BTree");
+		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
 	    return BTreeIndex.searchCost(numblocks, rpb);
 	  }
       //commented out until implemented in extensihash
-//	  else if (indextype == "eh") {
-//	    return ExtensiHashIndex.searchCost(numblocks,rpb);
-//	  } 
+	  else if (indextype.equals("eh")) {
+		System.out.println("cost of extensihash");
+		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
+	    return ExtensiHashIndex.searchCost(numblocks,rpb);
+	  } 
 	  else {
 	  //Not supposed to reach this point, should handle error
-	     return HashIndex.searchCost(numblocks, rpb);
+	     System.out.println("Not finding an indextype");
+	     return -1;
 	  }
    }
    
