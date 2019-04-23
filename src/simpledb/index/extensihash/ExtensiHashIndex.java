@@ -33,9 +33,9 @@ public class ExtensiHashIndex implements Index {
 
 		if (tx.size(dirTi.fileName()) == 0) 
 		{
-			tx.append(dirTi.fileName(), new EHPageFormatter(dirTi, 0));
+			tx.append(dirTi.fileName(), new ExtensiHashPageFormatter(dirTi, 0));
 
-			Block firstIdxBlk = tx.append(bucketsTi.fileName(), new EHPageFormatter(bucketsTi, 0, 0));
+			Block firstIdxBlk = tx.append(bucketsTi.fileName(), new ExtensiHashPageFormatter(bucketsTi, 0, 0));
 
 			dir = new ExtensiHashDir(dirTi, bucketsTi, this.tx);
 

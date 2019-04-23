@@ -60,12 +60,12 @@ class ExtensiHashBucket extends ExtensiHashPage
 	
 	void setBucketNum(int num)
 	{
-		tx.setInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET, num);
+		tx.setInt(blk, ExtensiHashPageFormatter.NUM_OFFSET, num);
 	}
 
 	int getBucketNum()
 	{
-		return tx.getInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET);
+		return tx.getInt(blk, ExtensiHashPageFormatter.NUM_OFFSET);
 	}
 
 	/**
@@ -162,7 +162,7 @@ class ExtensiHashBucket extends ExtensiHashPage
 	 * @return a reference to the newly-created block
 	 */
 	public Block appendNew(int localdepth, int bucketNum) {
-		return tx.append(ti.fileName(), new EHPageFormatter(ti, localdepth, bucketNum));
+		return tx.append(ti.fileName(), new ExtensiHashPageFormatter(ti, localdepth, bucketNum));
 	}
 
 	/*

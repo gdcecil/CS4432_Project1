@@ -54,6 +54,20 @@ public abstract class ExtensiHashPage
 	}
 	
 	/**
+	 * CS4432-Project2 
+	 * 
+	 * Returns the maximum number of records that will fit in the block represented 
+	 * by this object.
+	 * 
+	 * 
+	 * @return
+	 */
+	public int getMaxNumRecs() 
+	{
+		return (BLOCK_SIZE - ExtensiHashPageFormatter.RECORD_START_OFFSET)/ti.recordLength();
+	}
+	
+	/**
 	 * CS4432-Project2
 	 * Set the depth (interpreted to be global/local as appropriate) of this page to the 
 	 * specified value.
@@ -61,7 +75,7 @@ public abstract class ExtensiHashPage
 	 * @author mcwarms, gdcecil
 	 */
 	protected void setDepth(int depth) {
-		tx.setInt(blk, EHPageFormatter.DEPTH_OFFSET, depth);
+		tx.setInt(blk, ExtensiHashPageFormatter.DEPTH_OFFSET, depth);
 	}
 	
 	/**
@@ -73,7 +87,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected int getDepth() 
 	{
-		return tx.getInt(blk, EHPageFormatter.DEPTH_OFFSET);
+		return tx.getInt(blk, ExtensiHashPageFormatter.DEPTH_OFFSET);
 	}
 	
 	/* CS4432-Project2
@@ -116,7 +130,7 @@ public abstract class ExtensiHashPage
 	 * @return the number of index records in this page
 	 */
 	public int getNumRecs() {
-		return tx.getInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET);
+		return tx.getInt(blk, ExtensiHashPageFormatter.RECORD_COUNT_OFFSET);
 	}
 	
 	/**
@@ -243,7 +257,7 @@ public abstract class ExtensiHashPage
 	 * @param n
 	 */
 	protected void setNumRecs(int n) {
-		tx.setInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET, n);
+		tx.setInt(blk, ExtensiHashPageFormatter.RECORD_COUNT_OFFSET, n);
 	}
 	
 	/**
@@ -277,7 +291,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected int slotpos(int slot)
 	{
-		return EHPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
+		return ExtensiHashPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
 	}
 
 }
