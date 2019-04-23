@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=1000;
+ final static int maxSize=10000;
  /**
   * @param args
   */
@@ -293,13 +293,13 @@ public class CreateTestTables {
    
    rs.close();
    
-   time15 = LocalTime.now();
-	   
-   query = "Delete from test1 Where a1=1";
-   s.executeQuery(query);
-   
-   time16 = LocalTime.now();
-   
+//   time15 = LocalTime.now();
+//	   
+//   query = "Delete from test1 Where a1=1";
+//   s.executeQuery(query);
+//   
+//   time16 = LocalTime.now();
+//   
    
    
    //Print out of all time data collected
