@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=100;
+ final static int maxSize=1000;
  /**
   * @param args
   */
@@ -51,8 +51,8 @@ public class CreateTestTables {
      "  a2 int"+
    ")");
    s.executeUpdate("Create table test5" +
-     "( a1 int," +
-     "  a2 int"+
+     "( a3 int," +
+     "  a4 int"+
    ")");
 	
    
@@ -86,14 +86,14 @@ public class CreateTestTables {
      rand=new Random(1);// ensure every table gets the same data
      for(int j=0;j<maxSize;j++)
      {
-        s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+j+ ")");
+        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
      }
     }
     else//case where i=5
     {
      for(int j=0;j<maxSize/2;j++)// insert 50000 records into test5
      {
-      s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+j+ ")");
+      s.executeUpdate("insert into test"+i+" (a3,a4) values("+j+","+j+ ")");
      }
     }
    }
@@ -204,7 +204,7 @@ public class CreateTestTables {
    //Query test1 joined with test5 based on a1=a1, should use no index)
    time9 = LocalTime.now();
    
-   query = "Select a1, a2 from test1, test5 Where a1=a1";
+   query = "Select a2, a4 from test1, test5 Where a1=a3";
    rs = s.executeQuery(query);
    
    time10 = LocalTime.now();
@@ -216,9 +216,9 @@ public class CreateTestTables {
    System.out.println("Query output: ");
    while(rs.next())
 	{
-		int a1 = rs.getInt("a1");
-		int a2 = rs.getInt("a2");
-		System.out.println("a1: " + a1 + " a2: " + a2);
+		int a1 = rs.getInt("a2");
+		int a2 = rs.getInt("a4");
+		System.out.println("a2: " + a1 + " a4: " + a2);
 	}
    System.out.println("/////////////////////////////");
    
@@ -227,7 +227,7 @@ public class CreateTestTables {
    //Query test2 joined with test5 based on a1=a1, should use idx1 (Static)
    time11 = LocalTime.now();
    
-   query = "Select a1, a2 from test2, test5 Where a1=a2";
+   query = "Select a2, a4 from test2, test5 Where a1=a3";
    rs = s.executeQuery(query);
    
    time12 = LocalTime.now();
@@ -239,9 +239,9 @@ public class CreateTestTables {
    System.out.println("Query output: ");
    while(rs.next())
 	{
-		int a1 = rs.getInt("a1");
-		int a2 = rs.getInt("a2");
-		System.out.println("a1: " + a1 + " a2: " + a2);
+		int a1 = rs.getInt("a2");
+		int a2 = rs.getInt("a4");
+		System.out.println("a2: " + a1 + " a4: " + a2);
 	}
    System.out.println("/////////////////////////////");
    
@@ -250,7 +250,7 @@ public class CreateTestTables {
    //Query test3 joined with test5 based on a1=a1, should use idx2 (BTree)
    time13 = LocalTime.now();
    
-   query = "Select a1, a2 from test3, test5 Where a1=a2";
+   query = "Select a2, a4 from test3, test5 Where a1=a3";
    rs = s.executeQuery(query);
    
    time14 = LocalTime.now();
@@ -262,9 +262,9 @@ public class CreateTestTables {
    System.out.println("Query output: ");
    while(rs.next())
 	{
-		int a1 = rs.getInt("a1");
-		int a2 = rs.getInt("a2");
-		System.out.println("a1: " + a1 + " a2: " + a2);
+		int a1 = rs.getInt("a2");
+		int a2 = rs.getInt("a4");
+		System.out.println("a2: " + a1 + " a4: " + a2);
 	}
    System.out.println("/////////////////////////////");
    
@@ -273,7 +273,7 @@ public class CreateTestTables {
    //Query test4 joined with test5 based on a2=1, should use idx3 (Extensihash)
    time15 = LocalTime.now();
    
-   query = "Select a1, a2 from test4, test5 Where a1=a2";
+   query = "Select a2, a4 from test4, test5 Where a1=a3";
    rs = s.executeQuery(query);
    
    time16 = LocalTime.now();
@@ -285,13 +285,21 @@ public class CreateTestTables {
    System.out.println("Query output: ");
    while(rs.next())
 	{
-		int a1 = rs.getInt("a1");
-		int a2 = rs.getInt("a2");
-		System.out.println("a1: " + a1 + " a2: " + a2);
+		int a1 = rs.getInt("a2");
+		int a2 = rs.getInt("a4");
+		System.out.println("a2: " + a1 + " a4: " + a2);
 	}
    System.out.println("/////////////////////////////");
    
    rs.close();
+   
+   time15 = LocalTime.now();
+	   
+   query = "Delete from test1 Where a1=1";
+   s.executeQuery(query);
+   
+   time16 = LocalTime.now();
+   
    
    
    //Print out of all time data collected
