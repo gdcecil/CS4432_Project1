@@ -48,8 +48,9 @@ public class IndexUpdatePlanner implements UpdatePlanner {
 			//Retrieves index (if it exists) and inserts
 			IndexInfo ii = indexes.get(fldname);
 			if (ii != null) {
-				Index idx = ii.open();	
+				Index idx = ii.open();
 				idx.insert(val, rid);
+
 				idx.close();
 			}
 		}
