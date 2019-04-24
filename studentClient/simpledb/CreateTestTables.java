@@ -6,7 +6,7 @@ import java.sql.Statement;
 import java.util.Random;
 import simpledb.remote.SimpleDriver;
 import simpledb.tx.Transaction;
-import simpledb.index.extensihash.ExtensiHashIndex;
+import simpledb.index.extensiblehash.EHIndex;
 import simpledb.record.Schema;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;
@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=100;
+ final static int maxSize=100000;
  /**
   * @param args
   */
@@ -79,7 +79,7 @@ public class CreateTestTables {
    LocalTime time16 = LocalTime.now();
 
    //Insert values into i<number of tables + 1
-   for(int i=1;i<6;i++)
+   for(int i=4;i<6;i++)
    {
     if(i!=5)
     {
@@ -292,9 +292,6 @@ public class CreateTestTables {
    System.out.println("/////////////////////////////");
    
    rs.close();
-   
-   query = "Delete From test1 Where a1=1";
-   
       
    //Print out of all time data collected
    System.out.println("Table 1 (no index) query time: " + time1.until(time2, MILLIS) + " Milliseconds");

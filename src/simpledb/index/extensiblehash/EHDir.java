@@ -1,4 +1,4 @@
-package simpledb.index.extensihash;
+package simpledb.index.extensiblehash;
 
 import static java.sql.Types.INTEGER;
 import static simpledb.file.Page.*;
@@ -6,6 +6,9 @@ import simpledb.file.Block;
 import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
+
+import simpledb.file.Page;
+import simpledb.buffer.PageFormatter;
 
 /**
  * CS4432-Project2
@@ -28,23 +31,15 @@ import simpledb.tx.Transaction;
  * @author mcwarms, gdcecil
  *
  */
-class ExtensiHashDir extends ExtensiHashPage 
+class EHDir extends EHPage 
 {
 	private TableInfo bucketsTi;
 	static final String DIR_FIELD = "BlockNum";
 
-	ExtensiHashDir (Block currentblk, 
-			TableInfo ti, 
-			TableInfo bucketsTi,
-			Transaction tx)
+	EHDir (TableInfo ti, TableInfo bucketsTi, Transaction tx)
 	{
-		super (currentblk, ti, tx);
+		super (new Block(ti.fileName(),0), ti, tx);
 		this.bucketsTi = bucketsTi;
-	}
-
-	ExtensiHashDir (TableInfo ti, TableInfo bucketsTi, Transaction tx)
-	{
-		this(new Block(ti.fileName(),0), ti, bucketsTi, tx);
 	}
 
 
@@ -62,21 +57,18 @@ class ExtensiHashDir extends ExtensiHashPage
 	{
 		//store the current number of dir entries
 		int oldNum = getNumRecs(); 
-		
-		/* 
-		 * Increasing the depth by one doubles the number of directory entries, so if
-		 * slot 2*oldNum - 1 (subtracting one since slots are zero-based) exceeds the 
-		 * block size, print the global depth, the global depth + 1, and the number of blocks in 
-		 * bucket table file, and then throw a runtime exception. 
-		 * 
-		 * TODO: either delete or implement directories that span multiple blocks
-		 */
-		if (slotpos(2*oldNum -1) >= BLOCK_SIZE)
+
+		if (2*getNumRecs() > maxRecordsInBlock())
 		{
-			System.out.println("Error: Extensible hash index overflow.");
-			System.out.println("Attempted to increase depth from " +getDepth()+" to " + (getDepth()+1));
-			System.out.println("Number of buckets: " + tx.size(bucketsTi.fileName()));
-			throw new RuntimeException();
+			int oldFileSize = tx.size(ti.fileName());
+			int blocksRequired = 1+((2*getNumRecs()-1 - maxRecordsInBlock()) / maxRecordsInDirBlock());
+			
+			int blocksNeeded = blocksRequired - oldFileSize;
+			
+			for (int i = 0; i < blocksNeeded; i++)
+			{
+				tx.append(ti.fileName(), new RecordBlockFormatter(ti));
+			}
 		}
 
 		/*
@@ -110,14 +102,14 @@ class ExtensiHashDir extends ExtensiHashPage
 	public void insertIndexRecord (Constant dataval, RID rid)
 	{
 		//compute the bucket number for the given data value
-		int bucketNum = ExtensiHashPage.computeBucketNumber(dataval, getDepth());
+		int bucketNum = EHPage.computeBucketNumber(dataval, getDepth());
 
 		//get the block of the bucket with given bucket number
 		Block blk = getBucketBlock(bucketNum);
 
 		//Open an instance of ExtensiHashBucket to wrap the block containing 
 		//the bucket.
-		ExtensiHashBucket bucket = new ExtensiHashBucket(blk, bucketsTi, tx);
+		EHBucket bucket = new EHBucket(blk, bucketsTi, tx);
 
 		//If the bucket is full, extend the hash index by splitting the bucket
 		//and incrementing the global depth as needed.
@@ -131,21 +123,21 @@ class ExtensiHashDir extends ExtensiHashPage
 				//increment the global depth, doubling the number of 
 				//references to buckets.
 				incrementGlobalDepth();
-				
+
 				//update the bucket number for dataval under the new global depth
-				bucketNum = ExtensiHashPage.computeBucketNumber(dataval, getDepth());
+				bucketNum = EHPage.computeBucketNumber(dataval, getDepth());
 			}
 			//Now that the global depth has been updated, we can split the bucket.
-			
+
 			//First store the bucket number for the data value with respect to the local depth of the full bucket.
-			int oldBucketNum = ExtensiHashPage.computeBucketNumber(dataval, bucket.getDepth());
-			
+			int oldBucketNum = EHPage.computeBucketNumber(dataval, bucket.getDepth());
+
 			//Split the bucket 
 			Block newblk = bucket.split();
-			
+
 			//Compute the bucket number of the new bucket, given by oldBucketNum + 2^(old local depth).
 			int newBucketNum = oldBucketNum + (1 << (bucket.getDepth()-1));
-			
+
 			/*
 			 * This bucket might be referenced multiple times in the directory. If it is, its directory entries 
 			 * will be at slots 
@@ -169,11 +161,11 @@ class ExtensiHashDir extends ExtensiHashPage
 			 * 
 			 * where M is the largest integer such that newBucketNum+M*(2^(new local depth)) is less than 2^((global depth)).
 			 */
-			
+
 			//compute 2^(new local depth), which is used to step through the directory entries as above.
 			//Here bucket.getDepth() gets the correct number, since split() updates the local depth of the bucket.
 			int stepSize = (1 << bucket.getDepth());
-			
+
 			//iterate through the directory entries that need to be changed, and update them to 
 			//reference the new block. Note that if local depth = global depth, stepSize will be equal to 
 			//the number of records, and so only one entry will be changed (as expected).
@@ -185,23 +177,23 @@ class ExtensiHashDir extends ExtensiHashPage
 
 			//Set blk to the block with the bucket corresponding to the bucket number for dataval with respect
 			//to the new local depth.
-			blk = (ExtensiHashPage.computeBucketNumber(dataval, bucket.getDepth())== oldBucketNum) ?
+			blk = (EHPage.computeBucketNumber(dataval, bucket.getDepth())== oldBucketNum) ?
 					blk : newblk;
-			
+
 			//close the current ExtensiHashBucket wrapper
 			bucket.close();
-			
+
 			//open a new ExtensiHashBucket wrapper for blk, which holds whichever split bucket that the 
 			//index entry for dataval belongs in.
-			bucket = new ExtensiHashBucket(blk, bucketsTi, tx);
-			
+			bucket = new EHBucket(blk, bucketsTi, tx);
+
 			//return to the predicate for the while loop. If the split bucket we want to add the index entry
 			//for dataval to is still full, repeat this process. 
 		}
-		
+
 		//bucket is a priori not full, so insert the index entry for dataval.
 		bucket.insertIndexRecord(dataval, rid );
-		
+
 		//close the ExtensiHashBucket wrapper for the bucket.
 		bucket.close();
 
@@ -217,34 +209,166 @@ class ExtensiHashDir extends ExtensiHashPage
 	{
 		return new Block (bucketsTi.fileName(), getInt(key, DIR_FIELD));
 	}
-	
 
-	@Override
-	protected int slotpos(int slot) {
-		// TODO Auto-generated method stub
-		return INT_SIZE+INT_SIZE+INT_SIZE + (slot * slotsize);
+
+	private int maxRecordsInDirBlock()
+	{
+		return BLOCK_SIZE/ti.recordLength();	 		
+	}
+
+	private int getSlotNumInBlock(int slotNum)
+	{
+		return slotNum < maxRecordsInBlock() ?
+				slotNum : 
+					(slotNum - maxRecordsInBlock()) % maxRecordsInDirBlock();
+	}
+
+	private Block dirBlock(int slot)
+	{
+		int blk = slot < maxRecordsInBlock() ? 
+				0 : 1+((slot- maxRecordsInDirBlock())/maxRecordsInBlock());
+		return new Block(ti.fileName(), blk);
+	}
+
+	protected int dirBlockPos(int slot)
+	{
+		return getSlotNumInBlock(slot) * slotsize;
 	}
 	
 	@Override
+	protected int getInt(int slot, String fldname) 
+	{
+		int ret;
+		if (slot < maxRecordsInBlock()) 
+			ret = super.getInt(slot, fldname);
+		else 
+		{
+			Block dirblk = dirBlock(slot);
+			int posInBlock = dirBlockPos(slot);
+
+			tx.pin(dirblk);
+			ret = tx.getInt(dirblk, posInBlock);
+			tx.unpin(dirblk);
+
+		}
+		return ret;
+	}
+
+	@Override
+	protected String getString(int slot, String fldname) 
+	{
+		String ret;
+		if (slot < maxRecordsInBlock()) 
+			ret = super.getString(slot, fldname);
+		else 
+		{
+			Block dirblk = dirBlock(slot);
+			int posInBlock = dirBlockPos(slot);
+
+			tx.pin(dirblk);
+			ret = tx.getString(dirblk, posInBlock);
+			tx.unpin(dirblk);
+
+		}
+		return ret;
+	}
+
+	@Override
+	protected void setInt(int slot, String fldname, int val) 
+	{
+		if (slot < maxRecordsInBlock()) 
+			super.setInt(slot, fldname, val);
+		else 
+		{
+			Block dirblk = dirBlock(slot);
+			int posInBlock = dirBlockPos(slot);
+
+			tx.pin(dirblk);
+			tx.setInt(dirblk, posInBlock, val);
+			tx.unpin(dirblk);
+
+		}
+	}
+
+	@Override
+	protected void setString(int slot, String fldname, String val) 
+	{
+		if (slot < maxRecordsInBlock()) 
+			super.setString(slot, fldname, val);
+		else 
+		{
+			Block dirblk = dirBlock(slot);
+			int posInBlock = dirBlockPos(slot);
+
+			tx.pin(dirblk);
+			tx.setString(dirblk, posInBlock, val);
+			tx.unpin(dirblk);
+
+		}
+	}
+
+	//TODO update toString to get whole block 
+	@Override
 	public String toString()
 	{
-		String out = "Block " + blk.number() + " in file " + ti.fileName() + "\n";
-		out += "Global Depth: " + getDepth() + "\n";
-		out += "Number of directory entries: " + getNumRecs() + "\n";
-		
+		String out = dirTableToString();
+
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
 			out += "Bucket Number " + Integer.toBinaryString(slot) + ":\n";
-			
+
 			Block b = new Block (bucketsTi.fileName(), getInt(slot, DIR_FIELD));
-			
-			ExtensiHashBucket bucket = new ExtensiHashBucket(b, bucketsTi, tx);
-			
+
+			EHBucket bucket = new EHBucket(b, bucketsTi, tx);
+
 			out += bucket.toString();
 			bucket.close();
 		}
+
+		return out;
+	}
+	
+	public String dirTableToString()
+	{
+		String out = "\n\nFile " + ti.fileName() + "\n";
+		out += "Size: " + tx.size(ti.fileName()) + " blocks\n";
+		out += "Records in block 0: " + maxRecordsInBlock() + "\n";
+		out += "Records in block 1+: " + maxRecordsInDirBlock() + "\n";
+		out += "Global Depth: " + getDepth() + "\n";
+		out += "Number of directory entries: " + getNumRecs() + "\n";
 		
 		return out;
+	}
+	
+	
+}
+
+
+
+class RecordBlockFormatter implements PageFormatter
+{
+	private TableInfo ti;
+
+	RecordBlockFormatter (TableInfo ti)
+	{
+		this.ti = ti;
+	}
+	public void format (Page p)
+	{
+		int recSize = ti.recordLength();
+		for (int pos = 0; pos + recSize <= BLOCK_SIZE; pos += recSize)
+			makeDefaultRecord(p, pos);
+
+	}
+
+	private void makeDefaultRecord(Page page, int pos) {
+		for (String fldname : ti.schema().fields()) {
+			int offset = ti.offset(fldname);
+			if (ti.schema().type(fldname) == INTEGER)
+				page.setInt(pos + offset, 0);
+			else
+				page.setString(pos + offset, "");
+		}
 	}
 
 }

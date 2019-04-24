@@ -1,4 +1,4 @@
-package simpledb.index.extensihash;
+package simpledb.index.extensiblehash;
 
 import static java.sql.Types.INTEGER;
 import static simpledb.file.Page.*;
@@ -7,12 +7,12 @@ import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
 
-class ExtensiHashBucket extends ExtensiHashPage
+class EHBucket extends EHPage
 {
 	private int currentSlot = -1;
 	private Constant searchkey = null;
 
-	ExtensiHashBucket (Block currentblk, 
+	EHBucket (Block currentblk, 
 			TableInfo ti, 
 			Transaction tx) 
 	{
@@ -57,16 +57,13 @@ class ExtensiHashBucket extends ExtensiHashPage
 		resetSearchInfo();
 		
 	}
-	
-	void setBucketNum(int num)
-	{
-		tx.setInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET, num);
-	}
 
 	int getBucketNum()
 	{
 		return tx.getInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET);
 	}
+	
+	
 
 	/**
 	 * Splits this bucket into two, incrementing the local depth in each new
@@ -101,7 +98,7 @@ class ExtensiHashBucket extends ExtensiHashPage
 
 		//wrap the new page in an ExtensiHashBucket, and move index entries whose 
 		//corresponding bucket number equals newBucketNum to the new page
-		ExtensiHashBucket newBucket = new ExtensiHashBucket(newBlk, ti, tx);
+		EHBucket newBucket = new EHBucket(newBlk, ti, tx);
 		moveRecords(newBucket);
 
 		//close the extensiHashBucket object
@@ -122,7 +119,7 @@ class ExtensiHashBucket extends ExtensiHashPage
 	 * @param dest
 	 * @param modPredicate
 	 */
-	private void moveRecords(ExtensiHashBucket dest)
+	private void moveRecords(EHBucket dest)
 	{
 		// store depth, record size, the index schema, and the
 		// destination bucket number in local variables

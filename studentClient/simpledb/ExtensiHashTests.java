@@ -6,7 +6,6 @@ import java.sql.Statement;
 import java.util.Random;
 import simpledb.remote.SimpleDriver;
 import simpledb.tx.Transaction;
-import simpledb.index.extensihash.ExtensiHashIndex;
 import simpledb.record.Schema;
 import java.time.LocalTime;
 import static java.time.temporal.ChronoUnit.SECONDS;

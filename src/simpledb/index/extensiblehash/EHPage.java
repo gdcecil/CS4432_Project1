@@ -1,4 +1,4 @@
-package simpledb.index.extensihash;
+package simpledb.index.extensiblehash;
 
 import static java.sql.Types.INTEGER;
 import static simpledb.file.Page.*;
@@ -15,14 +15,14 @@ import simpledb.tx.Transaction;
  * @author mcwarms, gdcecil
  *
  */
-public abstract class ExtensiHashPage 
+public abstract class EHPage 
 {
 	protected Block blk; 
 	protected TableInfo ti;
 	protected Transaction tx;
 	protected int slotsize;
 	
-	public ExtensiHashPage (Block currentblk, 
+	public EHPage (Block currentblk, 
 							TableInfo ti, 
 							Transaction tx) 
 	{
@@ -32,6 +32,7 @@ public abstract class ExtensiHashPage
 		slotsize = ti.recordLength();
 		tx.pin(currentblk);
 	}
+	
 	
 	/**
 	 * CS4432-Project2
@@ -51,6 +52,20 @@ public abstract class ExtensiHashPage
 	static int computeBucketNumber (Constant val, int depth)
 	{
 		return val.hashCode() % (1 << depth);
+	}
+	
+	/**
+	 * CS4432-Project2 
+	 * 
+	 * Returns the maximum number of records that will fit in the block represented 
+	 * by this object.
+	 * 
+	 * 
+	 * @return
+	 */
+	public int maxRecordsInBlock() 
+	{
+		return (BLOCK_SIZE - EHPageFormatter.RECORD_START_OFFSET)/slotsize;
 	}
 	
 	/**
