@@ -1,0 +1,2904 @@
+diff --git a/QueryTesting b/QueryTesting
+new file mode 100644
+index 0000000..35a9766
+--- /dev/null
++++ b/QueryTesting
+@@ -0,0 +1,52 @@
++Insert into test1 time: 172 Seconds
++/////////////////////////////
++Query: Select a1, a2 from test1 Where a1=1
++Run time: 17 Milliseconds
++Query output: 
++797
++848
++321
++958
++149
++244
++604
++812
++293
++652
++530
++367
++/////////////////////////////
++/////////////////////////////
++Query: Select a1, a2 from test2 Where a1=1
++Run time: 3 Milliseconds
++Query output: 
++797
++848
++321
++958
++149
++244
++604
++812
++293
++652
++530
++367
++/////////////////////////////
++/////////////////////////////
++Query: Select a1, a2 from test3 Where a1=1
++Run time: 3 Milliseconds
++Query output: 
++797
++848
++321
++958
++149
++244
++604
++812
++293
++652
++530
++367
++/////////////////////////////
+\ No newline at end of file
+diff --git a/bin/.gitignore b/bin/.gitignore
+index b25cceb..f77778d 100644
+--- a/bin/.gitignore
++++ b/bin/.gitignore
+@@ -1,8 +1,3 @@
+ /simpledb/
+-/FindTest
+-/FindTest.class
+-/TestSingleBlock
+-/TestSingleBlock2
+-/TestSingleBlock.class
+-/FindAll.class
+-/Examples.class
++/ExtensiHashTests.class
++/CreateTestTables.class
+diff --git a/bin/CreateStudentDB.class b/bin/CreateStudentDB.class
+index 62391f4..ef6bff4 100644
+Binary files a/bin/CreateStudentDB.class and b/bin/CreateStudentDB.class differ
+diff --git a/bin/CreateTestTables.class b/bin/CreateTestTables.class
+new file mode 100644
+index 0000000..4e62206
+Binary files /dev/null and b/bin/CreateTestTables.class differ
+diff --git a/bin/Examples.class b/bin/Examples.class
+new file mode 100644
+index 0000000..31c7e39
+Binary files /dev/null and b/bin/Examples.class differ
+diff --git a/bin/simpledb/buffer/AdvancedBufferMgr.class b/bin/simpledb/buffer/AdvancedBufferMgr.class
+index 081de37..8d1a840 100644
+Binary files a/bin/simpledb/buffer/AdvancedBufferMgr.class and b/bin/simpledb/buffer/AdvancedBufferMgr.class differ
+diff --git a/bin/simpledb/buffer/AdvancedBufferMgrTest.class b/bin/simpledb/buffer/AdvancedBufferMgrTest.class
+index b3d9861..30fc4ff 100644
+Binary files a/bin/simpledb/buffer/AdvancedBufferMgrTest.class and b/bin/simpledb/buffer/AdvancedBufferMgrTest.class differ
+diff --git a/bin/simpledb/buffer/BasicBufferMgr.class b/bin/simpledb/buffer/BasicBufferMgr.class
+index b92172a..5419766 100644
+Binary files a/bin/simpledb/buffer/BasicBufferMgr.class and b/bin/simpledb/buffer/BasicBufferMgr.class differ
+diff --git a/bin/simpledb/buffer/BufferMgr.class b/bin/simpledb/buffer/BufferMgr.class
+index 20ce563..1916b02 100644
+Binary files a/bin/simpledb/buffer/BufferMgr.class and b/bin/simpledb/buffer/BufferMgr.class differ
+diff --git a/bin/simpledb/file/Block.class b/bin/simpledb/file/Block.class
+index c6972fe..33babac 100644
+Binary files a/bin/simpledb/file/Block.class and b/bin/simpledb/file/Block.class differ
+diff --git a/bin/simpledb/index/planner/IndexUpdatePlanner.class b/bin/simpledb/index/planner/IndexUpdatePlanner.class
+index e4dd1b3..34c8cc3 100644
+Binary files a/bin/simpledb/index/planner/IndexUpdatePlanner.class and b/bin/simpledb/index/planner/IndexUpdatePlanner.class differ
+diff --git a/bin/simpledb/metadata/IndexInfo.class b/bin/simpledb/metadata/IndexInfo.class
+index 66f6957..edf51fc 100644
+Binary files a/bin/simpledb/metadata/IndexInfo.class and b/bin/simpledb/metadata/IndexInfo.class differ
+diff --git a/bin/simpledb/metadata/IndexMgr.class b/bin/simpledb/metadata/IndexMgr.class
+index 0af5415..3e1b806 100644
+Binary files a/bin/simpledb/metadata/IndexMgr.class and b/bin/simpledb/metadata/IndexMgr.class differ
+diff --git a/bin/simpledb/metadata/MetadataMgr.class b/bin/simpledb/metadata/MetadataMgr.class
+index 5019e65..8dc6ac2 100644
+Binary files a/bin/simpledb/metadata/MetadataMgr.class and b/bin/simpledb/metadata/MetadataMgr.class differ
+diff --git a/bin/simpledb/parse/CreateIndexData.class b/bin/simpledb/parse/CreateIndexData.class
+index 65fc086..c77789c 100644
+Binary files a/bin/simpledb/parse/CreateIndexData.class and b/bin/simpledb/parse/CreateIndexData.class differ
+diff --git a/bin/simpledb/parse/Parser.class b/bin/simpledb/parse/Parser.class
+index 222d69b..822b38b 100644
+Binary files a/bin/simpledb/parse/Parser.class and b/bin/simpledb/parse/Parser.class differ
+diff --git a/bin/simpledb/planner/BasicUpdatePlanner.class b/bin/simpledb/planner/BasicUpdatePlanner.class
+index cb9368b..4d900b5 100644
+Binary files a/bin/simpledb/planner/BasicUpdatePlanner.class and b/bin/simpledb/planner/BasicUpdatePlanner.class differ
+diff --git a/bin/simpledb/query/StringConstant.class b/bin/simpledb/query/StringConstant.class
+index 805668d..4948c7e 100644
+Binary files a/bin/simpledb/query/StringConstant.class and b/bin/simpledb/query/StringConstant.class differ
+diff --git a/bin/simpledb/server/SimpleDB.class b/bin/simpledb/server/SimpleDB.class
+index ba69fec..a525af3 100644
+Binary files a/bin/simpledb/server/SimpleDB.class and b/bin/simpledb/server/SimpleDB.class differ
+diff --git a/bin/simpledb/tx/BufferList.class b/bin/simpledb/tx/BufferList.class
+index 88ef912..4a76af3 100644
+Binary files a/bin/simpledb/tx/BufferList.class and b/bin/simpledb/tx/BufferList.class differ
+diff --git a/iocost.txt b/iocost.txt
+new file mode 100644
+index 0000000..abc62cb
+--- /dev/null
++++ b/iocost.txt
+@@ -0,0 +1,600 @@
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++-2147483647
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++1
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
++printing to the right file
++0
+diff --git a/src/simpledb/buffer/BufferMgr.java b/src/simpledb/buffer/BufferMgr.java
+index fb0f677..48048a7 100644
+--- a/src/simpledb/buffer/BufferMgr.java
++++ b/src/simpledb/buffer/BufferMgr.java
+@@ -92,7 +92,7 @@ public class BufferMgr {
+     */
+    public synchronized Buffer pinNew(String filename, PageFormatter fmtr) {
+       try {
+-    	 System.out.println("pinning new");
++    	 //System.out.println("pinning new");
+          long timestamp = System.currentTimeMillis();
+          Buffer buff = bufferMgr.pinNew(filename, fmtr);
+          while (buff == null && !waitingTooLong(timestamp)) {
+diff --git a/src/simpledb/index/extensiblehash/EHBucket.java b/src/simpledb/index/extensiblehash/EHBucket.java
+new file mode 100644
+index 0000000..8988340
+--- /dev/null
++++ b/src/simpledb/index/extensiblehash/EHBucket.java
+@@ -0,0 +1,330 @@
++package simpledb.index.extensiblehash;
++
++import static java.sql.Types.INTEGER;
++import static simpledb.file.Page.*;
++import simpledb.file.Block;
++import simpledb.record.*;
++import simpledb.query.*;
++import simpledb.tx.Transaction;
++
++class EHBucket extends EHPage
++{
++	private int currentSlot = -1;
++	private Constant searchkey = null;
++
++	EHBucket (Block currentblk, 
++			TableInfo ti, 
++			Transaction tx) 
++	{
++		super (currentblk, ti, tx);
++	}
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Inserts the index entry (consisting of a dataval and an RID) into this bucket page.
++	 * 
++	 * If there is already an entry with the same dataval, the new index entry is inserted 
++	 * directly before that entry. Otherwise, the new entry is inserted at slot 0.
++	 * 
++	 * Modifies currentSlot and searchkey, but this is never the instance 
++	 * of bucket used in ExtensiHashIndex (as this is only called when
++	 * insertIndexRecord is called in ExtensiHashDir, which creates an 
++	 * local instance of this class for that purpose.
++	 * 
++	 * @param dataval, dataval for entry to insert
++	 * @param rid, contains id and block number for entry to insert
++	 */
++	void insertIndexRecord(Constant dataval, RID rid) 
++	{
++		//move before the first entry with dataval searchkey
++		moveBeforeValue(dataval);
++		
++		//if next() (i.e. if there is already an index entry with
++		//searchkey as its dataval), insert at currentslot. Otherwise,
++		//insert at slot 0.
++		int position = next() ? currentSlot : 0;
++
++		//move records over to make room for the new entry, and 
++		//update the record count.
++		insert(position);
++		
++		//set the fields of the index entry
++		setVal(position, "dataval",dataval);
++		setInt(position, "id", rid.id());
++		setInt(position, "block", rid.blockNumber());
++		
++		resetSearchInfo();
++		
++	}
++
++	int getBucketNum()
++	{
++		return tx.getInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET);
++	}
++	
++	
++
++	/**
++	 * Splits this bucket into two, incrementing the local depth in each new
++	 * bucket. The index entries are distributed into the new buckets based on the
++	 * value of bucket num=(index entry).(datavalue).hashcode() % 2^(new local depth).
++	 * 
++	 * This method will give two distinct bucket numbers 
++	 * (since (index entry).(datavalue).hashcode() for each entry was equivalent 
++	 * modulo 2^(old local depth) and this bucket will hold the lower one while the
++	 * new bucketw will hold the greater one
++	 * 
++	 * @return Block of the new split bucket
++	 */
++	public Block split() 
++	{
++		// store depth in local variable
++		int localDepth = getDepth();
++
++		// if bucketnum is congruent k (mod 2^depth), the only values in 0,1,...,(2^(Depth+1))-1
++		// that are congurent to k (mod 2^(depth)) are k and k+2^(depth), so the bucket numbers of
++		// the split blocks are k and k+2^(depth). 
++		int bucketNum = getBucketNum();
++		int newBucketNum = bucketNum+(1 << localDepth);
++
++		// increment local depth
++		setDepth(localDepth+1);
++
++		// append a new block for the split bucket 
++		// this bucket has the same local depth and number bucketNum+2^(old depth)
++		Block newBlk = appendNew(getDepth(), newBucketNum); 
++
++
++		//wrap the new page in an ExtensiHashBucket, and move index entries whose 
++		//corresponding bucket number equals newBucketNum to the new page
++		EHBucket newBucket = new EHBucket(newBlk, ti, tx);
++		moveRecords(newBucket);
++
++		//close the extensiHashBucket object
++		newBucket.close();
++
++		//return the block of the new bucket
++		return newBlk;
++	}
++
++
++	/** 
++	 * CS4432-Project2
++	 * 
++	 * Moves index records from this bucket to bucket dest if they satisfy 
++	 * record.dataval.hashcode() % localdepth == modPredicate (deleting them 
++	 * from this bucket as well).
++	 * 
++	 * @param dest
++	 * @param modPredicate
++	 */
++	private void moveRecords(EHBucket dest)
++	{
++		// store depth, record size, the index schema, and the
++		// destination bucket number in local variables
++		int depth = getDepth();
++		int bucketNum = dest.getBucketNum();
++
++		//iterate through the index entries on this page
++		for (int pos = 0; pos < getNumRecs();)
++		{
++			//if the bucket number for an index entry matches the dest bucket number,  
++			//copy the index entry to dest
++			Constant value = getDataVal(pos);
++			if (computeBucketNumber(value, depth) == bucketNum)
++			{
++				//insert the index record into dest
++				dest.insertIndexRecord(getDataVal(pos), getDataRID(pos));
++
++				//delete the index record from this page. Delete moves the index
++				//entries over to fill the empty slot, so no need to increment pos
++				delete(pos);
++			}
++			else pos++;
++		}
++	}
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Appends a new block to the end of the specified file, setting the depth
++	 * to the specificed value, and the bucketnum to the specified value. 
++	 * 
++	 * This is the appendNew() method from BTreePage, edited to use the 
++	 * EHPageFormatter and pass localDepth and BucketNum as arguments.
++	 * 
++	 * @param localdepth, number to write in the depth slot of the new block 
++	 * @param bucketNum, number to write in the bucketNum slot of the new block
++	 * @return a reference to the newly-created block
++	 */
++	public Block appendNew(int localdepth, int bucketNum) {
++		return tx.append(ti.fileName(), new EHPageFormatter(ti, localdepth, bucketNum));
++	}
++
++	/*
++	 * Start methods taken from BTreePage
++	 */
++
++	/**
++	 * Returns the dataval of the record at the specified slot.
++	 * 
++	 * @author Edward Sciore
++	 * @param slot the integer slot of an index record
++	 * @return the dataval of the record at that slot
++	 */
++	public Constant getDataVal(int slot) {
++		return getVal(slot, "dataval");
++	}
++
++
++	/**
++	 * Returns the dataRID value stored in the specified leaf index record.
++	 * 
++	 * @author Edward Sciore
++	 * @param slot the slot of the desired index record
++	 * @return the dataRID value store at that slot
++	 */
++	private RID getDataRID(int slot) {
++		return new RID(getInt(slot, "block"), getInt(slot, "id"));
++	}
++	
++	/*
++	 * End methods taken from BTreePage
++	 */
++	
++	/**
++	 * CS4432-Project2 
++	 * 
++	 * Get the RID from the current index entry.
++	 * 
++	 * @return RID of index entry at slot currentSlot
++	 */
++	public RID getCurrentRID()
++	{
++		return getDataRID(currentSlot);
++	}
++	
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Delete the index entry at current slot
++	 */
++	public void deleteCurrentEntry()
++	{
++		delete(currentSlot);
++	}
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * First resets the currentslot and searchkey. If there is no index entry 
++	 * with dataval search key, current info is not changed from its default
++	 * value (-1).
++	 * 
++	 * Sets private variable currentSlot to the slot before the first index 
++	 * entry having the specified search key (If the slot with the search key 
++	 * is zero, then currentSlot is set to -1).
++	 *
++	 * Also sets private variable searchkey to the specified searchkey (this 
++	 * occurs whether or not the given searchkey was found in the bucket).
++	 * 
++	 * @param searchkey, value to search for 
++	 */
++	public void moveBeforeValue(Constant searchkey)
++	{
++		//reset the currentSlot and searchkey to default values
++		resetSearchInfo();
++		//set the current searchkey to the specified value
++		this.searchkey = searchkey;
++
++		//keep track of whether we have found an index entry with dataval searchkey
++		boolean found = false;
++
++		//iterate through the records in this bucket while we haven't found
++		//an index entry with dataval searchkey, or until we've checked every record
++		for (int pos = 0; (pos < getNumRecs()) && (!found); pos++)
++		{
++			//check if dataval of index equals searchkey 
++			if (getVal(pos, "dataval").equals(searchkey))
++			{
++				//set currentSlot to the position before the first index
++				//entry with dataval searchkey
++				currentSlot = pos-1;
++
++				//set found to true (this breaks out of the loop)
++				found = true;
++			}
++		}
++
++	}
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Increments currentslot. Then if current slot holds a record and the dataval at the 
++	 * new currentSlot is still equal to the search key, this returns true. 
++	 * 
++	 * If the currentslot is past the records in the bucket or its dataval is not equal to the 
++	 * search key, currentSlot is set to -1, searchkey is set to null, and then this returns false;
++	 * 
++	 * @return true if the next slot has an index entry with dataval == searchkey, and false otherwise.
++	 */
++	public boolean next()
++	{
++
++		boolean hasNext;
++
++		//increment the current slot
++		currentSlot++;
++
++		//if the next slot doesn't hold a record, or if the search key is null, 
++		//or the dataval of the entry in the next slot is not equal to searchkey,
++		//reset the currentSlot and Searchkey to default values and return false.
++		if (currentSlot >= getNumRecs() || 
++				searchkey == null ||
++				! getVal(currentSlot,"dataval").equals(searchkey))
++		{
++			resetSearchInfo();
++			hasNext = false;
++		}
++		//otherwise, return true false.
++		else hasNext = true;
++
++		return hasNext;
++	}
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Set the currentSlot to -1 and the searchkey to null. 
++	 */
++	private void resetSearchInfo()
++	{
++		currentSlot = -1; 
++		searchkey = null;
++	}
++	
++	public String toString()
++	{
++		String out = "Block " + blk.number() + " in file " + ti.fileName() + "\n";
++		
++		out += "Local Depth: " + getDepth() + "\n";
++		out += "Number of index entries: " + getNumRecs() + "\n";
++		out += "Bucket Number: " + Integer.toBinaryString(getBucketNum()) + "\n";
++		
++		for (int slot = 0; slot < getNumRecs(); slot++)
++		{
++			out += "Slot " + slot + ":\n";
++			Schema sch = ti.schema(); 
++			for (String fldname : sch.fields())
++			{
++				out += "\t\t" + fldname + " = " + getVal(slot, fldname).toString() + "\n";
++			}
++			
++		}
++		
++		return out;
++	}
++
++}
+diff --git a/src/simpledb/index/extensiblehash/EHDir.java b/src/simpledb/index/extensiblehash/EHDir.java
+new file mode 100644
+index 0000000..a52e0f7
+--- /dev/null
++++ b/src/simpledb/index/extensiblehash/EHDir.java
+@@ -0,0 +1,374 @@
++package simpledb.index.extensiblehash;
++
++import static java.sql.Types.INTEGER;
++import static simpledb.file.Page.*;
++import simpledb.file.Block;
++import simpledb.record.*;
++import simpledb.query.*;
++import simpledb.tx.Transaction;
++
++import simpledb.file.Page;
++import simpledb.buffer.PageFormatter;
++
++/**
++ * CS4432-Project2
++ * ExtensiHashDir (EHD) is a wrapper for the underlying extensible hash directory
++ * on disk. EHD stores the global depth of the extensible hash table and records 
++ * for each bucket (containing the block number of the bucket in the file.
++ * 
++ * There are always 2^(global depth) such records, but they may not point to 
++ * different buckets (if multiple records reference the same bucket, then the 
++ * local depth of that bucket is strictly less than the global depth).
++ * 
++ * The records in the directory only contain a block number; the records are stored 
++ * in order. That is, if the global depth is n, then the kth directory record holds
++ * the block that contains index entries whose data value hash to k (mod 2^n). The 
++ * ordering of directory records is preserved throughout any actions on the directory.
++ * 
++ * EHD extends the abstract class ExtensiHashPage, which contains methods (authored 
++ * by E. Sciore) for manipulating the data in the block.
++ * 
++ * @author mcwarms, gdcecil
++ *
++ */
++class EHDir extends EHPage 
++{
++	private TableInfo bucketsTi;
++	static final String DIR_FIELD = "BlockNum";
++
++	EHDir (TableInfo ti, TableInfo bucketsTi, Transaction tx)
++	{
++		super (new Block(ti.fileName(),0), ti, tx);
++		this.bucketsTi = bucketsTi;
++	}
++
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Increment the global depth, doubling the number of references
++	 * to buckets.
++	 * 
++	 * This method does not double the buckets themselves, so index entries
++	 * with bucket numbers congruent modulo 2^(old depth) reference the
++	 * same bucket.
++	 */
++	private void incrementGlobalDepth() 
++	{
++		//store the current number of dir entries
++		int oldNum = getNumRecs(); 
++
++		if (2*getNumRecs() > maxRecordsInBlock())
++		{
++			int oldFileSize = tx.size(ti.fileName());
++			int blocksRequired = 1+((2*getNumRecs()-1 - maxRecordsInBlock()) / maxRecordsInDirBlock());
++			
++			int blocksNeeded = blocksRequired - oldFileSize;
++			
++			for (int i = 0; i < blocksNeeded; i++)
++			{
++				tx.append(ti.fileName(), new RecordBlockFormatter(ti));
++			}
++		}
++
++		/*
++		 * Since no new buckets are created here, doubling the number of directory
++		 * entries means that each bucket will have two directory entries referencing it.
++		 * Two entries should be the same if their slot numbers are congruent modulo 
++		 * oldNum, so for each entry at slot pos, we copy it to slot pos+oldnum. 
++		 */
++		for (int pos = 0; pos < oldNum; pos++)
++		{
++			//make space for the new directory entry at pos+oldNum
++			insert(pos + oldNum); 
++			//copy directory entry at pos to slot pos+oldNum
++			copyRecord(pos, pos + oldNum); 
++		}
++
++		setDepth(getDepth()+1);
++	}
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Insert the given index record (consisting of a data value and an
++	 * RID) into the appropriate bucket. 
++	 * 
++	 * This method extends the index as necessary, if the corresponding bucket 
++	 * is full, then the bucket is split (incrementing the global depth as needed). 
++	 * If the 
++	 * @param dataval
++	 * @param rid
++	 */
++	public void insertIndexRecord (Constant dataval, RID rid)
++	{
++		//compute the bucket number for the given data value
++		int bucketNum = EHPage.computeBucketNumber(dataval, getDepth());
++
++		//get the block of the bucket with given bucket number
++		Block blk = getBucketBlock(bucketNum);
++
++		//Open an instance of ExtensiHashBucket to wrap the block containing 
++		//the bucket.
++		EHBucket bucket = new EHBucket(blk, bucketsTi, tx);
++
++		//If the bucket is full, extend the hash index by splitting the bucket
++		//and incrementing the global depth as needed.
++		while (bucket.isFull())
++		{
++			//if the bucket is full and its local depth is equal to the global 
++			//depth of the hash index, increment the global depth before splitting
++			//the bucket.
++			if (bucket.getDepth() == this.getDepth())
++			{
++				//increment the global depth, doubling the number of 
++				//references to buckets.
++				incrementGlobalDepth();
++
++				//update the bucket number for dataval under the new global depth
++				bucketNum = EHPage.computeBucketNumber(dataval, getDepth());
++			}
++			//Now that the global depth has been updated, we can split the bucket.
++
++			//First store the bucket number for the data value with respect to the local depth of the full bucket.
++			int oldBucketNum = EHPage.computeBucketNumber(dataval, bucket.getDepth());
++
++			//Split the bucket 
++			Block newblk = bucket.split();
++
++			//Compute the bucket number of the new bucket, given by oldBucketNum + 2^(old local depth).
++			int newBucketNum = oldBucketNum + (1 << (bucket.getDepth()-1));
++
++			/*
++			 * This bucket might be referenced multiple times in the directory. If it is, its directory entries 
++			 * will be at slots 
++			 * 
++			 * oldBucketNum, oldBucketNum + 1*(2^(old local depth)),...,oldBucketNum+N*(2^(old local depth)),
++			 * 
++			 * where N is the largest integer such that oldBucketNum+N*(2^(old local depth)) is less than 2^((global depth)).
++			 * 
++			 * oldBucketNum is necessarily the smallest of these slots, since all the bits of oldBucketNum to the 
++			 * left of the (local depth)'th bit are zero.
++			 * 
++			 * Since we are splitting the bucket, we need to update these index entries to make sure they point to the
++			 * correct bucket. The entries that should point to the old bucket won't need to be changed. These entries are at slots
++			 * 
++			 * oldBucketNum, oldBucketNum + 1*(2^(new local depth)),...,oldBucketNum+N*(2^(new local depth)),
++			 * 
++			 * where N is the largest integer such that oldBucketNum+N*(2^(new local depth)) is less than 2^((global depth)).
++			 * The directory entries that we need to update to reference the new bucket will be at 
++			 * 
++			 * newBucketNum, newBucketNum + 1*(2^(new local depth)),...,newBucketNum+M*(2^(new local depth)),
++			 * 
++			 * where M is the largest integer such that newBucketNum+M*(2^(new local depth)) is less than 2^((global depth)).
++			 */
++
++			//compute 2^(new local depth), which is used to step through the directory entries as above.
++			//Here bucket.getDepth() gets the correct number, since split() updates the local depth of the bucket.
++			int stepSize = (1 << bucket.getDepth());
++
++			//iterate through the directory entries that need to be changed, and update them to 
++			//reference the new block. Note that if local depth = global depth, stepSize will be equal to 
++			//the number of records, and so only one entry will be changed (as expected).
++			for (int pos = newBucketNum; pos < getNumRecs(); pos += stepSize) 
++			{
++				//change the reference for the directory entry at pos to reference the new block 
++				updateDirEntry(pos, newblk.number());
++			}
++
++			//Set blk to the block with the bucket corresponding to the bucket number for dataval with respect
++			//to the new local depth.
++			blk = (EHPage.computeBucketNumber(dataval, bucket.getDepth())== oldBucketNum) ?
++					blk : newblk;
++
++			//close the current ExtensiHashBucket wrapper
++			bucket.close();
++
++			//open a new ExtensiHashBucket wrapper for blk, which holds whichever split bucket that the 
++			//index entry for dataval belongs in.
++			bucket = new EHBucket(blk, bucketsTi, tx);
++
++			//return to the predicate for the while loop. If the split bucket we want to add the index entry
++			//for dataval to is still full, repeat this process. 
++		}
++
++		//bucket is a priori not full, so insert the index entry for dataval.
++		bucket.insertIndexRecord(dataval, rid );
++
++		//close the ExtensiHashBucket wrapper for the bucket.
++		bucket.close();
++
++	}
++
++
++	public void updateDirEntry (int bucketNum, int block)
++	{
++		setInt(bucketNum, "BlockNum", block);
++	}
++
++	public Block getBucketBlock(int key)
++	{
++		return new Block (bucketsTi.fileName(), getInt(key, DIR_FIELD));
++	}
++
++
++	private int maxRecordsInDirBlock()
++	{
++		return BLOCK_SIZE/ti.recordLength();	 		
++	}
++
++	private int getSlotNumInBlock(int slotNum)
++	{
++		return slotNum < maxRecordsInBlock() ?
++				slotNum : 
++					(slotNum - maxRecordsInBlock()) % maxRecordsInDirBlock();
++	}
++
++	private Block dirBlock(int slot)
++	{
++		int blk = slot < maxRecordsInBlock() ? 
++				0 : 1+((slot- maxRecordsInDirBlock())/maxRecordsInBlock());
++		return new Block(ti.fileName(), blk);
++	}
++
++	protected int dirBlockPos(int slot)
++	{
++		return getSlotNumInBlock(slot) * slotsize;
++	}
++	
++	@Override
++	protected int getInt(int slot, String fldname) 
++	{
++		int ret;
++		if (slot < maxRecordsInBlock()) 
++			ret = super.getInt(slot, fldname);
++		else 
++		{
++			Block dirblk = dirBlock(slot);
++			int posInBlock = dirBlockPos(slot);
++
++			tx.pin(dirblk);
++			ret = tx.getInt(dirblk, posInBlock);
++			tx.unpin(dirblk);
++
++		}
++		return ret;
++	}
++
++	@Override
++	protected String getString(int slot, String fldname) 
++	{
++		String ret;
++		if (slot < maxRecordsInBlock()) 
++			ret = super.getString(slot, fldname);
++		else 
++		{
++			Block dirblk = dirBlock(slot);
++			int posInBlock = dirBlockPos(slot);
++
++			tx.pin(dirblk);
++			ret = tx.getString(dirblk, posInBlock);
++			tx.unpin(dirblk);
++
++		}
++		return ret;
++	}
++
++	@Override
++	protected void setInt(int slot, String fldname, int val) 
++	{
++		if (slot < maxRecordsInBlock()) 
++			super.setInt(slot, fldname, val);
++		else 
++		{
++			Block dirblk = dirBlock(slot);
++			int posInBlock = dirBlockPos(slot);
++
++			tx.pin(dirblk);
++			tx.setInt(dirblk, posInBlock, val);
++			tx.unpin(dirblk);
++
++		}
++	}
++
++	@Override
++	protected void setString(int slot, String fldname, String val) 
++	{
++		if (slot < maxRecordsInBlock()) 
++			super.setString(slot, fldname, val);
++		else 
++		{
++			Block dirblk = dirBlock(slot);
++			int posInBlock = dirBlockPos(slot);
++
++			tx.pin(dirblk);
++			tx.setString(dirblk, posInBlock, val);
++			tx.unpin(dirblk);
++
++		}
++	}
++
++	//TODO update toString to get whole block 
++	@Override
++	public String toString()
++	{
++		String out = dirTableToString();
++
++		for (int slot = 0; slot < getNumRecs(); slot++)
++		{
++			out += "Bucket Number " + Integer.toBinaryString(slot) + ":\n";
++
++			Block b = new Block (bucketsTi.fileName(), getInt(slot, DIR_FIELD));
++
++			EHBucket bucket = new EHBucket(b, bucketsTi, tx);
++
++			out += bucket.toString();
++			bucket.close();
++		}
++
++		return out;
++	}
++	
++	public String dirTableToString()
++	{
++		String out = "\n\nFile " + ti.fileName() + "\n";
++		out += "Size: " + tx.size(ti.fileName()) + " blocks\n";
++		out += "Records in block 0: " + maxRecordsInBlock() + "\n";
++		out += "Records in block 1+: " + maxRecordsInDirBlock() + "\n";
++		out += "Global Depth: " + getDepth() + "\n";
++		out += "Number of directory entries: " + getNumRecs() + "\n";
++		
++		return out;
++	}
++	
++	
++}
++
++
++
++class RecordBlockFormatter implements PageFormatter
++{
++	private TableInfo ti;
++
++	RecordBlockFormatter (TableInfo ti)
++	{
++		this.ti = ti;
++	}
++	public void format (Page p)
++	{
++		int recSize = ti.recordLength();
++		for (int pos = 0; pos + recSize <= BLOCK_SIZE; pos += recSize)
++			makeDefaultRecord(p, pos);
++
++	}
++
++	private void makeDefaultRecord(Page page, int pos) {
++		for (String fldname : ti.schema().fields()) {
++			int offset = ti.offset(fldname);
++			if (ti.schema().type(fldname) == INTEGER)
++				page.setInt(pos + offset, 0);
++			else
++				page.setString(pos + offset, "");
++		}
++	}
++
++}
+\ No newline at end of file
+diff --git a/src/simpledb/index/extensiblehash/EHIndex.java b/src/simpledb/index/extensiblehash/EHIndex.java
+new file mode 100644
+index 0000000..d5f2630
+--- /dev/null
++++ b/src/simpledb/index/extensiblehash/EHIndex.java
+@@ -0,0 +1,132 @@
++package simpledb.index.extensiblehash;
++
++import simpledb.file.Block;
++import simpledb.tx.Transaction;
++import simpledb.record.*;
++import simpledb.index.Index;
++import simpledb.index.hash.HashIndex;
++import simpledb.query.Constant;
++import simpledb.record.RID;
++
++public class EHIndex implements Index {
++
++	private Transaction tx;
++
++	private TableInfo bucketsTi;
++	private TableInfo dirTi;
++
++	private EHDir dir = null;
++	private EHBucket bucket = null;
++
++	public EHIndex(String idxname, Schema sch, Transaction tx)
++	{
++		this.tx = tx; 
++		bucketsTi = new TableInfo(idxname, sch);
++
++		Schema dirSch = new Schema();
++		dirSch.addIntField(EHDir.DIR_FIELD);
++
++		String dirName = idxname + "dir";
++		dirTi = new TableInfo(dirName, dirSch);
++
++
++
++		if (tx.size(dirTi.fileName()) == 0) 
++		{
++			tx.append(dirTi.fileName(), new EHPageFormatter(dirTi, 0));
++
++			Block firstIdxBlk = tx.append(bucketsTi.fileName(), new EHPageFormatter(bucketsTi, 0, 0));
++
++			dir = new EHDir(dirTi, bucketsTi, this.tx);
++
++			dir.updateDirEntry(0, firstIdxBlk.number());
++			
++			dir.setNumRecs(1);
++
++			dir.close();
++		}
++
++	}
++
++	public void beforeFirst(Constant searchkey) 
++	{
++		//close previous instances of ExtensiHashDir and ExtensiHashBucket
++		close();
++
++		//Wrap the directory in an ExtensiHashDir object
++		dir = new EHDir(dirTi, bucketsTi, tx);
++
++		//get the bucket number for this searchkey
++		int bucketNum = EHPage.computeBucketNumber(searchkey, dir.getDepth());
++
++		//get the block of the bucket having bucket number bucketNum
++		Block blk = dir.getBucketBlock(bucketNum);
++
++		//Wrap the bucket in an ExtensiHashBucket object
++		bucket = new EHBucket(blk, bucketsTi, tx);
++
++		//Move the bucket to the slot strictly before the first index entry 
++		//that has value
++		bucket.moveBeforeValue(searchkey);
++
++	}
++
++
++	public boolean next() 
++	{
++		return bucket.next();
++	}
++
++	public RID getDataRid() 
++	{
++		return bucket.getCurrentRID();
++	}
++
++	public void insert(Constant dataval, RID datarid) 
++	{
++		beforeFirst(dataval);
++		dir.insertIndexRecord(dataval, datarid);
++	}
++
++	public void delete(Constant dataval, RID datarid)
++	{
++		beforeFirst(dataval);
++
++		boolean deleted = false;
++
++		while (!deleted && bucket.next())
++		{
++			if (getDataRid().equals(datarid))
++			{
++				bucket.deleteCurrentEntry();
++				deleted = true;
++			}
++		}
++
++	}
++
++	
++	public void close() {
++		if (dir != null) dir.close();
++		if (bucket != null) bucket.close();
++	}
++
++	public static int searchCost(int numblocks, int rpb) {
++		return numblocks / HashIndex.NUM_BUCKETS;
++	}
++	
++	@Override
++	public String toString()
++	{
++		close();
++		
++		dir = new EHDir(dirTi, bucketsTi, tx);
++		
++		//String out = dir.toString();
++		String out = dir.dirTableToString();
++		dir.close();
++		
++		return out;
++	}
++
++}
+diff --git a/src/simpledb/index/extensiblehash/EHPage.java b/src/simpledb/index/extensiblehash/EHPage.java
+new file mode 100644
+index 0000000..61061de
+--- /dev/null
++++ b/src/simpledb/index/extensiblehash/EHPage.java
+@@ -0,0 +1,298 @@
++package simpledb.index.extensiblehash;
++
++import static java.sql.Types.INTEGER;
++import static simpledb.file.Page.*;
++import simpledb.file.Block;
++import simpledb.record.*;
++import simpledb.query.*;
++import simpledb.tx.Transaction;
++
++
++/**
++ * ExtensiHashPage
++ * 
++ * 
++ * @author mcwarms, gdcecil
++ *
++ */
++public abstract class EHPage 
++{
++	protected Block blk; 
++	protected TableInfo ti;
++	protected Transaction tx;
++	protected int slotsize;
++	
++	public EHPage (Block currentblk, 
++							TableInfo ti, 
++							Transaction tx) 
++	{
++		this.blk = currentblk; 
++		this.ti = ti;
++		this.tx = tx; 
++		slotsize = ti.recordLength();
++		tx.pin(currentblk);
++	}
++	
++	
++	/**
++	 * CS4432-Project2
++	 * 
++	 * In an extensible hash table, only the D rightmost bits are considered
++	 * when computing the corresponding bucket number for a key, where D is depth. 
++	 * 
++	 * That is, we compute (hashcode) % 2^D.
++	 * 
++	 * This method is implemented statically, as this calculation is used when the depth
++	 * does not correspond to the actual depth of the extensible hash index.
++	 * 
++	 * @param val, val to hash and compute
++	 * @param depth, power of two for the modulus 
++	 * @return bucket number for the given value, if global depth = depth
++	 */
++	static int computeBucketNumber (Constant val, int depth)
++	{
++		return val.hashCode() % (1 << depth);
++	}
++	
++	/**
++	 * CS4432-Project2 
++	 * 
++	 * Returns the maximum number of records that will fit in the block represented 
++	 * by this object.
++	 * 
++	 * 
++	 * @return
++	 */
++	public int maxRecordsInBlock() 
++	{
++		return (BLOCK_SIZE - EHPageFormatter.RECORD_START_OFFSET)/slotsize;
++	}
++	
++	/**
++	 * CS4432-Project2
++	 * Set the depth (interpreted to be global/local as appropriate) of this page to the 
++	 * specified value.
++	 * 
++	 * @author mcwarms, gdcecil
++	 */
++	protected void setDepth(int depth) {
++		tx.setInt(blk, EHPageFormatter.DEPTH_OFFSET, depth);
++	}
++	
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Get the depth (interpreted to be global/local as appropriate) of this page
++	 * 
++	 * @return depth depth of this index page
++	 */
++	protected int getDepth() 
++	{
++		return tx.getInt(blk, EHPageFormatter.DEPTH_OFFSET);
++	}
++	
++	/* CS4432-Project2
++	 * 
++	 * The following methods are copied from simpledb.index.btree.BTreePage,
++	 * and are use to access and manipulate records in the block referenced
++	 * by either ExtensiHashBucket or ExtensiHashDir (subclasses of this).
++	 * 
++	 */
++	
++	/*
++	 * Start methods taken from BTreepage
++	 */
++	
++	/**
++	 * Closes the page by unpinning its buffer.
++	 */
++	public void close() {
++		if (blk != null)
++			tx.unpin(blk);
++		blk = null;
++	}
++	
++	/**
++	 * Returns true if the block is full.
++	 * 
++	 * @author Edward Sciore
++	 * 
++	 * @return true if the block is full
++	 */
++	public boolean isFull() {
++		return slotpos(getNumRecs()+1) >= BLOCK_SIZE;
++	}
++	
++	/**
++	 * Returns the number of index records in this page.
++	 * 
++	 * @author Edward Sciore
++	 * 
++	 * @return the number of index records in this page
++	 */
++	public int getNumRecs() {
++		return tx.getInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET);
++	}
++	
++	/**
++	 * Deletes the index record at the specified slot.
++	 * 
++	 * @author Edward Sciore
++	 * 
++	 * @param slot the slot of the deleted index record
++	 */
++	public void delete(int slot) {
++		for (int i=slot+1; i<getNumRecs(); i++)
++			copyRecord(i, i-1);
++		setNumRecs(getNumRecs()-1);
++		return;
++	}
++	
++	
++	/**
++	 * Creates space for a new record at the specified slot by
++	 * moving all the records at and after 0slot by one slot.
++	 * 
++	 * @author Edward Sciore
++	 * 
++	 * @param slot the slot where the new record will be inserted
++	 */
++	protected void insert(int slot) {
++		for (int i=getNumRecs(); i>slot; i--)
++			copyRecord(i-1, i);
++		setNumRecs(getNumRecs()+1);
++	}
++
++	/**
++	 * 
++	 * @author Edward Sciore
++	 * 
++	 * @param from
++	 * @param to
++	 */
++	protected void copyRecord(int from, int to) {
++		Schema sch = ti.schema();
++		for (String fldname : sch.fields())
++			setVal(to, fldname, getVal(from, fldname));
++	}
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @return
++	 */
++	protected int getInt(int slot, String fldname) {
++		int pos = fldpos(slot, fldname);
++		return tx.getInt(blk, pos);
++	}
++	/** 
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @return
++	 */
++	protected String getString(int slot, String fldname) {
++		int pos = fldpos(slot, fldname);
++		return tx.getString(blk, pos);
++	}
++	
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @return
++	 */
++	protected Constant getVal(int slot, String fldname) {
++		int type = ti.schema().type(fldname);
++		if (type == INTEGER)
++			return new IntConstant(getInt(slot, fldname));
++		else
++			return new StringConstant(getString(slot, fldname));
++	}
++	
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @param val
++	 */
++	protected void setInt(int slot, String fldname, int val) {
++		int pos = fldpos(slot, fldname);
++		tx.setInt(blk, pos, val);
++	}
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @param val
++	 */
++	protected void setString(int slot, String fldname, String val) {
++		int pos = fldpos(slot, fldname);
++		tx.setString(blk, pos, val);
++	}
++	
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @param val
++	 */
++	protected void setVal(int slot, String fldname, Constant val) {
++		int type = ti.schema().type(fldname);
++		if (type == INTEGER)
++			setInt(slot, fldname, (Integer)val.asJavaVal());
++		else
++			setString(slot, fldname, (String)val.asJavaVal());
++	}
++	
++	
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param n
++	 */
++	protected void setNumRecs(int n) {
++		tx.setInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET, n);
++	}
++	
++	/**
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @param fldname
++	 * @return
++	 */
++	protected int fldpos(int slot, String fldname) {
++		int offset = ti.offset(fldname);
++		return slotpos(slot) + offset;
++	}
++	
++	/*
++	 * End methods taken from BTreePage
++	 */
++	
++	
++
++	/**
++	 * CS4432-Project2
++	 * 
++	 * Edited from the slotpos method in BTreePage to support the usage of
++	 * of a symbolic constant. 
++	 * 
++	 * @author Edward Sciore
++	 * 
++	 * @param slot
++	 * @return 
++	 */
++	protected int slotpos(int slot)
++	{
++		return EHPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
++	}
++
++}
+diff --git a/src/simpledb/index/extensiblehash/EHPageFormatter.java b/src/simpledb/index/extensiblehash/EHPageFormatter.java
+new file mode 100644
+index 0000000..dcd368a
+--- /dev/null
++++ b/src/simpledb/index/extensiblehash/EHPageFormatter.java
+@@ -0,0 +1,102 @@
++package simpledb.index.extensiblehash;
++
++
++import static java.sql.Types.INTEGER;
++import static simpledb.file.Page.*;
++import simpledb.buffer.PageFormatter;
++import simpledb.file.Page;
++import simpledb.record.TableInfo;
++
++/**
++ * EHPageFormatter formats a block for usage as either an EH directory 
++ * or an EH bucket. 
++ * 
++ * Blocks are formatted in the same way in either case: 
++ * 
++ * At offset 0, an integer depth is stored (interpreted to be global or local
++ * as required).
++ *  
++ * At offset INT_SIZE, an integer bucket number is stored (the directory doesn't
++ * use this slot, but since both bucket and directory are formatted in the same
++ * way, the slot is still created in a directory block).
++ * 
++ * At offset 2*INT_SIZE, an integer is used to store the number of records (i.e. 
++ * index entries or directory entries) in the block. 
++ * 
++ * At offset 3*INT_SIZE, records are stored. 
++ * 
++ * On disk, the block will look like
++ *
++ * |	Depth	|  BucketNum | Num Records|  Rec0  |  Rec1  | ... |
++ * 
++ * @author mcwarms, gdcecil
++ *
++ */
++public class EHPageFormatter implements PageFormatter 
++{
++	//info 
++	private TableInfo ti; 
++	private int depth = 0;
++	private int num = -1;
++	
++	//keep offsets as static constants
++	static final int DEPTH_OFFSET = 0;
++	static final int BUCKET_NUM_OFFSET = INT_SIZE;
++	static final int RECORD_COUNT_OFFSET = INT_SIZE+INT_SIZE;
++	static final int RECORD_START_OFFSET = INT_SIZE+INT_SIZE+INT_SIZE;
++
++	
++	public EHPageFormatter (TableInfo ti, int depth) 
++	{
++		this.ti=ti;
++		this.depth = depth;
++	}
++
++	public EHPageFormatter (TableInfo ti, int depth, int bucketNum) 
++	{ 
++		this.ti = ti; 
++		this.depth = depth;
++		this.num = bucketNum;
++	}
++
++	/**
++	 * CS4432-Project2:
++	 * 
++	 * Formats the page into a bucket for the extensible hash,
++	 * that stores local depth of the bucket as an integer, the number of 
++	 * records as an integer, and then each record.
++	 * 
++	 * | local depth (int) | #records (int) | record1 | record2 | ... |
++	 * 
++	 */
++	public void format(Page p) {
++		
++		
++		p.setInt(DEPTH_OFFSET, depth); //store global/local depth
++		
++		p.setInt(RECORD_COUNT_OFFSET, 0); //store number of records
++		
++		p.setInt(BUCKET_NUM_OFFSET, num);//store data
++		
++		int recSize = ti.recordLength(); 
++		
++		for (int pos = RECORD_START_OFFSET; pos + recSize <= BLOCK_SIZE; pos += recSize)
++		{
++			makeDefaultRecord(p, pos);
++		}
++
++	}
++
++	private void makeDefaultRecord(Page page, int pos) {
++		for (String fldname : ti.schema().fields()) {
++			int offset = ti.offset(fldname);
++			if (ti.schema().type(fldname) == INTEGER)
++				page.setInt(pos + offset, 0);
++			else
++				page.setString(pos + offset, "");
++		}
++	}
++
++
++
++}
+diff --git a/src/simpledb/index/planner/IndexUpdatePlanner.java b/src/simpledb/index/planner/IndexUpdatePlanner.java
+index cfc528b..502771c 100644
+--- a/src/simpledb/index/planner/IndexUpdatePlanner.java
++++ b/src/simpledb/index/planner/IndexUpdatePlanner.java
+@@ -1,5 +1,9 @@
+ package simpledb.index.planner;
+ 
++import java.io.File;
++import java.io.FileNotFoundException;
++import java.io.FileOutputStream;
++import java.io.PrintStream;
+ import java.util.Iterator;
+ import java.util.Map;
+ 
+@@ -7,6 +11,7 @@ import simpledb.record.RID;
+ import simpledb.server.SimpleDB;
+ import simpledb.tx.Transaction;
+ import simpledb.index.Index;
++import simpledb.index.extensiblehash.EHIndex;
+ import simpledb.metadata.IndexInfo;
+ import simpledb.parse.*;
+ import simpledb.planner.*;
+@@ -19,102 +24,126 @@ import simpledb.query.*;
+  * @author Edward Sciore
+  */
+ public class IndexUpdatePlanner implements UpdatePlanner {
+-   
+-   public int executeInsert(InsertData data, Transaction tx) {
+-      String tblname = data.tableName();
+-      Plan p = new TablePlan(tblname, tx);
+-      
+-      // first, insert the record
+-      UpdateScan s = (UpdateScan) p.open();
+-      s.insert();
+-      RID rid = s.getRid();
+-      
+-      // then modify each field, inserting an index record if appropriate
+-      Map<String,IndexInfo> indexes = SimpleDB.mdMgr().getIndexInfo(tblname, tx);
+-      Iterator<Constant> valIter = data.vals().iterator();
+-      for (String fldname : data.fields()) {
+-         Constant val = valIter.next();
+-         System.out.println("Modify field " + fldname + " to val " + val);
+-         s.setVal(fldname, val);
+-         
+-         IndexInfo ii = indexes.get(fldname);
+-         if (ii != null) {
+-            Index idx = ii.open();
+-            idx.insert(val, rid);
+-            idx.close();
+-         }
+-      }
+-      s.close();
+-      return 1;
+-   }
+-   
+-   public int executeDelete(DeleteData data, Transaction tx) {
+-      String tblname = data.tableName();
+-      Plan p = new TablePlan(tblname, tx);
+-      p = new SelectPlan(p, data.pred());
+-      Map<String,IndexInfo> indexes = SimpleDB.mdMgr().getIndexInfo(tblname, tx);
+-      
+-      UpdateScan s = (UpdateScan) p.open();
+-      int count = 0;
+-      while(s.next()) {
+-         // first, delete the record's RID from every index
+-         RID rid = s.getRid();
+-         for (String fldname : indexes.keySet()) {
+-            Constant val = s.getVal(fldname);
+-            Index idx = indexes.get(fldname).open();
+-            idx.delete(val, rid);
+-            idx.close();
+-         }
+-         // then delete the record
+-         s.delete();
+-         count++;
+-      }
+-      s.close();
+-      return count;
+-   }
+-   
+-   public int executeModify(ModifyData data, Transaction tx) {
+-      String tblname = data.tableName();
+-      String fldname = data.targetField();
+-      Plan p = new TablePlan(tblname, tx);
+-      p = new SelectPlan(p, data.pred());
+-      
+-      IndexInfo ii = SimpleDB.mdMgr().getIndexInfo(tblname, tx).get(fldname);
+-      Index idx = (ii == null) ? null : ii.open();
+-      
+-      UpdateScan s = (UpdateScan) p.open();
+-      int count = 0;
+-      while(s.next()) {
+-         // first, update the record
+-         Constant newval = data.newValue().evaluate(s);
+-         Constant oldval = s.getVal(fldname);
+-         s.setVal(data.targetField(), newval);
+-         
+-         // then update the appropriate index, if it exists
+-         if (idx != null) {
+-            RID rid = s.getRid();
+-            idx.delete(oldval, rid);
+-            idx.insert(newval, rid);
+-         }
+-         count++;
+-      }
+-      if (idx != null) idx.close();
+-      s.close();
+-      return count;
+-   }
+-   
+-   public int executeCreateTable(CreateTableData data, Transaction tx) {
+-      SimpleDB.mdMgr().createTable(data.tableName(), data.newSchema(), tx);
+-      return 0;
+-   }
+-   
+-   public int executeCreateView(CreateViewData data, Transaction tx) {
+-      SimpleDB.mdMgr().createView(data.viewName(), data.viewDef(), tx);
+-      return 0;
+-   }
+-   
+-   public int executeCreateIndex(CreateIndexData data, Transaction tx) {
+-      SimpleDB.mdMgr().createIndex(data.indexName(), data.tableName(), data.fieldName(), tx);
+-      return 0;
+-   }
++	private static int count = 0;
++
++	public int executeInsert(InsertData data, Transaction tx) {
++		count++;
++		System.out.println("COUNT IS -------------------- " + count);
++		String tblname = data.tableName();
++		Plan p = new TablePlan(tblname, tx);
++
++		// first, insert the record
++		UpdateScan s = (UpdateScan) p.open();
++		s.insert();
++		RID rid = s.getRid();
++
++		// then modify each field, inserting an index record if appropriate
++		Map<String,IndexInfo> indexes = SimpleDB.mdMgr().getIndexInfo(tblname, tx);
++		Iterator<Constant> valIter = data.vals().iterator();
++		for (String fldname : data.fields()) {
++			Constant val = valIter.next();
++			System.out.println("Modify field " + fldname + " to val " + val);
++			s.setVal(fldname, val);
++
++			//Retrieves index (if it exists) and inserts
++			IndexInfo ii = indexes.get(fldname);
++			if (ii != null) {
++				Index idx = ii.open();
++
++				//Print to file the cost of accessing the blocks
++				int cost = ii.blocksAccessed();
++				if (cost == -1) {
++				} else {
++					System.out.println("Cost of access: " + cost);
++				}
++					try {
++						PrintStream file = new PrintStream(new FileOutputStream("iocost.txt", true));
++						PrintStream console = System.out;
++						System.setOut(file);
++						System.out.println("printing to the right file");
++						System.out.println(cost);
++						System.setOut(console);
++					} catch (FileNotFoundException e) {
++						// TODO Auto-generated catch block
++						e.printStackTrace();
++					}
++
++				idx.insert(val, rid);
++				idx.close();
++			}
++		}
++		s.close();
++		return 1;
++	}
++
++	public int executeDelete(DeleteData data, Transaction tx) {
++		String tblname = data.tableName();
++		Plan p = new TablePlan(tblname, tx);
++		p = new SelectPlan(p, data.pred());
++		Map<String,IndexInfo> indexes = SimpleDB.mdMgr().getIndexInfo(tblname, tx);
++
++		UpdateScan s = (UpdateScan) p.open();
++		int count = 0;
++		while(s.next()) {
++			// first, delete the record's RID from every index
++			RID rid = s.getRid();
++			//Gets each index and deletes the entry
++			for (String fldname : indexes.keySet()) {
++				Constant val = s.getVal(fldname);
++				Index idx = indexes.get(fldname).open();
++				idx.delete(val, rid);
++				idx.close();
++			}
++			// then delete the record
++			s.delete();
++			count++;
++		}
++		s.close();
++		return count;
++	}
++
++	public int executeModify(ModifyData data, Transaction tx) {
++		String tblname = data.tableName();
++		String fldname = data.targetField();
++		Plan p = new TablePlan(tblname, tx);
++		p = new SelectPlan(p, data.pred());
++
++		IndexInfo ii = SimpleDB.mdMgr().getIndexInfo(tblname, tx).get(fldname);
++		Index idx = (ii == null) ? null : ii.open();
++
++		UpdateScan s = (UpdateScan) p.open();
++		int count = 0;
++		while(s.next()) {
++			// first, update the record
++			Constant newval = data.newValue().evaluate(s);
++			Constant oldval = s.getVal(fldname);
++			s.setVal(data.targetField(), newval);
++
++			// then update the appropriate index, if it exists
++			if (idx != null) {
++				RID rid = s.getRid();
++				idx.delete(oldval, rid);
++				idx.insert(newval, rid);
++			}
++			count++;
++		}
++		if (idx != null) idx.close();
++		s.close();
++		return count;
++	}
++
++	public int executeCreateTable(CreateTableData data, Transaction tx) {
++		SimpleDB.mdMgr().createTable(data.tableName(), data.newSchema(), tx);
++		return 0;
++	}
++
++	public int executeCreateView(CreateViewData data, Transaction tx) {
++		SimpleDB.mdMgr().createView(data.viewName(), data.viewDef(), tx);
++		return 0;
++	}
++
++	public int executeCreateIndex(CreateIndexData data, Transaction tx) {
++		SimpleDB.mdMgr().createIndex(data.indexType(), data.indexName(), data.tableName(), data.fieldName(), tx);
++		return 0;
++	}
+ }
+diff --git a/src/simpledb/metadata/IndexInfo.java b/src/simpledb/metadata/IndexInfo.java
+index 7b599c2..dc7ef45 100644
+--- a/src/simpledb/metadata/IndexInfo.java
++++ b/src/simpledb/metadata/IndexInfo.java
+@@ -7,7 +7,8 @@ import simpledb.tx.Transaction;
+ import simpledb.record.*;
+ import simpledb.index.Index;
+ import simpledb.index.hash.HashIndex; 
+-import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
++import simpledb.index.btree.BTreeIndex;
++import simpledb.index.extensiblehash.EHIndex;
+ 
+ 
+ /**
+@@ -19,7 +20,7 @@ import simpledb.index.btree.BTreeIndex; //in case we change to btree indexing
+  * @author Edward Sciore
+  */
+ public class IndexInfo {
+-   private String idxname, fldname;
++   private String indextype, idxname, fldname;
+    private Transaction tx;
+    private TableInfo ti;
+    private StatInfo si;
+@@ -31,8 +32,9 @@ public class IndexInfo {
+     * @param fldname the name of the indexed field
+     * @param tx the calling transaction
+     */
+-   public IndexInfo(String idxname, String tblname, String fldname,
++   public IndexInfo(String indextype, String idxname, String tblname, String fldname,
+                     Transaction tx) {
++	  this.indextype = indextype;
+       this.idxname = idxname;
+       this.fldname = fldname;
+       this.tx = tx;
+@@ -45,9 +47,20 @@ public class IndexInfo {
+     * @return the Index object associated with this information
+     */
+    public Index open() {
+-      Schema sch = schema();
+-      // Create new HashIndex for hash indexing
+-      return new HashIndex(idxname, sch, tx);
++       Schema sch = schema();
++       System.out.println("Index type: " + indextype + " with name: " + idxname);
++       //Create index based on type stored in IndexInfo
++       if (indextype.equals("sh")) {
++         return new HashIndex(idxname, sch, tx);
++       } else if (indextype.equals("bt")) {
++         return new BTreeIndex(idxname, sch, tx);
++       } else if (indextype.equals("eh")) {
++         return new EHIndex(idxname, sch, tx);
++       } else {
++         //Not supposed to reach this point, should handle error
++    	 return new HashIndex(idxname, sch, tx);
++       }     
++      
+    }
+    
+    /**
+@@ -65,8 +78,28 @@ public class IndexInfo {
+       TableInfo idxti = new TableInfo("", schema());
+       int rpb = BLOCK_SIZE / idxti.recordLength();
+       int numblocks = si.recordsOutput() / rpb;
+-      // Call HashIndex.searchCost for hash indexing
+-      return HashIndex.searchCost(numblocks, rpb);
++      System.out.println("Not finding an indextype");
++      //Call searchcost based on the type of index
++      if (indextype.equals("sh")) {
++    	System.out.println("cost of static hash");
++		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
++	    return HashIndex.searchCost(numblocks, rpb);
++	  } else if (indextype.equals("bt")) {
++		System.out.println("cost of BTree");
++		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
++	    return BTreeIndex.searchCost(numblocks, rpb);
++	  }
++      //commented out until implemented in extensihash
++	  else if (indextype.equals("eh")) {
++		System.out.println("cost of extensihash");
++		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
++	    return EHIndex.searchCost(numblocks,rpb);
++	  } 
++	  else {
++	  //Not supposed to reach this point, should handle error
++	     System.out.println("Not finding an indextype");
++	     return -1;
++	  }
+    }
+    
+    /**
+diff --git a/src/simpledb/metadata/IndexMgr.java b/src/simpledb/metadata/IndexMgr.java
+index 1900d12..3075306 100644
+--- a/src/simpledb/metadata/IndexMgr.java
++++ b/src/simpledb/metadata/IndexMgr.java
+@@ -17,12 +17,16 @@ public class IndexMgr {
+     * Creates the index manager.
+     * This constructor is called during system startup.
+     * If the database is new, then the <i>idxcat</i> table is created.
++    * 
++    * CS4432: Adds the indextype field to the schema 
++    * 
+     * @param isnew indicates whether this is a new database
+     * @param tx the system startup transaction
+     */
+    public IndexMgr(boolean isnew, TableMgr tblmgr, Transaction tx) {
+       if (isnew) {
+          Schema sch = new Schema();
++         sch.addStringField("indextype", MAX_NAME);
+          sch.addStringField("indexname", MAX_NAME);
+          sch.addStringField("tablename", MAX_NAME);
+          sch.addStringField("fieldname", MAX_NAME);
+@@ -40,9 +44,10 @@ public class IndexMgr {
+     * @param fldname the name of the indexed field
+     * @param tx the calling transaction
+     */
+-   public void createIndex(String idxname, String tblname, String fldname, Transaction tx) {
++   public void createIndex(String indextype, String idxname, String tblname, String fldname, Transaction tx) {
+       RecordFile rf = new RecordFile(ti, tx);
+       rf.insert();
++      rf.setString("indextype", indextype);
+       rf.setString("indexname", idxname);
+       rf.setString("tablename", tblname);
+       rf.setString("fieldname", fldname);
+@@ -61,9 +66,10 @@ public class IndexMgr {
+       RecordFile rf = new RecordFile(ti, tx);
+       while (rf.next())
+          if (rf.getString("tablename").equals(tblname)) {
++         String indextype = rf.getString("indextype");
+          String idxname = rf.getString("indexname");
+          String fldname = rf.getString("fieldname");
+-         IndexInfo ii = new IndexInfo(idxname, tblname, fldname, tx);
++         IndexInfo ii = new IndexInfo(indextype, idxname, tblname, fldname, tx);
+          result.put(fldname, ii);
+       }
+       rf.close();
+diff --git a/src/simpledb/metadata/MetadataMgr.java b/src/simpledb/metadata/MetadataMgr.java
+index e2de571..6b11f50 100644
+--- a/src/simpledb/metadata/MetadataMgr.java
++++ b/src/simpledb/metadata/MetadataMgr.java
+@@ -33,8 +33,8 @@ public class MetadataMgr {
+       return viewmgr.getViewDef(viewname, tx);
+    }
+    
+-   public void createIndex(String idxname, String tblname, String fldname, Transaction tx) {
+-      idxmgr.createIndex(idxname, tblname, fldname, tx);
++   public void createIndex(String indextype, String idxname, String tblname, String fldname, Transaction tx) {
++      idxmgr.createIndex(indextype, idxname, tblname, fldname, tx);
+    }
+    
+    public Map<String,IndexInfo> getIndexInfo(String tblname, Transaction tx) {
+diff --git a/src/simpledb/parse/CreateIndexData.java b/src/simpledb/parse/CreateIndexData.java
+index 1b7cfb9..6685f71 100644
+--- a/src/simpledb/parse/CreateIndexData.java
++++ b/src/simpledb/parse/CreateIndexData.java
+@@ -5,18 +5,27 @@ package simpledb.parse;
+  * @author Edward Sciore
+  */
+ public class CreateIndexData {
+-   private String idxname, tblname, fldname;
++   private String indextype, idxname, tblname, fldname;
+    
+    /**
+     * Saves the table and field names of the specified index.
+     */
+-   public CreateIndexData(String idxname, String tblname, String fldname) {
++   public CreateIndexData(String indextype, String idxname, String tblname, String fldname) {
++	  this.indextype = indextype;
+       this.idxname = idxname;
+       this.tblname = tblname;
+       this.fldname = fldname;
+    }
+    
+    /**
++    * Returns the type of the index.
++    * @return the type of the index
++    */
++   public String indexType() {
++	   return indextype;
++   }
++   
++   /**
+     * Returns the name of the index.
+     * @return the name of the index
+     */
+diff --git a/src/simpledb/parse/Parser.java b/src/simpledb/parse/Parser.java
+index 2f239d4..b7c811b 100644
+--- a/src/simpledb/parse/Parser.java
++++ b/src/simpledb/parse/Parser.java
+@@ -232,6 +232,7 @@ public class Parser {
+ //  Method for parsing create index commands
+    
+    public CreateIndexData createIndex() {
++	  String indextype = lex.eatId();
+       lex.eatKeyword("index");
+       String idxname = lex.eatId();
+       lex.eatKeyword("on");
+@@ -239,7 +240,7 @@ public class Parser {
+       lex.eatDelim('(');
+       String fldname = field();
+       lex.eatDelim(')');
+-      return new CreateIndexData(idxname, tblname, fldname);
++      return new CreateIndexData(indextype, idxname, tblname, fldname);
+    }
+ }
+ 
+diff --git a/src/simpledb/planner/BasicUpdatePlanner.java b/src/simpledb/planner/BasicUpdatePlanner.java
+index a1c5516..d895dfa 100644
+--- a/src/simpledb/planner/BasicUpdatePlanner.java
++++ b/src/simpledb/planner/BasicUpdatePlanner.java
+@@ -49,6 +49,9 @@ public class BasicUpdatePlanner implements UpdatePlanner {
+          us.setVal(fldname, val);
+       }
+       us.close();
++      
++      //Update associated indices
++      
+       return 1;
+    }
+    
+@@ -62,7 +65,7 @@ public class BasicUpdatePlanner implements UpdatePlanner {
+       return 0;
+    }
+    public int executeCreateIndex(CreateIndexData data, Transaction tx) {
+-      SimpleDB.mdMgr().createIndex(data.indexName(), data.tableName(), data.fieldName(), tx);
++      //SimpleDB.mdMgr().createIndex(data.indexName(), data.tableName(), data.fieldName(), tx);
+       return 0;  
+    }
+ }
+diff --git a/src/simpledb/server/SimpleDB.java b/src/simpledb/server/SimpleDB.java
+index f0c65b9..2145142 100644
+--- a/src/simpledb/server/SimpleDB.java
++++ b/src/simpledb/server/SimpleDB.java
+@@ -100,8 +100,8 @@ public class SimpleDB {
+     * To change how the planner works, modify this method.
+     * @return the system's planner for SQL commands
+     */public static Planner planner() {
+-      QueryPlanner  qplanner = new BasicQueryPlanner();
+-      UpdatePlanner uplanner = new BasicUpdatePlanner();
++      QueryPlanner  qplanner = new HeuristicQueryPlanner();
++      UpdatePlanner uplanner = new IndexUpdatePlanner();
+       return new Planner(qplanner, uplanner);
+    }
+ }
+diff --git a/src/simpledb/tx/BufferList.java b/src/simpledb/tx/BufferList.java
+index fe876e0..8cb1b37 100644
+--- a/src/simpledb/tx/BufferList.java
++++ b/src/simpledb/tx/BufferList.java
+@@ -30,7 +30,7 @@ class BufferList {
+     * @param blk a reference to the disk block
+     */
+    void pin(Block blk) {	   
+-      System.out.println("Pinning Block " + blk.toString() + "\n");
++      //System.out.println("Pinning Block " + blk.toString() + "\n");
+       Buffer buff = bufferMgr.pin(blk);
+       buffers.put(blk, buff);
+       pins.add(blk);
+diff --git a/studentClient/simpledb/CreateTestTables.java b/studentClient/simpledb/CreateTestTables.java
+new file mode 100644
+index 0000000..80cfb7d
+--- /dev/null
++++ b/studentClient/simpledb/CreateTestTables.java
+@@ -0,0 +1,321 @@
++import java.sql.Connection;
++import java.sql.Driver;
++import java.sql.ResultSet;
++import java.sql.SQLException;
++import java.sql.Statement;
++import java.util.Random;
++import simpledb.remote.SimpleDriver;
++import simpledb.tx.Transaction;
++import simpledb.index.extensiblehash.EHIndex;
++import simpledb.record.Schema;
++import java.time.LocalTime;
++import static java.time.temporal.ChronoUnit.SECONDS;
++import static java.time.temporal.ChronoUnit.MILLIS;
++
++
++public class CreateTestTables {
++ final static int maxSize=100000;
++ /**
++  * @param args
++  */
++ public static void main(String[] args) {
++  // TODO Auto-generated method stub
++	   
++  Connection conn=null;
++  Driver d = new SimpleDriver();
++  String host = "localhost"; //you may change it if your SimpleDB server is running on a different machine
++  String url = "jdbc:simpledb://" + host;
++  String qry="Create table test1" +
++  "( a1 int," +
++  "  a2 int"+
++  ")";
++  Random rand=null;
++  Statement s=null;
++  try {
++   conn = d.connect(url, null);
++   s=conn.createStatement();
++   s.executeUpdate("Create table test1" +
++     "( a1 int," +
++     "  a2 int"+
++   ")");
++   s.executeUpdate("Create table test2" +
++     "( a1 int," +
++     "  a2 int"+
++   ")");
++   s.executeUpdate("Create table test3" +
++     "( a1 int," +
++     "  a2 int"+
++   ")");
++   s.executeUpdate("Create table test4" +
++     "( a1 int," +
++     "  a2 int"+
++   ")");
++   s.executeUpdate("Create table test5" +
++     "( a3 int," +
++     "  a4 int"+
++   ")");
++	
++   
++   s.executeUpdate("create sh index idx1 on test2 (a1)");
++   s.executeUpdate("create bt index idx2 on test3 (a1)");
++   s.executeUpdate("create eh index idx3 on test4 (a1)");
++
++   //Track time to fill relations
++   LocalTime time1 = LocalTime.now();
++   LocalTime time2 = LocalTime.now();
++   LocalTime time3 = LocalTime.now();
++   LocalTime time4 = LocalTime.now();
++   LocalTime time5 = LocalTime.now();
++   LocalTime time6 = LocalTime.now();
++   LocalTime time7 = LocalTime.now();
++   LocalTime time8 = LocalTime.now();
++   LocalTime time9 = LocalTime.now();
++   LocalTime time10 = LocalTime.now();
++   LocalTime time11 = LocalTime.now();
++   LocalTime time12 = LocalTime.now();
++   LocalTime time13 = LocalTime.now();
++   LocalTime time14 = LocalTime.now();
++   LocalTime time15 = LocalTime.now();
++   LocalTime time16 = LocalTime.now();
++
++   //Insert values into i<number of tables + 1
++   for(int i=4;i<6;i++)
++   {
++    if(i!=5)
++    {
++     rand=new Random(1);// ensure every table gets the same data
++     for(int j=0;j<maxSize;j++)
++     {
++        s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+rand.nextInt(1000)+ ")");
++     }
++    }
++    else//case where i=5
++    {
++     for(int j=0;j<maxSize/2;j++)// insert 50000 records into test5
++     {
++      s.executeUpdate("insert into test"+i+" (a3,a4) values("+j+","+j+ ")");
++     }
++    }
++   }
++   
++   time2 = LocalTime.now();
++   System.out.println("Insert into tables time: " + time1.until(time2, SECONDS) + " Seconds");
++  
++   
++   
++   /* TEST CASES
++    * Test 1: Query each table based on the same attribute
++    * 	The time of each query is printed as well as the result	.
++    * 	This shows the difference in querying between the different
++    * 	indices and the control table which has no index
++    * 
++    * Test 2: Query the join of each table with table5
++    *   The time of each query is printed as well as the result.
++    */
++   
++   //Query test1 on a1=1, does not use an index
++   time1 = LocalTime.now();
++   
++   String query = "Select a2 from test1 Where a1=1";
++   ResultSet rs = s.executeQuery(query);
++   
++   time2 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("NO INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time1.until(time2, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a2 = rs.getInt("a2");
++		System.out.println(a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test2 based on a1=1, should use idx1 (Hash) w/ fldname a1
++   time3 = LocalTime.now();
++   
++   query = "Select a1, a2 from test2 Where a1=1";
++   rs = s.executeQuery(query);
++   
++   time4 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("HASH INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time3.until(time4, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a2 = rs.getInt("a2");
++		System.out.println(a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test3 based on a1=1, should use idx2 (BTree) w/ fldname a2
++   time5 = LocalTime.now();
++   
++   query = "Select a1, a2 from test3 Where a1=1";
++   rs = s.executeQuery(query);
++   
++   time6 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("B-TREE INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time5.until(time6, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a2 = rs.getInt("a2");
++		System.out.println(a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test3 based on a1=1, should use idx2 (Extensihash) w/ fldname a2
++   time7 = LocalTime.now();
++   
++   query = "Select a1, a2 from test4 Where a1=1";
++   rs = s.executeQuery(query);
++   
++   time8 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("Extensihash INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time7.until(time8, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a2 = rs.getInt("a2");
++		System.out.println(a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test1 joined with test5 based on a1=a1, should use no index)
++   time9 = LocalTime.now();
++   
++   query = "Select a2, a4 from test1, test5 Where a1=a3";
++   rs = s.executeQuery(query);
++   
++   time10 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("JOINED NO INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time9.until(time10, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a1 = rs.getInt("a2");
++		int a2 = rs.getInt("a4");
++		System.out.println("a2: " + a1 + " a4: " + a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test2 joined with test5 based on a1=a1, should use idx1 (Static)
++   time11 = LocalTime.now();
++   
++   query = "Select a2, a4 from test2, test5 Where a1=a3";
++   rs = s.executeQuery(query);
++   
++   time12 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("JOINED HASH INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time11.until(time12, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a1 = rs.getInt("a2");
++		int a2 = rs.getInt("a4");
++		System.out.println("a2: " + a1 + " a4: " + a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test3 joined with test5 based on a1=a1, should use idx2 (BTree)
++   time13 = LocalTime.now();
++   
++   query = "Select a2, a4 from test3, test5 Where a1=a3";
++   rs = s.executeQuery(query);
++   
++   time14 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("JOINED B-TREE INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time13.until(time14, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a1 = rs.getInt("a2");
++		int a2 = rs.getInt("a4");
++		System.out.println("a2: " + a1 + " a4: " + a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++   
++   //Query test4 joined with test5 based on a2=1, should use idx3 (Extensihash)
++   time15 = LocalTime.now();
++   
++   query = "Select a2, a4 from test4, test5 Where a1=a3";
++   rs = s.executeQuery(query);
++   
++   time16 = LocalTime.now();
++   
++   System.out.println("/////////////////////////////");
++   System.out.println("JOINED EXTENSIHASH INDEX");
++   System.out.println("Query: " + query);
++   System.out.println("Run time: " + time15.until(time16, MILLIS) + " Milliseconds");
++   System.out.println("Query output: ");
++   while(rs.next())
++	{
++		int a1 = rs.getInt("a2");
++		int a2 = rs.getInt("a4");
++		System.out.println("a2: " + a1 + " a4: " + a2);
++	}
++   System.out.println("/////////////////////////////");
++   
++   rs.close();
++      
++   //Print out of all time data collected
++   System.out.println("Table 1 (no index) query time: " + time1.until(time2, MILLIS) + " Milliseconds");
++   System.out.println("Table 2 (Hash) query time: " + time3.until(time4, MILLIS) + " Milliseconds");
++   System.out.println("Table 3 (B-Tree) query time: " + time5.until(time6, MILLIS) + " Milliseconds");
++   System.out.println("Table 4 (Extensihash) query time: " + time7.until(time8, MILLIS) + " Milliseconds");
++   System.out.println("Table 1 (no index) join time: " + time9.until(time10, MILLIS) + " Milliseconds");
++   System.out.println("Table 2 (Hash) join time: " + time11.until(time12, MILLIS) + " Milliseconds");
++   System.out.println("Table 3 (B-Tree) join time: " + time13.until(time14, MILLIS) + " Milliseconds");
++   System.out.println("Table 4 (Extensihash) join time: " + time15.until(time16, MILLIS) + " Milliseconds");
++
++
++  } catch (SQLException e) {
++   // TODO Auto-generated catch block
++   e.printStackTrace();
++  }finally
++  {
++   try {
++    conn.close();
++   } catch (SQLException e) {
++    // TODO Auto-generated catch block
++    e.printStackTrace();
++   }
++  }
++ }
++}
++
+diff --git a/studentClient/simpledb/ExtensiHashTests.java b/studentClient/simpledb/ExtensiHashTests.java
+new file mode 100644
+index 0000000..7028824
+--- /dev/null
++++ b/studentClient/simpledb/ExtensiHashTests.java
+@@ -0,0 +1,52 @@
++import java.sql.Connection;
++import java.sql.Driver;
++import java.sql.ResultSet;
++import java.sql.SQLException;
++import java.sql.Statement;
++import java.util.Random;
++import simpledb.remote.SimpleDriver;
++import simpledb.tx.Transaction;
++import simpledb.record.Schema;
++import java.time.LocalTime;
++import static java.time.temporal.ChronoUnit.SECONDS;
++import static java.time.temporal.ChronoUnit.MILLIS;
++
++
++public class ExtensiHashTests {
++	
++	 public static void main(String[] args) {
++		 
++		 Connection conn=null;
++		 Driver d = new SimpleDriver();
++		 String host = "localhost"; //you may change it if your SimpleDB server is running on a different machine
++		 String url = "jdbc:simpledb://" + host;
++		 String query = "Create table test" +
++		 "( col1 int," +
++		 " col2 int)";
++		 Statement s=null;
++
++		 try {
++			   conn = d.connect(url, null);
++			   s=conn.createStatement();
++			   
++			   s.executeUpdate(query);
++			   
++			   s.executeUpdate("create eh index idx1 on test (col1)");
++
++			   
++		 }
++	 	 catch (SQLException e) {
++		 // TODO Auto-generated catch block
++	 		 e.printStackTrace();
++		 }
++		 finally{
++			 try {
++				 conn.close();
++			 } catch (SQLException e) {
++				 // TODO Auto-generated catch block
++				 e.printStackTrace();
++			 }
++		 }
++	 }
++	
++}
+\ No newline at end of file

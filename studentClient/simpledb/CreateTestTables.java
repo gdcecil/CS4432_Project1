@@ -86,7 +86,7 @@ public class CreateTestTables {
      rand=new Random(1);// ensure every table gets the same data
      for(int j=0;j<maxSize;j++)
      {
-        s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+rand.nextInt(1000)+ ")");
+        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
      }
     }
     else//case where i=5
@@ -109,14 +109,14 @@ public class CreateTestTables {
     * 	This shows the difference in querying between the different
     * 	indices and the control table which has no index
     * 
-    * Test 2: Query the join of each table with table5
+    * Test 2: Query each table joined with table5
     *   The time of each query is printed as well as the result.
     */
    
    //Query test1 on a1=1, does not use an index
    time1 = LocalTime.now();
    
-   String query = "Select a2 from test1 Where a1=1";
+   String query = "Select a1, a2 from test1 Where a1=1";
    ResultSet rs = s.executeQuery(query);
    
    time2 = LocalTime.now();
