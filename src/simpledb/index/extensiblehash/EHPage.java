@@ -1,4 +1,4 @@
-package simpledb.index.extensihash;
+package simpledb.index.extensiblehash;
 
 import static java.sql.Types.INTEGER;
 import static simpledb.file.Page.*;
@@ -15,14 +15,14 @@ import simpledb.tx.Transaction;
  * @author mcwarms, gdcecil
  *
  */
-public abstract class ExtensiHashPage 
+public abstract class EHPage 
 {
 	protected Block blk; 
 	protected TableInfo ti;
 	protected Transaction tx;
 	protected int slotsize;
 	
-	public ExtensiHashPage (Block currentblk, 
+	public EHPage (Block currentblk, 
 							TableInfo ti, 
 							Transaction tx) 
 	{
@@ -32,6 +32,7 @@ public abstract class ExtensiHashPage
 		slotsize = ti.recordLength();
 		tx.pin(currentblk);
 	}
+	
 	
 	/**
 	 * CS4432-Project2
@@ -62,9 +63,9 @@ public abstract class ExtensiHashPage
 	 * 
 	 * @return
 	 */
-	public int getMaxNumRecs() 
+	public int maxRecordsInBlock() 
 	{
-		return (BLOCK_SIZE - ExtensiHashPageFormatter.RECORD_START_OFFSET)/ti.recordLength();
+		return (BLOCK_SIZE - EHPageFormatter.RECORD_START_OFFSET)/slotsize;
 	}
 	
 	/**
@@ -75,7 +76,7 @@ public abstract class ExtensiHashPage
 	 * @author mcwarms, gdcecil
 	 */
 	protected void setDepth(int depth) {
-		tx.setInt(blk, ExtensiHashPageFormatter.DEPTH_OFFSET, depth);
+		tx.setInt(blk, EHPageFormatter.DEPTH_OFFSET, depth);
 	}
 	
 	/**
@@ -87,7 +88,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected int getDepth() 
 	{
-		return tx.getInt(blk, ExtensiHashPageFormatter.DEPTH_OFFSET);
+		return tx.getInt(blk, EHPageFormatter.DEPTH_OFFSET);
 	}
 	
 	/* CS4432-Project2
@@ -130,7 +131,7 @@ public abstract class ExtensiHashPage
 	 * @return the number of index records in this page
 	 */
 	public int getNumRecs() {
-		return tx.getInt(blk, ExtensiHashPageFormatter.RECORD_COUNT_OFFSET);
+		return tx.getInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET);
 	}
 	
 	/**
@@ -257,7 +258,7 @@ public abstract class ExtensiHashPage
 	 * @param n
 	 */
 	protected void setNumRecs(int n) {
-		tx.setInt(blk, ExtensiHashPageFormatter.RECORD_COUNT_OFFSET, n);
+		tx.setInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET, n);
 	}
 	
 	/**
@@ -291,7 +292,7 @@ public abstract class ExtensiHashPage
 	 */
 	protected int slotpos(int slot)
 	{
-		return ExtensiHashPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
+		return EHPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
 	}
 
 }

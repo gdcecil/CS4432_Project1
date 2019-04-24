@@ -8,7 +8,7 @@ import simpledb.record.*;
 import simpledb.index.Index;
 import simpledb.index.hash.HashIndex; 
 import simpledb.index.btree.BTreeIndex;
-import simpledb.index.extensihash.ExtensiHashIndex;
+import simpledb.index.extensiblehash.EHIndex;
 
 
 /**
@@ -55,7 +55,7 @@ public class IndexInfo {
        } else if (indextype.equals("bt")) {
          return new BTreeIndex(idxname, sch, tx);
        } else if (indextype.equals("eh")) {
-         return new ExtensiHashIndex(idxname, sch, tx);
+         return new EHIndex(idxname, sch, tx);
        } else {
          //Not supposed to reach this point, should handle error
     	 return new HashIndex(idxname, sch, tx);
@@ -93,7 +93,7 @@ public class IndexInfo {
 	  else if (indextype.equals("eh")) {
 		System.out.println("cost of extensihash");
 		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
-	    return ExtensiHashIndex.searchCost(numblocks,rpb);
+	    return EHIndex.searchCost(numblocks,rpb);
 	  } 
 	  else {
 	  //Not supposed to reach this point, should handle error

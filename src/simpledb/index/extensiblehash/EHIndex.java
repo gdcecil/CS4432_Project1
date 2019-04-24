@@ -1,4 +1,4 @@
-package simpledb.index.extensihash;
+package simpledb.index.extensiblehash;
 
 import simpledb.file.Block;
 import simpledb.tx.Transaction;
@@ -8,23 +8,23 @@ import simpledb.index.hash.HashIndex;
 import simpledb.query.Constant;
 import simpledb.record.RID;
 
-public class ExtensiHashIndex implements Index {
+public class EHIndex implements Index {
 
 	private Transaction tx;
 
 	private TableInfo bucketsTi;
 	private TableInfo dirTi;
 
-	private ExtensiHashDir dir = null;
-	private ExtensiHashBucket bucket = null;
+	private EHDir dir = null;
+	private EHBucket bucket = null;
 
-	public ExtensiHashIndex(String idxname, Schema sch, Transaction tx)
+	public EHIndex(String idxname, Schema sch, Transaction tx)
 	{
 		this.tx = tx; 
 		bucketsTi = new TableInfo(idxname, sch);
 
 		Schema dirSch = new Schema();
-		dirSch.addIntField(ExtensiHashDir.DIR_FIELD);
+		dirSch.addIntField(EHDir.DIR_FIELD);
 
 		String dirName = idxname + "dir";
 		dirTi = new TableInfo(dirName, dirSch);
@@ -33,11 +33,11 @@ public class ExtensiHashIndex implements Index {
 
 		if (tx.size(dirTi.fileName()) == 0) 
 		{
-			tx.append(dirTi.fileName(), new ExtensiHashPageFormatter(dirTi, 0));
+			tx.append(dirTi.fileName(), new EHPageFormatter(dirTi, 0));
 
-			Block firstIdxBlk = tx.append(bucketsTi.fileName(), new ExtensiHashPageFormatter(bucketsTi, 0, 0));
+			Block firstIdxBlk = tx.append(bucketsTi.fileName(), new EHPageFormatter(bucketsTi, 0, 0));
 
-			dir = new ExtensiHashDir(dirTi, bucketsTi, this.tx);
+			dir = new EHDir(dirTi, bucketsTi, this.tx);
 
 			dir.updateDirEntry(0, firstIdxBlk.number());
 			
@@ -54,16 +54,16 @@ public class ExtensiHashIndex implements Index {
 		close();
 
 		//Wrap the directory in an ExtensiHashDir object
-		dir = new ExtensiHashDir(dirTi, bucketsTi, tx);
+		dir = new EHDir(dirTi, bucketsTi, tx);
 
 		//get the bucket number for this searchkey
-		int bucketNum = ExtensiHashPage.computeBucketNumber(searchkey, dir.getDepth());
+		int bucketNum = EHPage.computeBucketNumber(searchkey, dir.getDepth());
 
 		//get the block of the bucket having bucket number bucketNum
 		Block blk = dir.getBucketBlock(bucketNum);
 
 		//Wrap the bucket in an ExtensiHashBucket object
-		bucket = new ExtensiHashBucket(blk, bucketsTi, tx);
+		bucket = new EHBucket(blk, bucketsTi, tx);
 
 		//Move the bucket to the slot strictly before the first index entry 
 		//that has value
@@ -120,10 +120,10 @@ public class ExtensiHashIndex implements Index {
 	{
 		close();
 		
-		dir = new ExtensiHashDir(dirTi, bucketsTi, tx);
+		dir = new EHDir(dirTi, bucketsTi, tx);
 		
-		String out = dir.toString();
-		
+		//String out = dir.toString();
+		String out = dir.dirTableToString();
 		dir.close();
 		
 		return out;

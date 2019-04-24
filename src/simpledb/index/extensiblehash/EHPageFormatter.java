@@ -1,4 +1,4 @@
-package simpledb.index.extensihash;
+package simpledb.index.extensiblehash;
 
 
 import static java.sql.Types.INTEGER;
@@ -32,7 +32,7 @@ import simpledb.record.TableInfo;
  * @author mcwarms, gdcecil
  *
  */
-public class ExtensiHashPageFormatter implements PageFormatter 
+public class EHPageFormatter implements PageFormatter 
 {
 	//info 
 	private TableInfo ti; 
@@ -41,22 +41,22 @@ public class ExtensiHashPageFormatter implements PageFormatter
 	
 	//keep offsets as static constants
 	static final int DEPTH_OFFSET = 0;
-	static final int NUM_OFFSET = INT_SIZE;
+	static final int BUCKET_NUM_OFFSET = INT_SIZE;
 	static final int RECORD_COUNT_OFFSET = INT_SIZE+INT_SIZE;
 	static final int RECORD_START_OFFSET = INT_SIZE+INT_SIZE+INT_SIZE;
 
 	
-	public ExtensiHashPageFormatter (TableInfo ti, int depth) 
+	public EHPageFormatter (TableInfo ti, int depth) 
 	{
 		this.ti=ti;
 		this.depth = depth;
 	}
 
-	public ExtensiHashPageFormatter (TableInfo ti, int depth, int num) 
+	public EHPageFormatter (TableInfo ti, int depth, int bucketNum) 
 	{ 
 		this.ti = ti; 
 		this.depth = depth;
-		this.num = num;
+		this.num = bucketNum;
 	}
 
 	/**
@@ -76,7 +76,7 @@ public class ExtensiHashPageFormatter implements PageFormatter
 		
 		p.setInt(RECORD_COUNT_OFFSET, 0); //store number of records
 		
-		p.setInt(NUM_OFFSET, num);//store bucket num
+		p.setInt(BUCKET_NUM_OFFSET, num);//store data
 		
 		int recSize = ti.recordLength(); 
 		

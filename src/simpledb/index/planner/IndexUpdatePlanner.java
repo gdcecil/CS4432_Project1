@@ -11,7 +11,7 @@ import simpledb.record.RID;
 import simpledb.server.SimpleDB;
 import simpledb.tx.Transaction;
 import simpledb.index.Index;
-import simpledb.index.extensihash.ExtensiHashIndex;
+import simpledb.index.extensiblehash.EHIndex;
 import simpledb.metadata.IndexInfo;
 import simpledb.parse.*;
 import simpledb.planner.*;
@@ -69,10 +69,6 @@ public class IndexUpdatePlanner implements UpdatePlanner {
 					}
 
 				idx.insert(val, rid);
-
-
-				System.out.println(idx.toString());
-
 				idx.close();
 			}
 		}
