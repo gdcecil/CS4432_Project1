@@ -86,7 +86,7 @@ public class CreateTestTables {
      rand=new Random(1);// ensure every table gets the same data
      for(int j=0;j<maxSize;j++)
      {
-        s.executeUpdate("insert into test"+i+" (a1,a2) values("+rand.nextInt(1000)+","+rand.nextInt(1000)+ ")");
+        s.executeUpdate("insert into test"+i+" (a1,a2) values("+j+","+rand.nextInt(1000)+ ")");
      }
     }
     else//case where i=5
@@ -292,16 +292,7 @@ public class CreateTestTables {
    System.out.println("/////////////////////////////");
    
    rs.close();
-   
-//   time15 = LocalTime.now();
-//	   
-//   query = "Delete from test1 Where a1=1";
-//   s.executeQuery(query);
-//   
-//   time16 = LocalTime.now();
-//   
-   
-   
+      
    //Print out of all time data collected
    System.out.println("Table 1 (no index) query time: " + time1.until(time2, MILLIS) + " Milliseconds");
    System.out.println("Table 2 (Hash) query time: " + time3.until(time4, MILLIS) + " Milliseconds");
