@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=100000;
+ final static int maxSize=10000;
  /**
   * @param args
   */
@@ -79,7 +79,7 @@ public class CreateTestTables {
    LocalTime time16 = LocalTime.now();
 
    //Insert values into i<number of tables + 1
-   for(int i=4;i<6;i++)
+   for(int i=1;i<6;i++)
    {
     if(i!=5)
     {
