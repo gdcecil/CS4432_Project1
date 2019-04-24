@@ -58,6 +58,10 @@ class EHBucket extends EHPage
 		
 	}
 
+	/**
+	 * CS4432-Project2
+	 * @return
+	 */
 	int getBucketNum()
 	{
 		return tx.getInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET);

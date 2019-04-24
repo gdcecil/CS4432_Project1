@@ -2,6 +2,7 @@ package simpledb.index.extensiblehash;
 
 import static java.sql.Types.INTEGER;
 import static simpledb.file.Page.*;
+import static simpledb.index.extensiblehash.EHPageFormatter.*;
 import simpledb.file.Block;
 import simpledb.record.*;
 import simpledb.query.*;
@@ -9,7 +10,26 @@ import simpledb.tx.Transaction;
 
 
 /**
- * ExtensiHashPage
+ * CS4432-Project2
+ * 
+ * EHPage is an abstract class that is a parent for EHDir and 
+ * EHBucket, implementing methods used by both classes to access
+ * and manipulate data on disk. 
+ * 
+ * Classes that extend EHPage are essentially wrappers for disk 
+ * pages that were formatted by EHPageFormatter. The methods in this 
+ * class and its subclasses get and set data by passing the requests
+ * to the transaction tx, which handles requests as per the scheduling
+ * policy and then accesses buffers and so on. 
+ * 
+ * The corresponding page on disk holds some metadata and then records
+ * (see EHPageFormatter for details). The TableInfo variable keeps track 
+ * of the filename on disk where the blocks are stored and the schema 
+ * information for the records.
+ * 
+ * In general, the way EHPage interacts with the disk imitates the 
+ * implementation of BTree. Many of the methods here are either taken 
+ * from or modified from records in BTreePage. 
  * 
  * 
  * @author mcwarms, gdcecil
@@ -17,11 +37,30 @@ import simpledb.tx.Transaction;
  */
 public abstract class EHPage 
 {
+	//Block EHPage will read/write to
 	protected Block blk; 
+	
+	//TableInfo holding the filename 
 	protected TableInfo ti;
+	
+	//Transaction to process reads/writes, requests for size of the file
+	//and appends new blocks to file
 	protected Transaction tx;
+	
+	//Stores the size of a record in bytes
 	protected int slotsize;
 	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Construct an EHPage with the block EHPage is wrapping, the TableInfo
+	 * for information about the records in the block, and the transaction 
+	 * that will be used to get and set data on disk. 
+	 * 
+	 * @param currentblk, Block EHPage references in the file 
+	 * @param ti, TableInfo containing the schema for records in the block
+	 * @param tx, Transaction for getting and setting data
+	 */
 	public EHPage (Block currentblk, 
 							TableInfo ti, 
 							Transaction tx) 
@@ -29,7 +68,12 @@ public abstract class EHPage
 		this.blk = currentblk; 
 		this.ti = ti;
 		this.tx = tx; 
+		
+		//Use the TableInfo object to get the length of a record in bytes
 		slotsize = ti.recordLength();
+		
+		//Pin the current block, so that it will stay in the buffers 
+		//so that we can read/write to it
 		tx.pin(currentblk);
 	}
 	
@@ -42,15 +86,32 @@ public abstract class EHPage
 	 * 
 	 * That is, we compute (hashcode) % 2^D.
 	 * 
-	 * This method is implemented statically, as this calculation is used when the depth
-	 * does not correspond to the actual depth of the extensible hash index.
+	 * This method is static, as this calculation is used when the depth
+	 * does not correspond to the actual depth of the extensible hash index, 
+	 * and furthermore, this calculation is independent of any instance of 
+	 * this object. 
+	 * 
+	 * This can be interpreted as the bucket number with respect to depth.
+	 * For global depth this is just the bucket number. Locally, in a bucket 
+	 * with local depth d, for any key val in the bucket, computeBucketNumber(val, d)
+	 * will have the same value.
+	 * 
+	 * However, this method is also called without referring to the global or 
+	 * local depth, in particular it is used in calculations involving splitting
+	 * buckets and incrementing the global depth.
 	 * 
 	 * @param val, val to hash and compute
 	 * @param depth, power of two for the modulus 
-	 * @return bucket number for the given value, if global depth = depth
+	 * @return bucket number with respect to depth. For global depth this is just 
+	 * the bucket number. In a bucket with local depth d, for any key val in the 
+	 * bucket, computeBucketNumber 
+	 * 
 	 */
 	static int computeBucketNumber (Constant val, int depth)
 	{
+		//Hash val and get its remainder under modulus 2^depth 
+		//Here we compute 2^depth by just left shifting 1 depth
+		//places. 
 		return val.hashCode() % (1 << depth);
 	}
 	
@@ -58,37 +119,56 @@ public abstract class EHPage
 	 * CS4432-Project2 
 	 * 
 	 * Returns the maximum number of records that will fit in the block represented 
-	 * by this object.
+	 * by this object, i.e. the records that fit in the part of the block not 
+	 * occupied by metadata.
 	 * 
+	 * Note that if the block is full, the zero-indexed position relative to the start 
+	 * of the records is given by maxRecordsInBlock()-1
 	 * 
-	 * @return
+	 * @return maxRecordsInBlock()
 	 */
 	public int maxRecordsInBlock() 
 	{
-		return (BLOCK_SIZE - EHPageFormatter.RECORD_START_OFFSET)/slotsize;
+		//Subtract the bytes occupied by metadata, and then divide by slotsize
+		//Integer division discards the remaineder, so this will give the maximum
+		//number of records that can fit in the block.
+		return (BLOCK_SIZE - RECORD_START_OFFSET)/slotsize;
 	}
 	
 	/**
 	 * CS4432-Project2
 	 * Set the depth (interpreted to be global/local as appropriate) of this page to the 
-	 * specified value.
+	 * specified value. This is part of the metadata stored in the block on disk, and so 
+	 * a transaction is used to write it.
 	 * 
-	 * @author mcwarms, gdcecil
+	 * DEPTH_OFFSET, the offset of depth in the block, is a static final variable in 
+	 * EHPageFormatter.
+	 * 
+	 * @param depth, value to set
+	 * 
 	 */
-	protected void setDepth(int depth) {
-		tx.setInt(blk, EHPageFormatter.DEPTH_OFFSET, depth);
+	protected void setDepth(int depth) 
+	{
+		//request the int at offset DEPTH_OFFSET from the transaction
+		tx.setInt(blk, DEPTH_OFFSET, depth);
 	}
 	
 	/**
 	 * CS4432-Project2
 	 * 
-	 * Get the depth (interpreted to be global/local as appropriate) of this page
+	 * Get the depth (interpreted to be global/local as appropriate) of this page from 
+	 * the block on disk. This is part of the metadata stored in the block on disk, and so 
+	 * a transaction is used to read it.
 	 * 
-	 * @return depth depth of this index page
+	 * DEPTH_OFFSET, the offset of depth in the block, is a static final variable in 
+	 * EHPageFormatter.
+	 * 
+	 * @return depth, depth of this index page as read from disk
 	 */
 	protected int getDepth() 
 	{
-		return tx.getInt(blk, EHPageFormatter.DEPTH_OFFSET);
+		//pass a request to write an int at offset DEPTH_OFFSET to the transaction
+		return tx.getInt(blk, DEPTH_OFFSET);
 	}
 	
 	/* CS4432-Project2
@@ -97,6 +177,12 @@ public abstract class EHPage
 	 * and are use to access and manipulate records in the block referenced
 	 * by either ExtensiHashBucket or ExtensiHashDir (subclasses of this).
 	 * 
+	 * Documentation has been elaborated on or added by us where lacking. 
+	 * 
+	 * If the method has been modified, "CS4432-Project2" is in the javadoc
+	 * header. If this is absent, this is the function exactly as appears in 
+	 * BTreePage
+	 * 
 	 */
 	
 	/*
@@ -104,7 +190,12 @@ public abstract class EHPage
 	 */
 	
 	/**
-	 * Closes the page by unpinning its buffer.
+	 * Closes the page by unpinning its buffer. This should only be 
+	 * called when we are done using this instance of EHPage (viz. EHDir or EHBucket). 
+	 * The behavior of any call to a method that reads or writes to disk after close() 
+	 * has been called is undefined.
+	 * 
+	 * @author Edward Sciore 
 	 */
 	public void close() {
 		if (blk != null)
@@ -113,7 +204,8 @@ public abstract class EHPage
 	}
 	
 	/**
-	 * Returns true if the block is full.
+	 * Returns true if the block is full (in terms of records, 
+	 * i.e. this doesn't look at any metadata).
 	 * 
 	 * @author Edward Sciore
 	 * 
@@ -124,18 +216,33 @@ public abstract class EHPage
 	}
 	
 	/**
-	 * Returns the number of index records in this page.
+	 * CS4432-Project2: modified to use the constant RECORD_COUNT_OFFSET 
+	 * to access the metadata instead of INT_SIZE. 
+	 * 
+	 * Returns the number of index records in this page. This value is 
+	 * kept up to date by the insert and delete methods. The number of 
+	 * records is stored as metadata on the page. 
+	 * 
+	 * Note: EHDir uses getNumRecs to store all the records in its file, 
+	 * as opposed to just those in the page. See EHDir for details. 
 	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @return the number of index records in this page
+	 * @return the number of index records in this page (resp. file in the 
+	 * case of EHDir)
 	 */
 	public int getNumRecs() {
-		return tx.getInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET);
+		return tx.getInt(blk, RECORD_COUNT_OFFSET);
 	}
 	
 	/**
-	 * Deletes the index record at the specified slot.
+	 * Deletes the index record at the specified slot, by 
+	 * copying the records at greater slot positions all down 
+	 * by one slot. This ensures that all records are packed in 
+	 * the sense that for any two records at slot i and j, for any 
+	 * k with i < k < j, k holds a record.
+	 * 
+	 * Also decrements the number of records.
 	 * 
 	 * @author Edward Sciore
 	 * 
@@ -151,7 +258,14 @@ public abstract class EHPage
 	
 	/**
 	 * Creates space for a new record at the specified slot by
-	 * moving all the records at and after 0slot by one slot.
+	 * moving all the records at slots greater or equal to the parameter 
+	 * slot up by one, and increments getNumRecs. Again this preserves the 
+	 * packing of records as in delete. 
+	 * 
+	 * Note: this does not actually insert a record, rather it makes space for a 
+	 * new record. This method should be called any time a new recorded is added 
+	 * to the page (or at least care should be taken to preserve packing and 
+	 * maintain getNumRecs).
 	 * 
 	 * @author Edward Sciore
 	 * 
@@ -164,11 +278,17 @@ public abstract class EHPage
 	}
 
 	/**
+	 * Copies a record from slot from to slot to. This is used in insert 
+	 * and delete to shift the records. 
+	 * 
+	 * Caution: this method overwrites the record at to, but does not 
+	 * change the record at from. Care need also be taken to maintain 
+	 * the packing of the records. 
 	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param from
-	 * @param to
+	 * @param from, slot to copy record from
+	 * @param to, slot to copy record to.
 	 */
 	protected void copyRecord(int from, int to) {
 		Schema sch = ti.schema();
@@ -176,22 +296,34 @@ public abstract class EHPage
 			setVal(to, fldname, getVal(from, fldname));
 	}
 	/**
+	 * 
+	 * Gets the int int the record at slot number slot in field fldname (through a 
+	 * transaction). This calls fldpos to compute the byte offset from the given slot number.
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @return
+	 * @param slot, slot number to read from (used to compute a byte offset to read
+	 * from)
+	 * @param fldname, name of the field of the record to read the int from 
+	 * 
+	 * @return the int read from the record at slot in field field name
 	 */
 	protected int getInt(int slot, String fldname) {
 		int pos = fldpos(slot, fldname);
 		return tx.getInt(blk, pos);
 	}
 	/** 
+	 * 
+	 * Gets the string in the record at slot number slot in field fldname (through
+	 *  a transaction). This calls fldpos to compute the byte offset from the given slot number.
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @return
+	 * @param slot, slot number to read from (used to compute a byte offset to read
+	 * from)
+	 * @param fldname, name of the field of the record to read the string from 
+	 * 
+	 * @return the string read from the record at slot in field field name
 	 */
 	protected String getString(int slot, String fldname) {
 		int pos = fldpos(slot, fldname);
@@ -199,11 +331,14 @@ public abstract class EHPage
 	}
 	
 	/**
+	 * Get the Constant in field fldname in the record at slot. Constant 
+	 * is either String or Int, this checks which and calls the appropriate get method. 
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @return
+	 * @param slot, slot number to read from 
+	 * @param fldname, field in record to access
+	 * @return Constant val at slot in fldname field
 	 */
 	protected Constant getVal(int slot, String fldname) {
 		int type = ti.schema().type(fldname);
@@ -214,11 +349,13 @@ public abstract class EHPage
 	}
 	
 	/**
+	 * Set the int at record in slot in field fldname.
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @param val
+	 * @param slot, slot number to read from 
+	 * @param fldname, field in record to access
+	 * @return Constant val at slot in fldname field
 	 */
 	protected void setInt(int slot, String fldname, int val) {
 		int pos = fldpos(slot, fldname);
@@ -258,7 +395,7 @@ public abstract class EHPage
 	 * @param n
 	 */
 	protected void setNumRecs(int n) {
-		tx.setInt(blk, EHPageFormatter.RECORD_COUNT_OFFSET, n);
+		tx.setInt(blk, RECORD_COUNT_OFFSET, n);
 	}
 	
 	/**
@@ -292,7 +429,7 @@ public abstract class EHPage
 	 */
 	protected int slotpos(int slot)
 	{
-		return EHPageFormatter.RECORD_START_OFFSET + (slot * slotsize);
+		return RECORD_START_OFFSET + (slot * slotsize);
 	}
 
 }
