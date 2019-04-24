@@ -292,6 +292,9 @@ public class CreateTestTables {
    System.out.println("/////////////////////////////");
    
    rs.close();
+   
+   query = "Delete From test1 Where a1=1";
+   
       
    //Print out of all time data collected
    System.out.println("Table 1 (no index) query time: " + time1.until(time2, MILLIS) + " Milliseconds");
