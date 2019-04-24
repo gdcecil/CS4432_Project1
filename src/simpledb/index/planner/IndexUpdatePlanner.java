@@ -50,24 +50,6 @@ public class IndexUpdatePlanner implements UpdatePlanner {
 			if (ii != null) {
 				Index idx = ii.open();
 
-				//Print to file the cost of accessing the blocks
-				int cost = ii.blocksAccessed();
-				if (cost == -1) {
-				} else {
-					System.out.println("Cost of access: " + cost);
-				}
-				try {
-					PrintStream file = new PrintStream(new FileOutputStream("iocost.txt", true));
-					PrintStream console = System.out;
-					System.setOut(file);
-					System.out.println("printing to the right file");
-					System.out.println(cost);
-					System.setOut(console);
-				} catch (FileNotFoundException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-
 				idx.insert(val, rid);
 
 				idx.close();
