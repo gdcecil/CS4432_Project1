@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=1000;
+ final static int maxSize=10000;
  /**
   * @param args
   */
@@ -77,6 +77,15 @@ public class CreateTestTables {
    LocalTime time14 = LocalTime.now();
    LocalTime time15 = LocalTime.now();
    LocalTime time16 = LocalTime.now();
+   LocalTime time17 = LocalTime.now();
+   LocalTime time18 = LocalTime.now();
+   LocalTime time19 = LocalTime.now();
+   LocalTime time20 = LocalTime.now();
+   LocalTime time21 = LocalTime.now();
+   LocalTime time22 = LocalTime.now();
+   LocalTime time23 = LocalTime.now();
+   LocalTime time24 = LocalTime.now();
+
 
    //Insert values into i<number of tables + 1
    for(int i=1;i<6;i++)
@@ -292,6 +301,26 @@ public class CreateTestTables {
    System.out.println("/////////////////////////////");
    
    rs.close();
+   
+   time17 = LocalTime.now();
+   query = "Delete from test1 Where a1=1";
+   s.executeUpdate(query);
+   time18 = LocalTime.now();
+   
+   time19 = LocalTime.now();
+   query = "Delete from test2 Where a1=1";
+   s.executeUpdate(query);
+   time20 = LocalTime.now();
+   
+   time21 = LocalTime.now();
+   query = "Delete from test3 Where a1=1";
+   s.executeUpdate(query);
+   time22 = LocalTime.now();
+   
+   time23 = LocalTime.now();
+   query = "Delete from test4 Where a1=1";
+   s.executeUpdate(query);
+   time24 = LocalTime.now();
       
    //Print out of all time data collected
    System.out.println("Table 1 (no index) query time: " + time1.until(time2, MILLIS) + " Milliseconds");
@@ -302,6 +331,10 @@ public class CreateTestTables {
    System.out.println("Table 2 (Hash) join time: " + time11.until(time12, MILLIS) + " Milliseconds");
    System.out.println("Table 3 (B-Tree) join time: " + time13.until(time14, MILLIS) + " Milliseconds");
    System.out.println("Table 4 (Extensihash) join time: " + time15.until(time16, MILLIS) + " Milliseconds");
+   System.out.println("Table 1 (no index) delete time: " + time17.until(time18, MILLIS) + " Milliseconds");
+   System.out.println("Table 2 (Static) delete time: " + time19.until(time20, MILLIS) + " Milliseconds");
+   System.out.println("Table 3 (B-Tree) delete time: " + time21.until(time22, MILLIS) + " Milliseconds");
+   System.out.println("Table 4 (Extensihash) delete time: " + time23.until(time24, MILLIS) + " Milliseconds");
 
 
   } catch (SQLException e) {

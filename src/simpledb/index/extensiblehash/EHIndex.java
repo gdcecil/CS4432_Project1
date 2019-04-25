@@ -18,7 +18,7 @@ public class EHIndex implements Index {
 	private EHDir dir = null;
 	private EHBucket bucket = null;
 	
-	private boolean printing = true;
+	private boolean printing = false;
 
 	public EHIndex(String idxname, Schema sch, Transaction tx)
 	{
