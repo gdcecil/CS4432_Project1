@@ -215,9 +215,8 @@ public abstract class EHPage
 	 * @return true if the block is full
 	 */
 	public boolean isFull() {
-		//User return getNumRecs() + 1 >= 3; 
-		return getNumRecs() + 1 >= 3;
-		//return slotpos(getNumRecs()+1) >= BLOCK_SIZE;
+		//return getNumRecs() + 1 >= 3;
+		return slotpos(getNumRecs()+1) >= BLOCK_SIZE;
 	}
 	
 	/**

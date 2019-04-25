@@ -38,7 +38,7 @@ public class EHIndex implements Index {
 	private EHBucket bucket = null;
 
 	//whether or not to print data
-	private boolean printing = true;
+	private boolean printing = false;
 
 	
 	/**
@@ -194,6 +194,8 @@ public class EHIndex implements Index {
 		//call the insert method in EHDir
 		dir.insertIndexRecord(dataval, datarid);
 		
+		System.out.println(toString());
+		
 		//Print index info after the insert if printing is on
 		if (printing) 
 		{
@@ -277,9 +279,15 @@ public class EHIndex implements Index {
 	}
 
 	
-	//TODO fix this
+	/**
+	 * CS4432
+	 */
 	public static int searchCost(int numblocks, int rpb) {
-		return numblocks / HashIndex.NUM_BUCKETS;
+		//One block for the beginning of the directory
+		//One block for the directory entry in the file
+		//One block for accessing the value stored in the
+		//index
+		return 3;
 	}
 
 	/**

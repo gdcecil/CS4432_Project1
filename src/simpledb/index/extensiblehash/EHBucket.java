@@ -375,11 +375,11 @@ class EHBucket extends EHPage
 	public String toString()
 	{
 		//print metadata
-		String out = "Bucket number (stored in bucket): " + Integer.toBinaryString(getBucketNum()) + "\n";
+		String out = "Bucket number (stored in bucket): " + Integer.toBinaryString(getBucketNum()) + "\r\n";
 		
-		out += "Local Depth: " + getDepth() + "\n";
+		out += "Local Depth: " + getDepth() + "\r\n";
 		
-		out += "Number of index entries in block: " + getNumRecs() + "\n";
+		out += "Number of index entries in block: " + getNumRecs() + "\r\n";
 		
 		out += "Index entries:\n\n";
 		
@@ -387,20 +387,20 @@ class EHBucket extends EHPage
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
 			
-			out += "Slot " + slot + ":\n";
+			out += "Slot " + slot + ":\r\n";
 			
 			Schema sch = ti.schema(); 
 			
 			for (String fldname : sch.fields())
 			{
-				out += "\t\t" + fldname + " = " + getVal(slot, fldname).toString() + "\n";
+				out += "\t\t" + fldname + " = " + getVal(slot, fldname).toString() + "\r\n";
 			}
 		}
 		if (getNumRecs() == 0) {
 			out += "No current entries";
 		}
 		
-		return out + "\n";
+		return out + "\r\n";
 	}
 
 }

@@ -157,8 +157,8 @@ class EHDir extends EHPage
 		//the bucket.
 		EHBucket bucket = new EHBucket(blk, bucketsTi, tx);
 	
-		System.out.println("Bucket state before changing");
-		System.out.println(bucket.toString());
+//		System.out.println("Bucket state before changing");
+//		System.out.println(bucket.toString());
 		//If the bucket is full, extend the hash index by splitting the bucket
 		//and incrementing the global depth as needed.
 //		System.out.println("while bucket is full");
@@ -428,22 +428,23 @@ class EHDir extends EHPage
 	public String toString()
 	{
 		//output metadata
-		String out = "Filename: " + ti.fileName() + "\n";
+		String out = "";
+//				"Filename: " + ti.fileName() + "\n";
 
-		out += "Size: " + tx.size(ti.fileName()) + " blocks\n";
+//		out += "Size: " + tx.size(ti.fileName()) + " blocks\n";
 
-		out += "Max records in dir block 0: " + maxRecordsInBlock() + "\n";
+//		out += "Max records in dir block 0: " + maxRecordsInBlock() + "\n";
+//
+//		out += "Max records in dir block 1+: " + maxRecordsInDirBlock() + "\n";
 
-		out += "Max records in dir block 1+: " + maxRecordsInDirBlock() + "\n";
+		out += "Global depth: " + getDepth() + "\r\n";
 
-		out += "Global depth: " + getDepth() + "\n";
-
-		out += "Number of directory entries: " + getNumRecs() + "\n\n";
+		out += "Number of directory entries: " + getNumRecs() + "\r\n\r\n";
 
 		//output toString for each bucket
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
-			out += "Bucket number in directory: " + Integer.toBinaryString(slot) + ":\n\n";
+			out += "Bucket number in directory: " + Integer.toBinaryString(slot) + ":\r\n\r\n";
 
 			Block b = new Block (bucketsTi.fileName(), getInt(slot, DIR_FIELD));
 
