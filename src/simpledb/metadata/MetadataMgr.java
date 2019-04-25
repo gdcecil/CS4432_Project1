@@ -33,6 +33,7 @@ public class MetadataMgr {
       return viewmgr.getViewDef(viewname, tx);
    }
    
+   //CS4432: createIndex now passes the indextype along
    public void createIndex(String indextype, String idxname, String tblname, String fldname, Transaction tx) {
       idxmgr.createIndex(indextype, idxname, tblname, fldname, tx);
    }

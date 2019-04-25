@@ -27,6 +27,10 @@ public class IndexInfo {
    
    /**
     * Creates an IndexInfo object for the specified index.
+    * 
+    * CS4432: included index type in creation of IndexInfo
+    * 
+    * @param indextype the type of the index
     * @param idxname the name of the index
     * @param tblname the name of the table
     * @param fldname the name of the indexed field
@@ -44,11 +48,13 @@ public class IndexInfo {
    
    /**
     * Opens the index described by this object.
+    * 
+    * CS4432: Creates new index base on index type
+    * 
     * @return the Index object associated with this information
     */
    public Index open() {
        Schema sch = schema();
-       System.out.println("Index type: " + indextype + " with name: " + idxname);
        //Create index based on type stored in IndexInfo
        if (indextype.equals("sh")) {
          return new HashIndex(idxname, sch, tx);
@@ -69,6 +75,10 @@ public class IndexInfo {
     * The method uses the table's metadata to estimate the
     * size of the index file and the number of index records
     * per block.
+    * 
+    * CS4432: Chooses searchCost() method based on the table's
+    * index type.
+    * 
     * It then passes this information to the traversalCost
     * method of the appropriate index type,
     * which provides the estimate.
@@ -80,24 +90,26 @@ public class IndexInfo {
       int numblocks = si.recordsOutput() / rpb;
       System.out.println("Not finding an indextype");
       //Call searchcost based on the type of index
+      //Index is of type Static Hash
       if (indextype.equals("sh")) {
     	System.out.println("cost of static hash");
 		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
 	    return HashIndex.searchCost(numblocks, rpb);
-	  } else if (indextype.equals("bt")) {
+	  } 
+      //Index is of type B-Tree
+      else if (indextype.equals("bt")) {
 		System.out.println("cost of BTree");
 		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
 	    return BTreeIndex.searchCost(numblocks, rpb);
 	  }
-      //commented out until implemented in extensihash
+      //Index is of type ExtensiHash
 	  else if (indextype.equals("eh")) {
 		System.out.println("cost of extensihash");
 		System.out.println("Numblocks: " + numblocks + " rpb: " + rpb);
 	    return EHIndex.searchCost(numblocks,rpb);
 	  } 
 	  else {
-	  //Not supposed to reach this point, should handle error
-	     System.out.println("Not finding an indextype");
+		 //Not supposed to reach this point
 	     return -1;
 	  }
    }
