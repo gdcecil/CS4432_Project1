@@ -31,6 +31,9 @@ import simpledb.tx.Transaction;
  * implementation of BTree. Many of the methods here are either taken 
  * from or modified from records in BTreePage. 
  * 
+ * In the page, records are indexed by slot number, which is related to
+ * the byte offset through the method slotpos.
+ * 
  * 
  * @author mcwarms, gdcecil
  *
@@ -349,24 +352,31 @@ public abstract class EHPage
 	}
 	
 	/**
-	 * Set the int at record in slot in field fldname.
+	 * Set the int in the record at slot in field fldname (using tx). Again calls 
+	 * fldpos to compute the byte offset of the field of the record in the 
+	 * page. 
 	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot, slot number to read from 
-	 * @param fldname, field in record to access
-	 * @return Constant val at slot in fldname field
+	 * @param slot, slot number to write to
+	 * @param fldname, field in record to write to
+	 * @param val, int to write
 	 */
 	protected void setInt(int slot, String fldname, int val) {
 		int pos = fldpos(slot, fldname);
 		tx.setInt(blk, pos, val);
 	}
+	
 	/**
+	 * Set the string in the record at slot in field fldname (using tx). Again calls 
+	 * fldpos to compute the byte offset of the field of the record in the 
+	 * page. 
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @param val
+	 * @param slot, slot number to write to
+	 * @param fldname, field in the record to write to
+	 * @param val, string to write
 	 */
 	protected void setString(int slot, String fldname, String val) {
 		int pos = fldpos(slot, fldname);
@@ -374,11 +384,14 @@ public abstract class EHPage
 	}
 	
 	/**
+	 * Checks if fldname is int or string and then calls either setInt or setString 
+	 * as required. 
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @param val
+	 * @param slot, slot number to write to
+	 * @param fldname, field in record to write to
+	 * @param val, Constant to write
 	 */
 	protected void setVal(int slot, String fldname, Constant val) {
 		int type = ti.schema().type(fldname);
@@ -390,20 +403,30 @@ public abstract class EHPage
 	
 	
 	/**
+	 * Sets the integer at byte offset = RECORD_COUNT_OFFSET to the given 
+	 * int n. As the name suggests this value is interpreted as the number of 
+	 * records in the block. 
+	 * 
+	 * Note: in EHDir this instead keeps track of all the entries in the 
+	 * directory file.
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param n
+	 * @param n, value to set
 	 */
 	protected void setNumRecs(int n) {
 		tx.setInt(blk, RECORD_COUNT_OFFSET, n);
 	}
 	
 	/**
+	 * Returns the byte offset of field fldname in the record at the specified
+	 * slot, using TableInfo ti and a call to slotpos
+	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @param fldname
-	 * @return
+	 * @param slot, index of record 
+	 * @param fldname, field in record
+	 * @return byte offset of the field fldname in the record at slot in the page
 	 */
 	protected int fldpos(int slot, String fldname) {
 		int offset = ti.offset(fldname);
@@ -420,12 +443,19 @@ public abstract class EHPage
 	 * CS4432-Project2
 	 * 
 	 * Edited from the slotpos method in BTreePage to support the usage of
-	 * of a symbolic constant. 
+	 * of a symbolic constant (where the records start) 
+	 * 
+	 * Computes the byte offset of the record number slot (zero based) in the page. 
+	 * 
+	 * For example, the byte offset of the record at slot 0 is the byte offset of the 
+	 * start of the records in the page, the byte offset of the record at slot 1 is 
+	 * RECORD_START_OFFSET + 1*Ti.recordLength(), and so on, so the byte offset of the 
+	 * record at slot n is given by RECORD_START_OFFSET + n*Ti.recordLength().
 	 * 
 	 * @author Edward Sciore
 	 * 
-	 * @param slot
-	 * @return 
+	 * @param slot, index to convert to a byte offset
+	 * @return byte offset of slot in page
 	 */
 	protected int slotpos(int slot)
 	{
