@@ -12,6 +12,12 @@ from the README.txt found packaged with SimpleDB:
     * The union and except keywords are not supported.
     * Insert statements take explicit values only, not queries.
     * Update statements can have only one assignment in the set clause.
+    
+
+Known issue: Inserting the same value into a table with an Extensible
+Hash Index may cause the program to crash
+Cause: Inserting the same value more times than can be held in a single
+block will cause the index to infinitely split.
 
 
 ////////////////

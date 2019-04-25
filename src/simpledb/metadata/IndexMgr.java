@@ -39,6 +39,10 @@ public class IndexMgr {
     * Creates an index of the specified type for the specified field.
     * A unique ID is assigned to this index, and its information
     * is stored in the idxcat table.
+    * 
+    * CS4432: createIndex now sets the indextype in the record file
+    * 
+    * @param indextype the type of the index
     * @param idxname the name of the index
     * @param tblname the name of the indexed table
     * @param fldname the name of the indexed field

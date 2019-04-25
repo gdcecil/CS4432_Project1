@@ -230,7 +230,12 @@ public class Parser {
    
    
 //  Method for parsing create index commands
-   
+//
+//  CS4432: Added parsing of index keyword
+//  which takes a string (sh, bt, eh) and
+//  creates a corresponding index on
+//  the given table  
+    
    public CreateIndexData createIndex() {
 	  String indextype = lex.eatId();
       lex.eatKeyword("index");
