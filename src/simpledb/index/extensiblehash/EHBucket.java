@@ -1,17 +1,50 @@
 package simpledb.index.extensiblehash;
 
-import static java.sql.Types.INTEGER;
-import static simpledb.file.Page.*;
+import static simpledb.index.extensiblehash.EHPageFormatter.*;
 import simpledb.file.Block;
 import simpledb.record.*;
 import simpledb.query.*;
 import simpledb.tx.Transaction;
 
+/**
+ * CS4432-Project2
+ * 
+ * EHBucket is a subclass of EHPage that serves as a wrapper for a bucket page on 
+ * disk. EHBucket has methods for splitting in case of over flow, inserting, deleting, 
+ * and accessing records. 
+ * 
+ * EHBucket also keeps track of a current slot and a search key, which are the current 
+ * position and search key of the EHIndex respectively. 
+ * 
+ * Inserts and deletes on EHBucket maintain the constraint that index entries with 
+ * equal datavals are adjacent on disk (i.e. they are in consecutive slot numbers).
+ * 
+ * @author gdcecil, mcwarms
+ *
+ */
 class EHBucket extends EHPage
 {
+	//keep track of the current index position and search key 
+	//-1 is the default value so that a call of EHIndex.next() will 
+	//look at the 0th record.
 	private int currentSlot = -1;
 	private Constant searchkey = null;
 
+	
+	/**
+	 * CS4432-Project2 
+	 * 
+	 * Construct an instance of an EHBucket, wrapping the specified block, with 
+	 * TableInfo Ti for the index entry schema and Transaction tx for IOs,
+	 *  
+	 * This calls the superclass constructor which pins this block in memory.
+	 * 
+	 * This block can be unpinned by calling close().
+	 * 
+	 * @param currentblk, block that this EHBucket object is wrapping
+	 * @param ti, TableInfo for the index entries
+	 * @param tx, Transaction for inputting an outputting data from the underlying disk page
+	 */
 	EHBucket (Block currentblk, 
 			TableInfo ti, 
 			Transaction tx) 
@@ -38,6 +71,7 @@ class EHBucket extends EHPage
 	void insertIndexRecord(Constant dataval, RID rid) 
 	{
 		//move before the first entry with dataval searchkey
+		//ensures entries with equal datavals are adjacenet in buckets
 		moveBeforeValue(dataval);
 		
 		//if next() (i.e. if there is already an index entry with
@@ -60,42 +94,54 @@ class EHBucket extends EHPage
 
 	/**
 	 * CS4432-Project2
-	 * @return
+	 * 
+	 * Get the bucket number of this bucket, stored at offset BUCKET_NUM_OFFSET
+	 * of block blk (the block an instance of this class wraps)
+	 * 
+	 * bucket number will be a number between 0 and 2^(local depth - 1). This 
+	 * will correspond the the bucket number of one directory entry (that is, 
+	 * the slot number of the directory entry) that references this block.
+	 * The other directory entries that reference this block will have 
+	 * bucket numbers congruent to getBucketNum(), modulo local depth
+	 * 
+	 * @return the bucket number for this block
 	 */
 	int getBucketNum()
 	{
-		return tx.getInt(blk, EHPageFormatter.BUCKET_NUM_OFFSET);
+		return tx.getInt(blk, BUCKET_NUM_OFFSET);
 	}
 	
 	
 
 	/**
+	 * CS4432-Project2 
+	 * 
 	 * Splits this bucket into two, incrementing the local depth in each new
 	 * bucket. The index entries are distributed into the new buckets based on the
 	 * value of bucket num=(index entry).(datavalue).hashcode() % 2^(new local depth).
 	 * 
-	 * This method will give two distinct bucket numbers 
-	 * (since (index entry).(datavalue).hashcode() for each entry was equivalent 
-	 * modulo 2^(old local depth) and this bucket will hold the lower one while the
-	 * new bucketw will hold the greater one
+	 * This method will give two distinct bucket numbers (since (index entry).(datavalue).hashcode() 
+	 * for each entry was equivalent modulo 2^(old local depth)) and this bucket 
+	 * will hold the lesser one (i.e. this bucket's bucket number is not changed) 
+	 * while the new bucket will hold the greater one (getBucketNum() + 2^(old local depth))
 	 * 
 	 * @return Block of the new split bucket
 	 */
 	public Block split() 
 	{
-		// store depth in local variable
+		// store old depth in local variable
 		int localDepth = getDepth();
 
 		// if bucketnum is congruent k (mod 2^depth), the only values in 0,1,...,(2^(Depth+1))-1
 		// that are congurent to k (mod 2^(depth)) are k and k+2^(depth), so the bucket numbers of
 		// the split blocks are k and k+2^(depth). 
 		int bucketNum = getBucketNum();
-		int newBucketNum = bucketNum+(1 << localDepth);
+		int newBucketNum = bucketNum+(1 << localDepth); //left shift for a power of two
 
 		// increment local depth
 		setDepth(localDepth+1);
 
-		// append a new block for the split bucket 
+		// append a new block to the bucket file for the split bucket 
 		// this bucket has the same local depth and number bucketNum+2^(old depth)
 		Block newBlk = appendNew(getDepth(), newBucketNum); 
 
@@ -117,8 +163,9 @@ class EHBucket extends EHPage
 	 * CS4432-Project2
 	 * 
 	 * Moves index records from this bucket to bucket dest if they satisfy 
-	 * record.dataval.hashcode() % localdepth == modPredicate (deleting them 
-	 * from this bucket as well).
+	 * record.dataval.hashcode() % localdepth == dest.getBucketNum().
+	 * 
+	 * Used as part of the block splitting process.
 	 * 
 	 * @param dest
 	 * @param modPredicate
@@ -131,21 +178,22 @@ class EHBucket extends EHPage
 		int bucketNum = dest.getBucketNum();
 
 		//iterate through the index entries on this page
-		for (int pos = 0; pos < getNumRecs();)
+		for (int slot = 0; slot < getNumRecs();)
 		{
 			//if the bucket number for an index entry matches the dest bucket number,  
 			//copy the index entry to dest
-			Constant value = getDataVal(pos);
+			Constant value = getDataVal(slot);
 			if (computeBucketNumber(value, depth) == bucketNum)
 			{
 				//insert the index record into dest
-				dest.insertIndexRecord(getDataVal(pos), getDataRID(pos));
+				dest.insertIndexRecord(getDataVal(slot), getDataRID(slot));
 
 				//delete the index record from this page. Delete moves the index
-				//entries over to fill the empty slot, so no need to increment pos
-				delete(pos);
+				//entries over to fill the empty slot, so no need to increment slot
+				delete(slot);
 			}
-			else pos++;
+			//only increment slot if we didn't delete an index enttry
+			else slot++;
 		}
 	}
 
@@ -183,7 +231,7 @@ class EHBucket extends EHPage
 
 
 	/**
-	 * Returns the dataRID value stored in the specified leaf index record.
+	 * Returns the dataRID value stored in the specified index record.
 	 * 
 	 * @author Edward Sciore
 	 * @param slot the slot of the desired index record
@@ -301,7 +349,7 @@ class EHBucket extends EHPage
 	/**
 	 * CS4432-Project2
 	 * 
-	 * Set the currentSlot to -1 and the searchkey to null. 
+	 * Set the currentSlot to -1 and the searchkey to null (default values)
 	 */
 	private void resetSearchInfo()
 	{
@@ -309,18 +357,37 @@ class EHBucket extends EHPage
 		searchkey = null;
 	}
 	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * toString() representation of this bucket, including associated metadata and each 
+	 * index entry in the bucket.
+	 * 
+	 * @return string containing metadata and each index entry
+	 */
+	@Override
 	public String toString()
 	{
-		String out = "Block " + blk.number() + " in file " + ti.fileName() + "\n";
+		//print metadata
+		String out = "Bucket number (stored in bucket): " + Integer.toBinaryString(getBucketNum()) + "\n";
+		
+		out += "Block " + blk.number() + " in file " + ti.fileName() + "\n";
 		
 		out += "Local Depth: " + getDepth() + "\n";
-		out += "Number of index entries: " + getNumRecs() + "\n";
-		out += "Bucket Number: " + Integer.toBinaryString(getBucketNum()) + "\n";
 		
+		out += "Max records in bucket block: " + maxRecordsInBlock();
+		
+		out += "Number of index entries in block: " + getNumRecs() + "\n";
+		
+		out += "Index entries:\n\n";
+		
+		//print each index entry
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
 			out += "Slot " + slot + ":\n";
+			
 			Schema sch = ti.schema(); 
+			
 			for (String fldname : sch.fields())
 			{
 				out += "\t\t" + fldname + " = " + getVal(slot, fldname).toString() + "\n";
@@ -328,7 +395,7 @@ class EHBucket extends EHPage
 			
 		}
 		
-		return out;
+		return out + "\n";
 	}
 
 }

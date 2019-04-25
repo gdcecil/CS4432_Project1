@@ -25,6 +25,9 @@ import simpledb.buffer.PageFormatter;
  * the block that contains index entries whose data value hash to k (mod 2^n). The 
  * ordering of directory records is preserved throughout any actions on the directory.
  * 
+ * Note that block 0 contains metadata, but subsequent blocks do not. So a different 
+ * number of records will fit in block 0 than in any other block.
+ * 
  * EHD extends the abstract class ExtensiHashPage, which contains methods (authored 
  * by E. Sciore) for manipulating the data in the block.
  * 
@@ -33,12 +36,29 @@ import simpledb.buffer.PageFormatter;
  */
 class EHDir extends EHPage 
 {
+	//TableInfo for the buckets, used to construct EHBucket objects as needed
 	private TableInfo bucketsTi;
+	
+	//Store the field name of the directory entries
 	static final String DIR_FIELD = "BlockNum";
 
+	/**
+	 * Constructor for an EHDir object. This will always refer to the 
+	 * first block of ~idxname~dir.tbl, so we evoke the super constructor 
+	 * with block 0 of this file. 
+	 * 
+	 * Passed a TableInfo for the records and a transaction for IOs, 
+	 * and then the tableinfo for the buckets file
+	 * 
+	 * @param ti, tableinfo for the directory  
+	 * @param bucketsTi, tableinfo for the buckets
+	 * @param tx, tableinfo for the directory
+	 */
 	EHDir (TableInfo ti, TableInfo bucketsTi, Transaction tx)
 	{
+		//call the super constructor with the first block of the directory file
 		super (new Block(ti.fileName(),0), ti, tx);
+		
 		this.bucketsTi = bucketsTi;
 	}
 
@@ -51,22 +71,43 @@ class EHDir extends EHPage
 	 * 
 	 * This method does not double the buckets themselves, so index entries
 	 * with bucket numbers congruent modulo 2^(old depth) reference the
-	 * same bucket.
+	 * same bucket (this method updates the new references).
+	 * 
 	 */
 	private void incrementGlobalDepth() 
 	{
 		//store the current number of dir entries
 		int oldNum = getNumRecs(); 
 
+		/*
+		 * When doubling the number of records, there are two cases: 
+		 * the first is when there is still enough space in block 0 of 
+		 * the directory file. In that case, there's no need to append 
+		 * any blocks
+		 * 
+		 * If 2*NumRecs larger than the number of recs in block 0, we 
+		 * must append more blocks to the file to fit the directory entries.
+		 * 
+		 * If the directory takes up more than one block, it will have to 
+		 * double the number of blocks every time thereafter, so it is sufficient
+		 * to just see if we have overflowed block 0
+		 */
 		if (2*getNumRecs() > maxRecordsInBlock())
 		{
 			int oldFileSize = tx.size(ti.fileName());
+			
+			//compute the total number of blocks needed to store the directory entries
+			//to do this we take the last slot number, 2*getNumRecs()-1, subtract the 
+			//number of records that fit in block zero, and then divide by the number 
+			//of records that fit in a block of all records
 			int blocksRequired = 1+((2*getNumRecs()-1 - maxRecordsInBlock()) / maxRecordsInDirBlock());
-			
+
+			//blocks to add
 			int blocksNeeded = blocksRequired - oldFileSize;
-			
+
 			for (int i = 0; i < blocksNeeded; i++)
 			{
+				//append a number of all-record blocks as needed
 				tx.append(ti.fileName(), new RecordBlockFormatter(ti));
 			}
 		}
@@ -85,6 +126,7 @@ class EHDir extends EHPage
 			copyRecord(pos, pos + oldNum); 
 		}
 
+		//increment the global depth
 		setDepth(getDepth()+1);
 	}
 	/**
@@ -95,9 +137,13 @@ class EHDir extends EHPage
 	 * 
 	 * This method extends the index as necessary, if the corresponding bucket 
 	 * is full, then the bucket is split (incrementing the global depth as needed). 
-	 * If the 
-	 * @param dataval
-	 * @param rid
+	 * 
+	 * This also updates any directory entries as needed. 
+	 * 
+	 * For the actual insert, the EHBucket method is called.
+	 * 
+	 * @param dataval, Constant data value to insert
+	 * @param rid, Record id to insert.
 	 */
 	public void insertIndexRecord (Constant dataval, RID rid)
 	{
@@ -191,7 +237,7 @@ class EHDir extends EHPage
 			//for dataval to is still full, repeat this process. 
 		}
 
-		//bucket is a priori not full, so insert the index entry for dataval.
+		//bucket is not full, so insert the index entry for dataval.
 		bucket.insertIndexRecord(dataval, rid );
 
 		//close the ExtensiHashBucket wrapper for the bucket.
@@ -199,123 +245,201 @@ class EHDir extends EHPage
 
 	}
 
-
-	public void updateDirEntry (int bucketNum, int block)
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Update the directory record at slot bucketNum to contain 
+	 * the specified block number
+	 * 
+	 * @param bucketNum, which directory entry to update
+	 * @param blockNum, value to update
+	 * 
+	 */
+	public void updateDirEntry (int bucketNum, int blockNum)
 	{
-		setInt(bucketNum, "BlockNum", block);
+		setInt(bucketNum, "BlockNum", blockNum);
 	}
 
-	public Block getBucketBlock(int key)
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Uses the directory to get the block in the buckets file 
+	 * where the specified bucket is stored.
+	 * 
+	 * @param bucketNum, which bucket to get the block for 
+	 * @return a block for the buckets file with the block number of the specified bucket
+	 */
+	public Block getBucketBlock(int bucketNum)
 	{
-		return new Block (bucketsTi.fileName(), getInt(key, DIR_FIELD));
+		return new Block (bucketsTi.fileName(), getInt(bucketNum, DIR_FIELD));
 	}
 
 
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Get the maximum number of records that fit in an all-record block, 
+	 * that is a block in this file with num >= 1.
+	 * 
+	 * @return maximum number of records that will fit in a block 
+	 */
 	private int maxRecordsInDirBlock()
 	{
 		return BLOCK_SIZE/ti.recordLength();	 		
 	}
 
+	/**
+	 * CS4432-Project2
+	 * Takes an index relative to the whole of the directory file and then computes 
+	 * the slot index relative to the block where original index was located. 
+	 * 
+	 * @param slotNum, index relative to the whole directory file
+	 * @return an index relative to the number of records in a single block
+	 */
 	private int getSlotNumInBlock(int slotNum)
 	{
 		return slotNum < maxRecordsInBlock() ?
-				slotNum : 
+				slotNum : //if the index refers to block zero we can just return it 
+					//otherwise we subtract the number of records in block 0 and return 
+					//the result modulo the max number of records in an all-record block
 					(slotNum - maxRecordsInBlock()) % maxRecordsInDirBlock();
 	}
 
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Takes the slot index and computes which block in this file that slot 
+	 * is actually located in.
+	 * 
+	 * @param slot, index relative to the whole of the directory file
+	 * @return block where that slot is located.
+	 */
 	private Block dirBlock(int slot)
 	{
+		
 		int blk = slot < maxRecordsInBlock() ? 
-				0 : 1+((slot- maxRecordsInDirBlock())/maxRecordsInBlock());
+				0//if the slot is in block zero, return block zero. 
+				//otherwise subtract the number of records in block 0 
+				//and divide by the number of records in an all-record block
+				//add one because the first block with only records is 1
+				: 1+((slot- maxRecordsInBlock())/maxRecordsInDirBlock());
 		return new Block(ti.fileName(), blk);
 	}
 
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Given a slot index relative to the whole directory, returns 
+	 * the byte offset of that slot relative to the block where it is located.
+	 * 
+	 * @param slot, index relative to the whole of the directory file
+	 * @return byte offset of slot in the block where it is located
+	 */
 	protected int dirBlockPos(int slot)
 	{
 		return getSlotNumInBlock(slot) * slotsize;
 	}
+
 	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * This overrides the get int method to support having many blocks in the directory file. 
+	 * If slot is in block 0, the int is retrieved using super getInt as normal. 
+	 * 
+	 * @param slot, slot relative to the whole file where we want to get an int
+	 * @param fldname, field to get the int from in the record
+	 * 
+	 * @return the int in fldname in the record at the given slot in the dir file
+	 */
 	@Override
 	protected int getInt(int slot, String fldname) 
 	{
 		int ret;
+		
+		//if slot is in block 0, retrieve it as usual
 		if (slot < maxRecordsInBlock()) 
 			ret = super.getInt(slot, fldname);
 		else 
 		{
+			//find the block and offset for slot
 			Block dirblk = dirBlock(slot);
 			int posInBlock = dirBlockPos(slot);
 
+			//pin the directory block and get the int
 			tx.pin(dirblk);
 			ret = tx.getInt(dirblk, posInBlock);
+			
+			//unpin the block
 			tx.unpin(dirblk);
 
 		}
 		return ret;
 	}
 
-	@Override
-	protected String getString(int slot, String fldname) 
-	{
-		String ret;
-		if (slot < maxRecordsInBlock()) 
-			ret = super.getString(slot, fldname);
-		else 
-		{
-			Block dirblk = dirBlock(slot);
-			int posInBlock = dirBlockPos(slot);
 
-			tx.pin(dirblk);
-			ret = tx.getString(dirblk, posInBlock);
-			tx.unpin(dirblk);
-
-		}
-		return ret;
-	}
-
+	/**
+	 * CS4432-Project2
+	 * 
+	 * This overrides the set int method to support having many blocks in the directory file. 
+	 * If slot is in block 0, the int is set using super setInt as normal. 
+	 * 
+	 * @param slot, slot relative to the whole file where we want to set the int
+	 * @param fldname, field to change in record.
+	 * @param val, int to write
+	 */
 	@Override
 	protected void setInt(int slot, String fldname, int val) 
 	{
+		//if slot is in block zero, set it as usual
 		if (slot < maxRecordsInBlock()) 
 			super.setInt(slot, fldname, val);
 		else 
 		{
+			//find the block and byte offset for slot
 			Block dirblk = dirBlock(slot);
 			int posInBlock = dirBlockPos(slot);
-
+			
+			
+			//pin the directory block and set the int
 			tx.pin(dirblk);
 			tx.setInt(dirblk, posInBlock, val);
+			
+			//unpin the block
 			tx.unpin(dirblk);
 
 		}
 	}
 
-	@Override
-	protected void setString(int slot, String fldname, String val) 
-	{
-		if (slot < maxRecordsInBlock()) 
-			super.setString(slot, fldname, val);
-		else 
-		{
-			Block dirblk = dirBlock(slot);
-			int posInBlock = dirBlockPos(slot);
 
-			tx.pin(dirblk);
-			tx.setString(dirblk, posInBlock, val);
-			tx.unpin(dirblk);
-
-		}
-	}
-
-	//TODO update toString to get whole block 
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Creates a string representation of this directory. This string includes both metadata
+	 * and then the string representation for each bucket in the directory. 
+	 * 
+	 * @return String representation of this object
+	 */
 	@Override
 	public String toString()
 	{
-		String out = dirTableToString();
+		//output metadata
+		String out = "Filename: " + ti.fileName() + "\n";
 
+		out += "Size: " + tx.size(ti.fileName()) + " blocks\n";
+
+		out += "Max records in dir block 0: " + maxRecordsInBlock() + "\n";
+
+		out += "Max records in dir block 1+: " + maxRecordsInDirBlock() + "\n";
+
+		out += "Global depth: " + getDepth() + "\n";
+
+		out += "Number of directory entries: " + getNumRecs() + "\n\n";
+
+		//output toString for each bucket
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
-			out += "Bucket Number " + Integer.toBinaryString(slot) + ":\n";
+			out += "Bucket number in directory: " + Integer.toBinaryString(slot) + ":\n\n";
 
 			Block b = new Block (bucketsTi.fileName(), getInt(slot, DIR_FIELD));
 
@@ -327,32 +451,46 @@ class EHDir extends EHPage
 
 		return out;
 	}
-	
-	public String dirTableToString()
-	{
-		String out = "\n\nFile " + ti.fileName() + "\n";
-		out += "Size: " + tx.size(ti.fileName()) + " blocks\n";
-		out += "Records in block 0: " + maxRecordsInBlock() + "\n";
-		out += "Records in block 1+: " + maxRecordsInDirBlock() + "\n";
-		out += "Global Depth: " + getDepth() + "\n";
-		out += "Number of directory entries: " + getNumRecs() + "\n";
-		
-		return out;
-	}
-	
-	
+
+
 }
 
 
-
+/**
+ * CS4432-Project2 
+ * 
+ * Pageformatter for the blocks in the directory after the first one. 
+ * 
+ * This pageformatter just formats the page to look a like a collection 
+ * of empty records with no metadata. 
+ * 
+ * @author mcwarms, gdcecil
+ *
+ */
 class RecordBlockFormatter implements PageFormatter
 {
+	//tableinfo for the records
 	private TableInfo ti;
 
+	/**
+	 * CS4432-Project2: 
+	 * 
+	 * Constructor. As there are only records in this block we just need a TableInfo object
+	 * 
+	 * @param ti, table info for the records
+	 */
 	RecordBlockFormatter (TableInfo ti)
 	{
 		this.ti = ti;
 	}
+	
+	/**
+	 * CS4432-Project2
+	 * 
+	 * Formats the page by writing default records at each slot  of the page. 
+	 * 
+	 * @param p, page to format
+	 */
 	public void format (Page p)
 	{
 		int recSize = ti.recordLength();
@@ -361,6 +499,16 @@ class RecordBlockFormatter implements PageFormatter
 
 	}
 
+	
+	/**
+	 * Taken from BTPageFormatter, and unchanged. This 
+	 * overwrites a record slot with default values. 
+	 * 
+	 * @author Edward Sciore
+	 * 
+	 * @param page, page to format
+	 * @param pos, byte offset for record
+	 */
 	private void makeDefaultRecord(Page page, int pos) {
 		for (String fldname : ti.schema().fields()) {
 			int offset = ti.offset(fldname);
