@@ -368,6 +368,7 @@ class EHBucket extends EHPage
 	@Override
 	public String toString()
 	{
+		//print metadata
 		String out = "Bucket number (stored in bucket): " + Integer.toBinaryString(getBucketNum()) + "\n";
 		
 		out += "Block " + blk.number() + " in file " + ti.fileName() + "\n";
@@ -380,6 +381,7 @@ class EHBucket extends EHPage
 		
 		out += "Index entries:\n\n";
 		
+		//print each index entry
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
 			out += "Slot " + slot + ":\n";

@@ -12,6 +12,12 @@ import static java.time.temporal.ChronoUnit.SECONDS;
 import static java.time.temporal.ChronoUnit.MILLIS;
 
 
+
+/**
+ * 
+ * @author mcwarms
+ *
+ */
 public class ExtensiHashTests {
 	
 	 public static void main(String[] args) {
@@ -20,9 +26,11 @@ public class ExtensiHashTests {
 		 Driver d = new SimpleDriver();
 		 String host = "localhost"; //you may change it if your SimpleDB server is running on a different machine
 		 String url = "jdbc:simpledb://" + host;
+		 
 		 String query = "Create table test" +
 		 "( col1 int," +
 		 " col2 int)";
+		 
 		 Statement s=null;
 
 		 try {
@@ -32,6 +40,11 @@ public class ExtensiHashTests {
 			   s.executeUpdate(query);
 			   
 			   s.executeUpdate("create eh index idx1 on test (col1)");
+			   
+			   for (int i = 0; i < 2; i++)
+			   {
+				   
+			   }
 
 			   
 		 }

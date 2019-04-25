@@ -8,6 +8,14 @@ import simpledb.index.hash.HashIndex;
 import simpledb.query.Constant;
 import simpledb.record.RID;
 
+
+/**
+ * CS4432-Project2
+ * 
+ * Implementation of the ext
+ * @author gdcecil, mcwarms
+ *
+ */
 public class EHIndex implements Index {
 
 	private Transaction tx;
@@ -17,8 +25,8 @@ public class EHIndex implements Index {
 
 	private EHDir dir = null;
 	private EHBucket bucket = null;
-	
-	private boolean printing = true;
+
+	private boolean printing = false;
 
 	public EHIndex(String idxname, Schema sch, Transaction tx)
 	{
@@ -42,18 +50,18 @@ public class EHIndex implements Index {
 			dir = new EHDir(dirTi, bucketsTi, this.tx);
 
 			dir.updateDirEntry(0, firstIdxBlk.number());
-			
+
 			dir.setNumRecs(1);
 
 			dir.close();
-			
+
 			if (printing)
 			{
 				System.out.println("Created new extensible hash index\nDirectory file: "
 						+ dirName + "\nBucket file: " + bucketsTi.fileName() + "\n(global and local depth are 0)");
 			}
 		}
-		
+
 
 	}
 
@@ -93,55 +101,81 @@ public class EHIndex implements Index {
 
 	public void insert(Constant dataval, RID datarid) 
 	{
-		if (printing)
-		{
-			 System.out.println("State of index before insert of key " + dataval.toString());
-			 System.out.println(dir.toString());
-		}
+		//Move t
 		beforeFirst(dataval);
-		dir.insertIndexRecord(dataval, datarid);
+		
+		
+		//If output is set to on then 
 		if (printing) 
 		{
-			System.out.println("State of index after insert of key " + dataval.toString());		
-			System.out.println("dir.toString()");
+			int gDepth = dir.getDepth();
+			int lDepth = bucket.getDepth();
+			
+			System.out.println("Insert value " + dataval.toString() + ", RID " + datarid.toString() + ":\n");
+			System.out.println("\tHashcode modulo 2^(global depth) = " + (dataval.hashCode() % (1 << gDepth)) + "\n");
+			System.out.println("\tHashcode modulo 2^(local depth) = "  + (dataval.hashCode() % (1 << lDepth)) + "\n\n");
+			
+			System.out.println("State of index before insert of key " + dataval.toString() + "\n");		
+			System.out.println(this.toString());
+		}
+		
+		dir.insertIndexRecord(dataval, datarid);
+		
+		if (printing) 
+		{
+			System.out.println("State of index after insert of key " + dataval.toString() + "\n");		
+			System.out.println(this.toString());
 		}
 	}
 
 	public void delete(Constant dataval, RID datarid)
 	{
+		
+		beforeFirst(dataval);
+		
 		if (printing)
 		{
-			 System.out.println("State of index before delete of key " + dataval.toString());
-			 System.out.println(dir.toString());
+			int gDepth = dir.getDepth();
+			int lDepth = bucket.getDepth();
+			
+			System.out.println("Delete value " + dataval.toString() + ", RID " + datarid.toString() + ":\n");
+			System.out.println("\tHashcode modulo 2^(global depth) = " + (dataval.hashCode() % (1 << gDepth)) + "\n");
+			System.out.println("\tHashcode modulo 2^(local depth) = "  + (dataval.hashCode() % (1 << lDepth)) + "\n\n");
+			
+			System.out.println("State of index before delete of key " + dataval.toString() + "\n");		
+			System.out.println(this.toString());
 		}
-		beforeFirst(dataval);
+		
 
 		boolean deleted = false;
 
-		while (!deleted && bucket.next())
+		while (bucket.next())
 		{
 			if (getDataRid().equals(datarid))
 			{
 				bucket.deleteCurrentEntry();
-				deleted = true;
 			}
 		}
-		
+
 		if (printing && !deleted)
 		{
 			System.out.println("No index entry with key " + dataval.toString() + 
 					" and RID " + datarid.toString());
-			System.out.println("No index entry was deleted the index is unchanged:");
-			
+			System.out.println("No index entry was deleted; the index is unchanged:");
+
 		} else 
 		{ 
 			System.out.println("Deleted entry from index with key " + dataval.toString()
-			+ " and RID " + datarid.toString()+ " in bucket number " + Integer.toBinaryString(bucket.getBucketNum())); 
+			+ " and RID " + datarid.toString()+ " in bucket number " + 
+					Integer.toBinaryString(bucket.getBucketNum())); 
+			System.out.println("State of index after delete of key " + dataval.toString() + "\n");		
+			System.out.println(this.toString());
+			
 		}
 
 	}
 
-	
+
 	public void close() {
 		if (dir != null) dir.close();
 		if (bucket != null) bucket.close();
@@ -150,18 +184,18 @@ public class EHIndex implements Index {
 	public static int searchCost(int numblocks, int rpb) {
 		return numblocks / HashIndex.NUM_BUCKETS;
 	}
-	
+
 	@Override
 	public String toString()
 	{
 		close();
-		
+
 		dir = new EHDir(dirTi, bucketsTi, tx);
-		
+
 		String out = dir.toString();
-		//String out = dir.dirTableToString();
-		dir.close();
 		
+		dir.close();
+
 		return out;
 	}
 
