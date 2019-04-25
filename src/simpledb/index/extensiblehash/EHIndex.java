@@ -38,7 +38,7 @@ public class EHIndex implements Index {
 	private EHBucket bucket = null;
 
 	//whether or not to print data
-	private boolean printing = false;
+	private boolean printing = true;
 
 	
 	/**
@@ -290,15 +290,7 @@ public class EHIndex implements Index {
 	@Override
 	public String toString()
 	{
-		close();
-
-		dir = new EHDir(dirTi, bucketsTi, tx);
-
-		String out = dir.toString();
-		
-		dir.close();
-
-		return out;
+		return dir.toString();
 	}
 
 }
