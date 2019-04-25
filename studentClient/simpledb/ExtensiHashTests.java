@@ -42,32 +42,39 @@ public class ExtensiHashTests {
 			   
 			   s.executeUpdate("create eh index idx1 on test1 (a1)");
 			   
-			   
+			   //Our extensible hash begins with a single bucket
 			   s.executeUpdate( "insert into test1 (a1, a2) values(0,1)");
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(0,2)");
+			   
+			   //The single bucket will split after the next record into
+			   //two, separating by hash value into buckets 1 and 2
+			   //global depth is now 1
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(1,1)");
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(1,2)");
 			   
 			   //With bucket size 2, bucket 1 should now split and global
-			   //depth should be 2. A new bucket should should also point
-			   //to bucket 0 now
+			   //depth should be 2. A new bucket should also point to bucket
+			   //0 now
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(3,3)");
 			   
 			   //This value should be inserted into the newly split bucket 3
-			   s.executeUpdate( "Insert into test1 (a1, a2) values(3,1)");
+			   s.executeUpdate( "Insert into test1 (a1, a2) values(7,1)");
 			   
 			   //Bucket 1 should split again increasing global depth to 3 and
 			   //making a bunch of new buckets that point to 0, 1, and 3
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(5,1)");
-			   
+			   s.executeUpdate( "Insert into test1 (a1, a2) values(13,2)");
+
 			   //This should fill bucket 4
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(4,1)");
-			   
+			   s.executeUpdate( "Insert into test1 (a1, a2) values(4,2)");
+
 			   //This should fill bucket 2 because althouh bucket 6 exists,
 			   //bucket 2 and 6 have local depth 2 meaning bucket 6 still
 			   //points to bucket 2
 			   s.executeUpdate( "Insert into test1 (a1, a2) values(6,1)");
-			   			   
+			   s.executeUpdate( "Insert into test1 (a1, a2) values(6,2)");
+
 		 }
 	 	 catch (SQLException e) {
 		 // TODO Auto-generated catch block

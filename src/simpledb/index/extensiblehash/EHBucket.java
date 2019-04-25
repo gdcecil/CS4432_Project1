@@ -196,6 +196,12 @@ class EHBucket extends EHPage
 			else slot++;
 		}
 	}
+	
+//	public boolean isFull() {
+//		return slotpos(getNumRecs()+1) >= 3;
+//				
+//	}
+	
 
 	/**
 	 * CS4432-Project2
@@ -371,11 +377,7 @@ class EHBucket extends EHPage
 		//print metadata
 		String out = "Bucket number (stored in bucket): " + Integer.toBinaryString(getBucketNum()) + "\n";
 		
-		out += "Block " + blk.number() + " in file " + ti.fileName() + "\n";
-		
 		out += "Local Depth: " + getDepth() + "\n";
-		
-		out += "Max records in bucket block: " + maxRecordsInBlock() + "\n";
 		
 		out += "Number of index entries in block: " + getNumRecs() + "\n";
 		
@@ -393,7 +395,9 @@ class EHBucket extends EHPage
 			{
 				out += "\t\t" + fldname + " = " + getVal(slot, fldname).toString() + "\n";
 			}
-			
+		}
+		if (getNumRecs() == 0) {
+			out += "No current entries";
 		}
 		
 		return out + "\n";

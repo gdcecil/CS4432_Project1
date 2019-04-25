@@ -115,7 +115,6 @@ public abstract class EHPage
 		//Hash val and get its remainder under modulus 2^depth 
 		//Here we compute 2^depth by just left shifting 1 depth
 		//places. 
-		System.out.println("val: " + val + " depth: " + depth);
 		return val.hashCode() % (1 << depth);
 	}
 	
@@ -216,7 +215,9 @@ public abstract class EHPage
 	 * @return true if the block is full
 	 */
 	public boolean isFull() {
-		return slotpos(getNumRecs()+1) >= BLOCK_SIZE;
+		//User return getNumRecs() + 1 >= 3; 
+		return getNumRecs() + 1 >= 3;
+		//return slotpos(getNumRecs()+1) >= BLOCK_SIZE;
 	}
 	
 	/**

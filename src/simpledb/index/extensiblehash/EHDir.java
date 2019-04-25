@@ -128,6 +128,7 @@ class EHDir extends EHPage
 
 		//increment the global depth
 		setDepth(getDepth()+1);
+		System.out.println("New Global Depth after split: " + getDepth());
 	}
 	/**
 	 * CS4432-Project2
@@ -148,19 +149,16 @@ class EHDir extends EHPage
 	public void insertIndexRecord (Constant dataval, RID rid)
 	{
 		//compute the bucket number for the given data value
-//		System.out.println("Computing bucket number");
-//		System.out.println("dataval: " + dataval);
 		int bucketNum = EHPage.computeBucketNumber(dataval, getDepth());
-
 		//get the block of the bucket with given bucket number
-//		System.out.println("Getting bucket block");
 		Block blk = getBucketBlock(bucketNum);
 
 		//Open an instance of ExtensiHashBucket to wrap the block containing 
 		//the bucket.
-//		System.out.println("making new bucket");
 		EHBucket bucket = new EHBucket(blk, bucketsTi, tx);
-
+	
+		System.out.println("Bucket state before changing");
+		System.out.println(bucket.toString());
 		//If the bucket is full, extend the hash index by splitting the bucket
 		//and incrementing the global depth as needed.
 //		System.out.println("while bucket is full");
@@ -171,6 +169,7 @@ class EHDir extends EHPage
 			//the bucket.
 			if (bucket.getDepth() == this.getDepth())
 			{
+				System.out.println("Bucket full, splitting bucket");
 				//increment the global depth, doubling the number of 
 				//references to buckets.
 				incrementGlobalDepth();
