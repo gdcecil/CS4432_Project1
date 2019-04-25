@@ -375,7 +375,7 @@ class EHBucket extends EHPage
 		
 		out += "Local Depth: " + getDepth() + "\n";
 		
-		out += "Max records in bucket block: " + maxRecordsInBlock();
+		out += "Max records in bucket block: " + maxRecordsInBlock() + "\n";
 		
 		out += "Number of index entries in block: " + getNumRecs() + "\n";
 		
@@ -384,6 +384,7 @@ class EHBucket extends EHPage
 		//print each index entry
 		for (int slot = 0; slot < getNumRecs(); slot++)
 		{
+			
 			out += "Slot " + slot + ":\n";
 			
 			Schema sch = ti.schema(); 

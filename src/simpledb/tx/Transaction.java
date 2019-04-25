@@ -107,8 +107,11 @@ public class Transaction {
     * @return the integer stored at that offset
     */
    public int getInt(Block blk, int offset) {
+//	  System.out.println("getting lock");
       concurMgr.sLock(blk);
+//      System.out.println("getting buffers");
       Buffer buff = myBuffers.getBuffer(blk);
+//      System.out.println("block: " + blk + " offest: " + offset);
       return buff.getInt(offset);
    }
    

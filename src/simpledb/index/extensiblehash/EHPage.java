@@ -115,6 +115,7 @@ public abstract class EHPage
 		//Hash val and get its remainder under modulus 2^depth 
 		//Here we compute 2^depth by just left shifting 1 depth
 		//places. 
+		System.out.println("val: " + val + " depth: " + depth);
 		return val.hashCode() % (1 << depth);
 	}
 	

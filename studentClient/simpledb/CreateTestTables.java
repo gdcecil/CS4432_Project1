@@ -14,7 +14,7 @@ import static java.time.temporal.ChronoUnit.MILLIS;
 
 
 public class CreateTestTables {
- final static int maxSize=10000;
+ final static int maxSize=1000;
  /**
   * @param args
   */
